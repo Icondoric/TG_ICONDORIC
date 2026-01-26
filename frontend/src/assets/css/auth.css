@@ -1,0 +1,461 @@
+/* Estilos de Autenticación - EMI Connect */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);  <-- Removed to avoid global body conflict, handled in component container */
+    /* min-height: 100vh; <-- Handled in component */
+}
+
+/* Auth Page Wrapper */
+.auth-wrapper {
+    background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding-top: 80px;
+    /* Compensate for fixed Navbar */
+    padding-bottom: 2rem;
+    /* Add some bottom spacing */
+}
+
+/* Background EMI Logo Watermark */
+.watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20rem;
+    font-weight: 900;
+    color: rgba(209, 213, 219, 0.3);
+    letter-spacing: -1rem;
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+    font-family: 'Arial Black', sans-serif;
+}
+
+/* Decorative Castle Icons */
+.castle-decoration {
+    position: absolute;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.castle-left {
+    bottom: 10%;
+    left: 5%;
+    font-size: 12rem;
+}
+
+.castle-right {
+    top: 10%;
+    right: 5%;
+    font-size: 10rem;
+}
+
+/* Main Container */
+.login-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 450px;
+    padding: 3rem 2.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Header */
+.login-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.emi-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+.system-title {
+    font-size: 1.8rem;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.system-subtitle {
+    color: #6b7280;
+    font-size: 0.95rem;
+    border-top: 2px solid #e5e7eb;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 0.5rem 0;
+    display: inline-block;
+}
+
+/* Tab System */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.tab {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #6b7280;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    bottom: -2px;
+}
+
+.tab.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+}
+
+.tab:hover:not(.active) {
+    color: #1f2937;
+}
+
+/* Form Sections */
+/* Removed .form-section display logic as we use Vue components/routes now */
+.form-section {
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    background: #f9fafb;
+    color: #1f2937;
+    /* Ensure text color is dark enough */
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+input::placeholder {
+    color: #9ca3af;
+}
+
+/* CAPTCHA Simulation */
+.captcha-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.captcha-display {
+    flex: 1;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 0.5rem;
+    color: #92400e;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    border: 2px dashed #d97706;
+}
+
+.captcha-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(45deg,
+            transparent,
+            transparent 10px,
+            rgba(217, 119, 6, 0.1) 10px,
+            rgba(217, 119, 6, 0.1) 20px);
+}
+
+.captcha-text {
+    position: relative;
+    z-index: 1;
+}
+
+.captcha-refresh {
+    padding: 0.9rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.captcha-refresh:hover {
+    background: #f3f4f6;
+    border-color: #2563eb;
+}
+
+/* Role Selection */
+.role-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.role-option {
+    padding: 1.2rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #f9fafb;
+    position: relative;
+}
+
+.role-option:hover {
+    border-color: #2563eb;
+    background: white;
+}
+
+.role-option.selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.role-option input[type="radio"] {
+    display: none;
+}
+
+.role-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.role-label {
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Buttons */
+.btn-primary {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1rem;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 0.8rem;
+    background: white;
+    color: #f59e0b;
+    border: 2px solid #f59e0b;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1rem;
+}
+
+.btn-secondary:hover {
+    background: #fef3c7;
+}
+
+/* Help Links */
+.help-links {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.help-links a {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+    cursor: pointer;
+}
+
+.help-links a:hover {
+    color: #1e40af;
+    text-decoration: underline;
+}
+
+/* Footer */
+.login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.institutional-motto {
+    font-style: italic;
+    color: #9ca3af;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* Validation Messages */
+.validation-message {
+    display: none;
+    padding: 0.8rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.validation-message.active {
+    display: block;
+}
+
+.validation-message.success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.validation-message.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s;
+    border-radius: 2px;
+}
+
+.password-strength-bar.weak {
+    width: 33%;
+    background: #ef4444;
+}
+
+.password-strength-bar.medium {
+    width: 66%;
+    background: #f59e0b;
+}
+
+.password-strength-bar.strong {
+    width: 100%;
+    background: #10b981;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 2rem 1.5rem;
+    }
+
+    .watermark {
+        font-size: 10rem;
+    }
+
+    .castle-decoration {
+        display: none;
+    }
+
+    .system-title {
+        font-size: 1.5rem;
+    }
+
+    .role-selector {
+        grid-template-columns: 1fr;
+    }
+}

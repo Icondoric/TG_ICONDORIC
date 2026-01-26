@@ -1,0 +1,24 @@
+# --- General ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Backend (Python) ---
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv/
+venv/
+env/
+*.sqlite3
+*.db
+
+# --- Frontend (Node.js/Vue) ---
+node_modules/
+dist/
+npm-debug.log*
+yarn-error.log*
+frontend/.env
+frontend/.env.local

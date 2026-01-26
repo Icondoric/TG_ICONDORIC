@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+spacy
+pdfplumber
+fuzzywuzzy
+python-Levenshtein
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+supabase
+pydantic-settings
+email-validator
+bcrypt==3.2.2
