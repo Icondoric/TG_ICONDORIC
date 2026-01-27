@@ -28,7 +28,26 @@ async def upload_cv(file: UploadFile = File(...)):
         entities = nlp_data.get("entities", {})
         
         # Extract Skills and Occupations
-        extraction_result = skills.extract_skills(text)
+        # extraction_result = skills.extract_skills(text)
+        extraction_result = {"skills": [], "occupations": []}
+
+        # Adapter: Convert LLM Skills to Frontend format
+        llm_skills_data = entities.get("LLM_SKILLS", {})
+        if llm_skills_data:
+            # Map Hard Skills
+            for skill in llm_skills_data.get("hard_skills", []):
+                 extraction_result["skills"].append({
+                     "name": skill,
+                     "categories": ["technical"], 
+                     "uri": "custom:llm"
+                 })
+            # Map Soft Skills
+            for skill in llm_skills_data.get("soft_skills", []):
+                 extraction_result["skills"].append({
+                     "name": skill,
+                     "categories": ["soft"], 
+                     "uri": "custom:llm"
+                 })
         
         return {
             "message": "CV processed successfully",
@@ -37,11 +56,16 @@ async def upload_cv(file: UploadFile = File(...)):
                     "email": entities.get("EMAIL", [""])[0] if entities.get("EMAIL") else "",
                     "phone": entities.get("PHONE", [""])[0] if entities.get("PHONE") else "",
                     "detected_names": entities.get("PER", []),
-                    "degree": entities.get("CAREERS", [""])[0] if entities.get("CAREERS") else ""
+                    "degree": entities.get("CAREERS", [""])[0] if entities.get("CAREERS") else "",
+                    "summary": llm_skills_data.get("personal_info", {}).get("summary", ""),
+                    "languages": llm_skills_data.get("personal_info", {}).get("languages", [])
                 },
                 "skills": extraction_result["skills"],
                 "occupations": extraction_result["occupations"],
-                "education": nlp_data.get("segments", {}).get("education", ""), 
+                "education": nlp_data.get("segments", {}).get("education", ""),
+                "education_structured": llm_skills_data.get("education", []),
+                "experience_structured": llm_skills_data.get("experience", []),
+                "llm_data": entities.get("LLM_SKILLS", {}) 
             },
              "raw_text_preview": text[:500] + "..." # Limit preview
         }

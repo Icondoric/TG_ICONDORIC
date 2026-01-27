@@ -1,5 +1,6 @@
 import re
 import spacy
+from .llm_extractor import extract_skills_with_llm
 
 def load_spacy_model():
     try:
@@ -213,6 +214,14 @@ def process_cv_text(text: str) -> dict:
     
     if custom_careers:
         entities['CAREERS'] = custom_careers
+
+    # 4. LLM Extraction (Gemini)
+    try:
+        llm_data = extract_skills_with_llm(cleaned_text)
+        if "error" not in llm_data:
+            entities['LLM_SKILLS'] = llm_data
+    except Exception as e:
+        print(f"LLM Extraction failed: {e}")
             
     return {
         "entities": entities,
