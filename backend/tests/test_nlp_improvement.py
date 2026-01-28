@@ -4,30 +4,12 @@ import os
 # Add app to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.core import nlp, skills
-from app.core.esco import esco_loader
+from app.core import nlp
 from app.core.nlp import segment_cv
 
 def test_nlp_improvements():
     print("=== Testing NLP Improvements ===")
-    
-    # 1. Test Spacy Matcher (False Positive Check)
-    print("\n[Test 1] Skills Extraction (Avoid False Positives)")
-    text_trick = "Me gusta ir a Go y tocar la nota C en la guitarra. Tengo experiencia en Python."
-    # Expect: Python. NOT Go, NOT C.
-    print(f"Input: '{text_trick}'")
-    
-    # Ensure loader is ready
-    skills.extract_skills(text_trick) # trigger load
-    
-    res = skills.extract_skills(text_trick)
-    extracted_skills = [s['name'] for s in res['skills']]
-    print(f"Extracted: {extracted_skills}")
-    
-    if "Python" in extracted_skills and "Go" not in extracted_skills and "C" not in extracted_skills:
-        print("PASS: Correctly ignored 'Go' (verb) and 'C' (music note).")
-    else:
-        print("FAIL: False positives detected.")
+
 
     # 2. Test Phone Strictness
     print("\n[Test 2] Phone Extraction (Strictness)")

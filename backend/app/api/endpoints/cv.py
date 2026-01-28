@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.core import nlp, skills
+from app.core import nlp
 import pdfplumber
 import io
 
@@ -28,7 +28,6 @@ async def upload_cv(file: UploadFile = File(...)):
         entities = nlp_data.get("entities", {})
         
         # Extract Skills and Occupations
-        # extraction_result = skills.extract_skills(text)
         extraction_result = {"skills": [], "occupations": []}
 
         # Adapter: Convert LLM Skills to Frontend format
