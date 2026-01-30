@@ -1,0 +1,30 @@
+{
+  "id": "profile_ong_internacional",
+  "institution_name": "Save The Children Bolivia",
+  "sector": "ONG Internacional",
+  "description": "Proyectos de desarrollo social, educativo y protección infantil en comunidades rurales y urbanas",
+  "created_at": "2025-01-29",
+  
+  "weights": {
+    "hard_skills": 0.15,
+    "soft_skills": 0.35,
+    "experience": 0.20,
+    "education": 0.10,
+    "languages": 0.20
+  },
+  
+  "requirements": {
+    "min_experience_years": 1.0,
+    "required_skills": ["Gestión de proyectos", "Trabajo en equipo", "Comunicación"],
+    "preferred_skills": ["Excel", "PowerPoint", "Fundraising", "Monitoreo y evaluación"],
+    "required_education_level": "Licenciatura",
+    "required_languages": ["Inglés", "Español"]
+  },
+  
+  "thresholds": {
+    "apto": 0.68,
+    "considerado": 0.48
+  },
+  
+  "comments": "ONG internacional valora altamente soft skills (empatía, adaptabilidad cultural, trabajo comunitario). Dominio de inglés es crítico para reportes a oficinas internacionales. Experiencia en contextos vulnerables es un plus."
+}
