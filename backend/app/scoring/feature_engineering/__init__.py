@@ -36,7 +36,10 @@ from .languages_scorer import (
 from .feature_extractor import (
     extract_features,
     get_feature_names,
-    validate_gemini_output
+    validate_gemini_output,
+    calculate_final_score,
+    classify_candidate,
+    FeatureExtractor
 )
 
 __all__ = [
@@ -64,4 +67,7 @@ __all__ = [
     "extract_features",
     "get_feature_names",
     "validate_gemini_output",
+    "calculate_final_score",
+    "classify_candidate",
+    "FeatureExtractor",
 ]

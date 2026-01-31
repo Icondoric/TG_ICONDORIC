@@ -2,6 +2,7 @@
 Machine Learning Module
 Fase 3: Dataset sintetico
 Fase 4: Modelo Ridge
+Fase 5: Evaluacion y Visualizaciones
 """
 
 from .data import (
@@ -16,6 +17,11 @@ from .models import (
     MatchPredictor
 )
 
+from .evaluation import (
+    ModelEvaluator,
+    ModelVisualizer
+)
+
 __all__ = [
     # Fase 3 - Dataset
     "SyntheticDatasetGenerator",
@@ -25,4 +31,7 @@ __all__ = [
     "InstitutionalMatchModel",
     "ModelTrainer",
     "MatchPredictor",
+    # Fase 5 - Evaluacion
+    "ModelEvaluator",
+    "ModelVisualizer",
 ]

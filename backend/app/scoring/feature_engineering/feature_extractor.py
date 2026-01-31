@@ -319,3 +319,79 @@ def classify_candidate(final_score: float, thresholds: Dict) -> str:
         return 'CONSIDERADO'
     else:
         return 'NO_APTO'
+
+
+class FeatureExtractor:
+    """
+    Clase wrapper para extraccion de features
+    Provee una interfaz orientada a objetos sobre las funciones de extraccion
+    """
+
+    def __init__(self):
+        """Inicializa el extractor de features"""
+        self.feature_names = get_feature_names()
+
+    def extract_features(
+        self,
+        gemini_output: Dict,
+        institutional_config: Dict
+    ) -> Dict:
+        """
+        Extrae features desde CV y configuracion institucional
+
+        Args:
+            gemini_output: Output de Gemini (CV estructurado)
+            institutional_config: Configuracion de la institucion
+
+        Returns:
+            Dict con feature_vector, cv_scores, institutional_params, metadata
+        """
+        return extract_features(gemini_output, institutional_config)
+
+    def validate_input(self, gemini_output: Dict) -> bool:
+        """
+        Valida que el output de Gemini tenga la estructura requerida
+
+        Args:
+            gemini_output: Output de Gemini
+
+        Returns:
+            True si es valido
+        """
+        return validate_gemini_output(gemini_output)
+
+    def get_feature_names(self) -> List[str]:
+        """
+        Retorna nombres de los features
+
+        Returns:
+            Lista de nombres de features
+        """
+        return self.feature_names
+
+    def calculate_weighted_score(self, feature_result: Dict) -> float:
+        """
+        Calcula score ponderado final
+
+        Args:
+            feature_result: Resultado de extract_features()
+
+        Returns:
+            Score final [0-1]
+        """
+        return calculate_final_score(feature_result)
+
+    def classify(self, final_score: float, thresholds: Dict = None) -> str:
+        """
+        Clasifica al candidato
+
+        Args:
+            final_score: Score final
+            thresholds: Umbrales (opcional)
+
+        Returns:
+            Clasificacion: APTO, CONSIDERADO o NO_APTO
+        """
+        if thresholds is None:
+            thresholds = {'apto': 0.70, 'considerado': 0.50}
+        return classify_candidate(final_score, thresholds)
