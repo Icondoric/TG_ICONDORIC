@@ -1,0 +1,30 @@
+{
+  "id": "profile_drogueria_inti",
+  "institution_name": "Drogueria INTI S.A.",
+  "sector": "Farmaceutico - Salud",
+  "description": "Lider en la industria farmaceutica boliviana desde 1936, con mas de 1,500 productos y 1,130 empleados. Empresa con certificacion Great Place to Work que fabrica, importa y comercializa productos farmaceuticos",
+  "created_at": "2025-01-30",
+
+  "weights": {
+    "hard_skills": 0.25,
+    "soft_skills": 0.30,
+    "experience": 0.20,
+    "education": 0.15,
+    "languages": 0.10
+  },
+
+  "requirements": {
+    "min_experience_years": 1.0,
+    "required_skills": ["Atencion al cliente", "Conocimiento farmaceutico basico", "Excel", "Trabajo en equipo"],
+    "preferred_skills": ["Regencia farmaceutica", "Power BI", "SAP", "Gestion de inventarios", "Ventas"],
+    "required_education_level": "Licenciatura",
+    "required_languages": []
+  },
+
+  "thresholds": {
+    "apto": 0.68,
+    "considerado": 0.48
+  },
+
+  "comments": "INTI valora altamente las soft skills (comunicacion, orientacion al cliente, trabajo en equipo) por sobre competencias tecnicas. La empresa ofrece un ambiente laboral inclusivo certificado como Great Place to Work con horarios flexibles, capacitaciones continuas certificadas, seguro medico privado y descuentos en medicamentos. Busca personas con ganas de aprender aunque no tengan experiencia previa. Para roles especializados como coordinadores se requiere 3+ anios de experiencia en sector farmaceutico y dominio de BI. Valores: calidad, excelencia, honestidad, respeto, iniciativa y sensibilidad social."
+}

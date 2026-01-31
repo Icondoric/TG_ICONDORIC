@@ -14,3 +14,15 @@ email-validator
 bcrypt==3.2.2
 
 google-generativeai
+
+# ML / Feature Engineering (Fase 2)
+scikit-learn
+numpy
+
+# ML / Dataset Sintetico (Fase 3)
+pandas
+matplotlib
+seaborn
+
+# ML / Modelo Ridge (Fase 4)
+joblib

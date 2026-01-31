@@ -1,0 +1,30 @@
+{
+  "id": "profile_banco_fie",
+  "institution_name": "Banco FIE S.A.",
+  "sector": "Servicios Financieros - Banca",
+  "description": "Institucion financiera lider en Bolivia con mas de 30 anios de experiencia, enfocada en inclusion financiera y servicios bancarios accesibles para emprendedores y comunidades",
+  "created_at": "2025-01-30",
+
+  "weights": {
+    "hard_skills": 0.30,
+    "soft_skills": 0.25,
+    "experience": 0.25,
+    "education": 0.15,
+    "languages": 0.05
+  },
+
+  "requirements": {
+    "min_experience_years": 1.0,
+    "required_skills": ["Excel", "Atencion al cliente", "Gestion de caja", "Software bancario"],
+    "preferred_skills": ["Power BI", "SAP", "Analisis financiero", "Contabilidad", "Gestion de riesgos"],
+    "required_education_level": "Licenciatura",
+    "required_languages": []
+  },
+
+  "thresholds": {
+    "apto": 0.70,
+    "considerado": 0.50
+  },
+
+  "comments": "Banco FIE valora equilibrio entre competencias tecnicas financieras y habilidades de servicio al cliente. La experiencia en sector bancario o atencion al publico es fundamental. Ofrece capacitacion continua, seguro medico, bonos por desempenio y horarios flexibles en algunas posiciones. La cultura organizacional es inclusiva con oportunidades de crecimiento profesional. Certificacion Great Place to Work. Formacion en areas de Administracion, Contabilidad o Economia es preferida."
+}

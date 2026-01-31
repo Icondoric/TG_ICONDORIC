@@ -1,0 +1,30 @@
+{
+  "id": "profile_agetic",
+  "institution_name": "AGETIC - Agencia de Gobierno Electronico y TICs",
+  "sector": "Gobierno - Tecnologia",
+  "description": "Entidad publica descentralizada del Ministerio de la Presidencia, creada en 2015, encargada de implementar politicas de Gobierno Electronico, desarrollar tecnologia soberana y modernizar el Estado boliviano",
+  "created_at": "2025-01-30",
+
+  "weights": {
+    "hard_skills": 0.40,
+    "soft_skills": 0.20,
+    "experience": 0.20,
+    "education": 0.15,
+    "languages": 0.05
+  },
+
+  "requirements": {
+    "min_experience_years": 1.5,
+    "required_skills": ["Programacion", "Desarrollo de software", "Sistemas operativos Linux", "Git"],
+    "preferred_skills": ["Python", "Java", "PHP", "PostgreSQL", "Software libre", "Ciberseguridad", "Cloud computing", "DevOps"],
+    "required_education_level": "Licenciatura",
+    "required_languages": []
+  },
+
+  "thresholds": {
+    "apto": 0.72,
+    "considerado": 0.52
+  },
+
+  "comments": "AGETIC busca profesionales jovenes comprometidos con el desarrollo tecnologico soberano de Bolivia. Priorizan hard skills tecnicos en programacion y desarrollo de software, especialmente en tecnologias de codigo abierto y software libre (politica estatal desde 2017). Se valora experiencia en desarrollo de sistemas gubernamentales, interoperabilidad y servicios digitales. Conocimientos en ciberseguridad son muy valorados. La institucion trabaja en proyectos de Ciudadania Digital, Pasarela de Pagos, Facturacion Electronica y otros servicios que modernizan el Estado. Ambiente de innovacion tecnologica con impacto social. Carreras preferidas: Ingenieria de Sistemas, Informatica, Ciencias de la Computacion."
+}

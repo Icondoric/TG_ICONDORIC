@@ -1,0 +1,30 @@
+{
+  "id": "profile_mopsv",
+  "institution_name": "Ministerio de Obras Públicas, Servicios y Vivienda",
+  "sector": "Gobierno",
+  "description": "Ministerio encargado de promover y gestionar el acceso universal a obras y servicios de calidad en telecomunicaciones, transportes y vivienda. Tiene tres viceministerios: Vivienda, Transporte y Telecomunicaciones",
+  "created_at": "2025-01-30",
+  
+  "weights": {
+    "hard_skills": 0.30,
+    "soft_skills": 0.25,
+    "experience": 0.25,
+    "education": 0.15,
+    "languages": 0.05
+  },
+  
+  "requirements": {
+    "min_experience_years": 2.0,
+    "required_skills": ["AutoCAD", "Excel", "Gestión de proyectos", "Normativa de construcción"],
+    "preferred_skills": ["Civil 3D", "Ingeniería de carreteras", "MS Project", "SAP", "Gestión pública", "Normativa AASHO"],
+    "required_education_level": "Ingeniería",
+    "required_languages": []
+  },
+  
+  "thresholds": {
+    "apto": 0.68,
+    "considerado": 0.48
+  },
+  
+  "comments": "El MOPSV valora experiencia en gestión de proyectos de infraestructura pública (carreteras, puentes, vivienda, telecomunicaciones). Se requieren conocimientos técnicos sólidos en ingeniería civil, transporte o telecomunicaciones según el área. La institución trabaja bajo principios de transparencia institucional e igualdad de oportunidades. Se valora experiencia previa en sector público y conocimiento de normativa boliviana de construcción y contrataciones estatales (SICOES). Hard skills en software de diseño (AutoCAD, Civil 3D) y gestión de proyectos son importantes. Misión institucional enfocada en vertebrar el país y mejorar calidad de vida. Carreras: Ingeniería Civil, Arquitectura, Ingeniería en Telecomunicaciones, Ingeniería de Transporte."
+}
