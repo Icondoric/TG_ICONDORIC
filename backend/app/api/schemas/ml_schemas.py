@@ -341,3 +341,455 @@ class ErrorResponse(BaseModel):
                 "timestamp": "2025-01-31T10:30:00Z"
             }
         }
+
+
+# ============================================================
+# PERFIL PROFESIONAL SCHEMAS (Usuario)
+# ============================================================
+
+class EducacionItem(BaseModel):
+    """Item de educacion del perfil"""
+    degree: str = Field(description="Titulo obtenido")
+    institution: str = Field(description="Institucion educativa")
+    year: Optional[str] = Field(default=None, description="Ano de graduacion")
+    field: Optional[str] = Field(default=None, description="Area de estudio")
+
+
+class ExperienciaItem(BaseModel):
+    """Item de experiencia laboral"""
+    role: str = Field(description="Cargo/Puesto")
+    company: str = Field(description="Empresa")
+    duration: Optional[str] = Field(default=None, description="Duracion (ej: '2021-2023')")
+    description: Optional[str] = Field(default=None, description="Descripcion de responsabilidades")
+
+
+class PerfilProfesionalResponse(BaseModel):
+    """Response del perfil profesional del usuario"""
+    id: str
+    usuario_id: str
+
+    # Datos extraidos de Gemini
+    gemini_extraction: Dict[str, Any] = Field(default={})
+
+    # Campos normalizados
+    hard_skills: List[str] = Field(default=[])
+    soft_skills: List[str] = Field(default=[])
+    education_level: Optional[str] = None
+    experience_years: float = 0
+    languages: List[str] = Field(default=[])
+
+    # Metadatos del CV
+    cv_filename: Optional[str] = None
+    cv_uploaded_at: Optional[datetime] = None
+
+    # Estado del perfil
+    is_complete: bool = False
+    completeness_score: float = 0
+
+    # Timestamps
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "uuid-perfil",
+                "usuario_id": "uuid-usuario",
+                "gemini_extraction": {
+                    "personal_info": {"summary": "Ingeniero de software..."},
+                    "hard_skills": ["Python", "React", "SQL"],
+                    "soft_skills": ["Liderazgo", "Trabajo en equipo"],
+                    "education": [{"degree": "Ingenieria", "institution": "EMI"}],
+                    "experience": [{"role": "Developer", "company": "Tech Co"}]
+                },
+                "hard_skills": ["Python", "React", "SQL"],
+                "soft_skills": ["Liderazgo", "Trabajo en equipo"],
+                "education_level": "Licenciatura",
+                "experience_years": 2.5,
+                "languages": ["Espanol", "Ingles"],
+                "cv_filename": "cv_juan_perez.pdf",
+                "cv_uploaded_at": "2026-01-31T10:00:00Z",
+                "is_complete": True,
+                "completeness_score": 0.85,
+                "created_at": "2026-01-31T09:00:00Z",
+                "updated_at": "2026-01-31T10:00:00Z"
+            }
+        }
+
+
+class PerfilProfesionalUpdate(BaseModel):
+    """Request para actualizar perfil manualmente"""
+    hard_skills: Optional[List[str]] = None
+    soft_skills: Optional[List[str]] = None
+    education_level: Optional[str] = None
+    experience_years: Optional[float] = Field(default=None, ge=0)
+    languages: Optional[List[str]] = None
+
+    @field_validator('education_level')
+    @classmethod
+    def validate_education_level(cls, v):
+        if v is None:
+            return v
+        valid_levels = [
+            'Bachillerato', 'Tecnico', 'Licenciatura',
+            'Ingenieria', 'Maestria', 'Doctorado'
+        ]
+        if v not in valid_levels:
+            raise ValueError(f"Nivel educativo invalido. Opciones: {valid_levels}")
+        return v
+
+
+class PerfilCompletenessResponse(BaseModel):
+    """Response de completitud del perfil"""
+    score: float = Field(ge=0, le=1, description="Score de completitud (0-1)")
+    percentage: int = Field(ge=0, le=100, description="Porcentaje de completitud")
+    is_complete: bool
+    missing_fields: List[str] = Field(default=[], description="Campos faltantes o incompletos")
+    recommendations: List[str] = Field(default=[], description="Recomendaciones para completar")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "score": 0.75,
+                "percentage": 75,
+                "is_complete": False,
+                "missing_fields": ["languages", "soft_skills"],
+                "recommendations": [
+                    "Agrega al menos 2 habilidades blandas",
+                    "Especifica los idiomas que dominas"
+                ]
+            }
+        }
+
+
+class CVUploadResponse(BaseModel):
+    """Response al subir CV"""
+    message: str
+    perfil: PerfilProfesionalResponse
+    extraction_summary: Dict[str, Any]
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "message": "CV procesado y perfil actualizado exitosamente",
+                "perfil": {},
+                "extraction_summary": {
+                    "hard_skills_count": 8,
+                    "soft_skills_count": 4,
+                    "education_items": 2,
+                    "experience_items": 3
+                }
+            }
+        }
+
+
+# ============================================================
+# OFERTAS LABORALES SCHEMAS
+# ============================================================
+
+class OfertaLaboralCreate(BaseModel):
+    """Request para crear oferta laboral"""
+    institutional_profile_id: Optional[str] = Field(default=None, description="ID del perfil institucional base")
+    titulo: str = Field(min_length=5, max_length=200, description="Titulo de la oferta")
+    descripcion: Optional[str] = Field(default=None, max_length=2000, description="Descripcion detallada")
+    tipo: str = Field(description="Tipo: 'pasantia' o 'empleo'")
+    modalidad: Optional[str] = Field(default=None, description="Modalidad: 'presencial', 'remoto', 'hibrido'")
+    ubicacion: Optional[str] = Field(default=None, max_length=200, description="Ubicacion geografica")
+    requisitos_especificos: Optional[Dict[str, Any]] = Field(default=None, description="Requisitos adicionales")
+    fecha_inicio: Optional[str] = Field(default=None, description="Fecha inicio (YYYY-MM-DD)")
+    fecha_cierre: Optional[str] = Field(default=None, description="Fecha cierre (YYYY-MM-DD)")
+    cupos_disponibles: int = Field(default=1, ge=1, description="Numero de cupos")
+
+    @field_validator('tipo')
+    @classmethod
+    def validate_tipo(cls, v):
+        if v not in ['pasantia', 'empleo']:
+            raise ValueError("Tipo debe ser 'pasantia' o 'empleo'")
+        return v
+
+    @field_validator('modalidad')
+    @classmethod
+    def validate_modalidad(cls, v):
+        if v is not None and v not in ['presencial', 'remoto', 'hibrido']:
+            raise ValueError("Modalidad debe ser 'presencial', 'remoto' o 'hibrido'")
+        return v
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "institutional_profile_id": "uuid-perfil-institucional",
+                "titulo": "Pasantia en Desarrollo Web",
+                "descripcion": "Buscamos estudiantes para desarrollo de aplicaciones web...",
+                "tipo": "pasantia",
+                "modalidad": "hibrido",
+                "ubicacion": "La Paz, Bolivia",
+                "fecha_inicio": "2026-02-01",
+                "fecha_cierre": "2026-04-30",
+                "cupos_disponibles": 3
+            }
+        }
+
+
+class OfertaLaboralUpdate(BaseModel):
+    """Request para actualizar oferta laboral"""
+    institutional_profile_id: Optional[str] = None
+    titulo: Optional[str] = Field(default=None, min_length=5, max_length=200)
+    descripcion: Optional[str] = Field(default=None, max_length=2000)
+    tipo: Optional[str] = None
+    modalidad: Optional[str] = None
+    ubicacion: Optional[str] = Field(default=None, max_length=200)
+    requisitos_especificos: Optional[Dict[str, Any]] = None
+    fecha_inicio: Optional[str] = None
+    fecha_cierre: Optional[str] = None
+    cupos_disponibles: Optional[int] = Field(default=None, ge=1)
+    is_active: Optional[bool] = None
+
+    @field_validator('tipo')
+    @classmethod
+    def validate_tipo(cls, v):
+        if v is not None and v not in ['pasantia', 'empleo']:
+            raise ValueError("Tipo debe ser 'pasantia' o 'empleo'")
+        return v
+
+    @field_validator('modalidad')
+    @classmethod
+    def validate_modalidad(cls, v):
+        if v is not None and v not in ['presencial', 'remoto', 'hibrido']:
+            raise ValueError("Modalidad debe ser 'presencial', 'remoto' o 'hibrido'")
+        return v
+
+
+class OfertaLaboralResponse(BaseModel):
+    """Response de oferta laboral"""
+    id: str
+    institutional_profile_id: Optional[str] = None
+    institution_name: Optional[str] = None  # Joined from institutional_profiles
+    sector: Optional[str] = None  # Joined from institutional_profiles
+
+    titulo: str
+    descripcion: Optional[str] = None
+    tipo: str
+    modalidad: Optional[str] = None
+    ubicacion: Optional[str] = None
+    requisitos_especificos: Dict[str, Any] = Field(default={})
+
+    is_active: bool
+    fecha_inicio: Optional[str] = None
+    fecha_cierre: Optional[str] = None
+    cupos_disponibles: int
+
+    created_by: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "uuid-oferta",
+                "institutional_profile_id": "uuid-perfil",
+                "institution_name": "AGETIC",
+                "sector": "Gobierno - Tecnologia",
+                "titulo": "Pasantia en Desarrollo Web",
+                "descripcion": "Buscamos estudiantes...",
+                "tipo": "pasantia",
+                "modalidad": "hibrido",
+                "ubicacion": "La Paz, Bolivia",
+                "requisitos_especificos": {},
+                "is_active": True,
+                "fecha_inicio": "2026-02-01",
+                "fecha_cierre": "2026-04-30",
+                "cupos_disponibles": 3,
+                "created_at": "2026-01-31T10:00:00Z",
+                "updated_at": "2026-01-31T10:00:00Z"
+            }
+        }
+
+
+class OfertaLaboralListResponse(BaseModel):
+    """Response de lista de ofertas"""
+    ofertas: List[OfertaLaboralResponse]
+    total: int
+    page: int = 1
+    page_size: int = 20
+
+
+# ============================================================
+# RECOMENDACIONES MEJORADAS SCHEMAS
+# ============================================================
+
+class RecomendacionDetalladaResponse(BaseModel):
+    """Response de recomendacion con detalle completo"""
+    id: str
+    oferta_id: str
+
+    # Info de la oferta
+    oferta: OfertaLaboralResponse
+
+    # Resultado de evaluacion
+    match_score: float = Field(ge=0, le=1)
+    clasificacion: str
+
+    # Detalles
+    scores_detalle: Dict[str, float] = Field(default={})
+    fortalezas: List[str] = Field(default=[])
+    debilidades: List[str] = Field(default=[])
+
+    # Estado
+    fue_vista: bool = False
+    vista_at: Optional[datetime] = None
+    created_at: datetime
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "uuid-recomendacion",
+                "oferta_id": "uuid-oferta",
+                "oferta": {},
+                "match_score": 0.82,
+                "clasificacion": "APTO",
+                "scores_detalle": {
+                    "hard_skills": 0.85,
+                    "soft_skills": 0.70,
+                    "education": 0.90,
+                    "experience": 0.75,
+                    "languages": 0.80
+                },
+                "fortalezas": ["Habilidades tecnicas solidas", "Nivel educativo adecuado"],
+                "debilidades": ["Podria mejorar experiencia"],
+                "fue_vista": False,
+                "created_at": "2026-01-31T10:00:00Z"
+            }
+        }
+
+
+class MisRecomendacionesResponse(BaseModel):
+    """Response de recomendaciones del usuario"""
+    recomendaciones: List[RecomendacionDetalladaResponse]
+    total: int
+    nuevas: int = Field(description="Recomendaciones no vistas")
+
+    # Resumen del perfil usado
+    perfil_summary: Dict[str, Any] = Field(default={})
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "recomendaciones": [],
+                "total": 5,
+                "nuevas": 3,
+                "perfil_summary": {
+                    "completeness_score": 0.85,
+                    "top_skills": ["Python", "React"],
+                    "experience_years": 2.5
+                }
+            }
+        }
+
+
+class RecomendacionesRequestFromProfile(BaseModel):
+    """Request para obtener recomendaciones basadas en perfil guardado"""
+    top_n: int = Field(default=10, ge=1, le=50, description="Numero maximo de recomendaciones")
+    tipo: Optional[str] = Field(default=None, description="Filtrar por tipo: 'pasantia' o 'empleo'")
+    sector: Optional[str] = Field(default=None, description="Filtrar por sector")
+    recalcular: bool = Field(default=False, description="Forzar recalculo de recomendaciones")
+
+    @field_validator('tipo')
+    @classmethod
+    def validate_tipo(cls, v):
+        if v is not None and v not in ['pasantia', 'empleo']:
+            raise ValueError("Tipo debe ser 'pasantia' o 'empleo'")
+        return v
+
+
+# ============================================================
+# ESTADISTICAS ADMIN SCHEMAS
+# ============================================================
+
+class EstadisticasGeneralesResponse(BaseModel):
+    """Estadisticas generales para admin dashboard"""
+    # Usuarios
+    total_estudiantes: int = 0
+    total_titulados: int = 0
+    total_admins: int = 0
+    perfiles_completos: int = 0
+
+    # Ofertas
+    pasantias_activas: int = 0
+    empleos_activos: int = 0
+    ofertas_expiradas: int = 0
+
+    # Recomendaciones
+    total_recomendaciones: int = 0
+    promedio_match_score: float = 0
+    distribucion_clasificacion: Dict[str, int] = Field(default={})
+
+    # Perfiles institucionales
+    perfiles_institucionales_activos: int = 0
+
+    # Por sector
+    ofertas_por_sector: Dict[str, int] = Field(default={})
+    matches_por_sector: Dict[str, float] = Field(default={})
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "total_estudiantes": 150,
+                "total_titulados": 80,
+                "total_admins": 3,
+                "perfiles_completos": 120,
+                "pasantias_activas": 25,
+                "empleos_activos": 15,
+                "ofertas_expiradas": 5,
+                "total_recomendaciones": 500,
+                "promedio_match_score": 0.68,
+                "distribucion_clasificacion": {
+                    "APTO": 150,
+                    "CONSIDERADO": 200,
+                    "NO_APTO": 150
+                },
+                "perfiles_institucionales_activos": 10,
+                "ofertas_por_sector": {
+                    "Tecnologia": 15,
+                    "Finanzas": 10,
+                    "Gobierno": 8
+                }
+            }
+        }
+
+
+class UsuarioAdminResponse(BaseModel):
+    """Response de usuario para admin"""
+    id: str
+    email: str
+    nombre_completo: Optional[str] = None
+    rol: str
+    created_at: datetime
+
+    # Estado del perfil
+    tiene_perfil: bool = False
+    perfil_completo: bool = False
+    completeness_score: float = 0
+    cv_uploaded_at: Optional[datetime] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "uuid-usuario",
+                "email": "juan@emi.edu.bo",
+                "nombre_completo": "Juan Perez",
+                "rol": "estudiante",
+                "created_at": "2026-01-15T10:00:00Z",
+                "tiene_perfil": True,
+                "perfil_completo": True,
+                "completeness_score": 0.85,
+                "cv_uploaded_at": "2026-01-20T14:30:00Z"
+            }
+        }
+
+
+class UsuariosListResponse(BaseModel):
+    """Response de lista de usuarios para admin"""
+    usuarios: List[UsuarioAdminResponse]
+    total: int
+    page: int = 1
+    page_size: int = 20

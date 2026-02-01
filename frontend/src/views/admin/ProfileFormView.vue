@@ -48,10 +48,11 @@ const form = ref({
 const isEditMode = computed(() => !!route.params.id)
 const profileId = computed(() => route.params.id)
 
-// Skills temporales (para input)
+// Skills temporales y custom inputs
 const newRequiredSkill = ref('')
 const newPreferredSkill = ref('')
 const newLanguage = ref('')
+const customSector = ref('')
 
 // Opciones
 const educationLevels = [
@@ -76,6 +77,23 @@ const sectorOptions = [
     'Otro'
 ]
 
+// Listas comunes para autocompletado
+const commonSkills = [
+    'Python', 'Java', 'JavaScript', 'TypeScript', 'C++', 'C#', 'SQL', 'NoSQL',
+    'React', 'Vue.js', 'Angular', 'Node.js', 'Django', 'FastAPI', 'Spring Boot',
+    'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP',
+    'Machine Learning', 'Data Analysis', 'Project Management', 'Scrum', 'Agile',
+    'Communication', 'Leadership', 'Teamwork', 'Problem Solving', 'Critical Thinking'
+]
+
+const commonLanguages = [
+    'Español (Nativo)', 'Español (Avanzado)',
+    'Inglés (A1)', 'Inglés (A2)', 'Inglés (B1)', 'Inglés (B2)', 'Inglés (C1)', 'Inglés (C2)',
+    'Francés (B1)', 'Francés (B2)',
+    'Portugués (B1)', 'Portugués (B2)',
+    'Aymara (Básico)', 'Quechua (Básico)'
+]
+
 // Computed
 const weightsSum = computed(() => {
     const weights = form.value.weights
@@ -91,8 +109,10 @@ const isThresholdsValid = computed(() => {
 })
 
 const canSave = computed(() => {
+    const isSectorValid = form.value.sector === 'Otro' ? customSector.value.trim().length > 0 : !!form.value.sector
+    
     return form.value.institution_name.trim() &&
-           form.value.sector &&
+           isSectorValid &&
            isWeightsValid.value &&
            isThresholdsValid.value &&
            !isSaving.value
@@ -112,7 +132,16 @@ onMounted(async () => {
             if (mlStore.currentProfile) {
                 // Poblar formulario
                 form.value.institution_name = mlStore.currentProfile.institution_name
-                form.value.sector = mlStore.currentProfile.sector
+                
+                // Manejo de Sector Personalizado
+                const loadedSector = mlStore.currentProfile.sector
+                if (sectorOptions.includes(loadedSector)) {
+                    form.value.sector = loadedSector
+                } else {
+                    form.value.sector = 'Otro'
+                    customSector.value = loadedSector
+                }
+
                 form.value.description = mlStore.currentProfile.description || ''
                 form.value.weights = { ...mlStore.currentProfile.weights }
                 form.value.requirements = { ...mlStore.currentProfile.requirements }
@@ -188,9 +217,12 @@ const save = async () => {
     error.value = null
 
     try {
+        // Determinar sector final
+        const finalSector = form.value.sector === 'Otro' ? customSector.value.trim() : form.value.sector
+
         const data = {
             institution_name: form.value.institution_name.trim(),
-            sector: form.value.sector,
+            sector: finalSector,
             description: form.value.description.trim() || null,
             weights: form.value.weights,
             requirements: form.value.requirements,
@@ -284,6 +316,20 @@ const cancel = () => {
                                 {{ sector }}
                             </option>
                         </select>
+                        
+                        <!-- Input para sector personalizado -->
+                        <div v-if="form.sector === 'Otro'" class="mt-3">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">
+                                Especificar Sector *
+                            </label>
+                            <input
+                                v-model="customSector"
+                                type="text"
+                                required
+                                placeholder="Ej: Biotecnología"
+                                class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50"
+                            />
+                        </div>
                     </div>
 
                     <div>
@@ -446,6 +492,7 @@ const cancel = () => {
                                 v-model="newRequiredSkill"
                                 @keyup.enter.prevent="addRequiredSkill"
                                 type="text"
+                                list="skillsList"
                                 placeholder="Agregar habilidad..."
                                 class="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
@@ -481,6 +528,7 @@ const cancel = () => {
                                 v-model="newPreferredSkill"
                                 @keyup.enter.prevent="addPreferredSkill"
                                 type="text"
+                                list="skillsList"
                                 placeholder="Agregar habilidad..."
                                 class="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
@@ -516,6 +564,7 @@ const cancel = () => {
                                 v-model="newLanguage"
                                 @keyup.enter.prevent="addLanguage"
                                 type="text"
+                                list="languagesList"
                                 placeholder="Ej: Ingles (B2)..."
                                 class="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
@@ -540,6 +589,14 @@ const cancel = () => {
                             </span>
                         </div>
                     </div>
+
+                    <!-- Datalists -->
+                    <datalist id="skillsList">
+                        <option v-for="skill in commonSkills" :key="skill" :value="skill" />
+                    </datalist>
+                    <datalist id="languagesList">
+                        <option v-for="lang in commonLanguages" :key="lang" :value="lang" />
+                    </datalist>
                 </div>
             </div>
 

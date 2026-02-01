@@ -171,26 +171,38 @@ const modelMetrics = computed(() => {
                     <div v-if="Object.keys(modelMetrics).length > 0" class="border-t pt-4 mt-4">
                         <h3 class="text-sm font-medium text-slate-700 mb-3">Metricas de Entrenamiento</h3>
                         <div class="grid grid-cols-2 gap-3">
-                            <div v-if="modelMetrics.r2_score !== undefined" class="bg-slate-50 p-3 rounded-lg">
-                                <p class="text-xs text-slate-500">R2 Score</p>
+                            <div v-if="modelMetrics.r2_score !== undefined" class="bg-slate-50 p-3 rounded-lg cursor-help transition-colors hover:bg-slate-100" title="R² (Coeficiente de Determinación): Indica qué tan confiable es el modelo (0-100%). Más alto es mejor.">
+                                <div class="flex items-center gap-1 mb-1">
+                                    <p class="text-xs text-slate-500">R2 Score</p>
+                                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
                                 <p class="text-lg font-bold text-blue-600">
                                     {{ (modelMetrics.r2_score * 100).toFixed(1) }}%
                                 </p>
                             </div>
-                            <div v-if="modelMetrics.rmse !== undefined" class="bg-slate-50 p-3 rounded-lg">
-                                <p class="text-xs text-slate-500">RMSE</p>
+                            <div v-if="modelMetrics.rmse !== undefined" class="bg-slate-50 p-3 rounded-lg cursor-help transition-colors hover:bg-slate-100" title="RMSE (Raíz del Error Cuadrático Medio): Margen de error promedio del modelo. Más bajo es mejor.">
+                                <div class="flex items-center gap-1 mb-1">
+                                    <p class="text-xs text-slate-500">RMSE</p>
+                                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
                                 <p class="text-lg font-bold text-blue-600">
                                     {{ modelMetrics.rmse.toFixed(4) }}
                                 </p>
                             </div>
-                            <div v-if="modelMetrics.mae !== undefined" class="bg-slate-50 p-3 rounded-lg">
-                                <p class="text-xs text-slate-500">MAE</p>
+                            <div v-if="modelMetrics.mae !== undefined" class="bg-slate-50 p-3 rounded-lg cursor-help transition-colors hover:bg-slate-100" title="MAE (Error Absoluto Medio): Desviación promedio de las predicciones. Más bajo es mejor.">
+                                <div class="flex items-center gap-1 mb-1">
+                                    <p class="text-xs text-slate-500">MAE</p>
+                                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
                                 <p class="text-lg font-bold text-blue-600">
                                     {{ modelMetrics.mae.toFixed(4) }}
                                 </p>
                             </div>
-                            <div v-if="modelMetrics.accuracy !== undefined" class="bg-slate-50 p-3 rounded-lg">
-                                <p class="text-xs text-slate-500">Accuracy</p>
+                            <div v-if="modelMetrics.accuracy !== undefined" class="bg-slate-50 p-3 rounded-lg cursor-help transition-colors hover:bg-slate-100" title="Accuracy (Exactitud): Porcentaje global de aciertos del modelo.">
+                                <div class="flex items-center gap-1 mb-1">
+                                    <p class="text-xs text-slate-500">Accuracy</p>
+                                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
                                 <p class="text-lg font-bold text-blue-600">
                                     {{ (modelMetrics.accuracy * 100).toFixed(1) }}%
                                 </p>
@@ -200,6 +212,7 @@ const modelMetrics = computed(() => {
                 </div>
 
                 <div v-else class="text-center py-8">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                     <p class="text-slate-400">Cargando informacion del modelo...</p>
                 </div>
             </div>

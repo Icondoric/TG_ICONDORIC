@@ -205,7 +205,7 @@ const formatScore = (score) => {
             <div class="space-y-4">
                 <div
                     v-for="rec in mlStore.recommendations"
-                    :key="rec.profile_id"
+                    :key="rec.institution_id"
                     class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow"
                 >
                     <div class="flex items-start justify-between">
@@ -250,7 +250,7 @@ const formatScore = (score) => {
                                 {{ formatScore(rec.match_score) }}%
                             </div>
                             <button
-                                @click="goToEvaluation(rec.profile_id)"
+                                @click="goToEvaluation(rec.institution_id)"
                                 class="mt-3 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors"
                             >
                                 Ver Detalles

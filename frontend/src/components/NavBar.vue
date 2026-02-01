@@ -72,8 +72,11 @@ onMounted(() => {
                 <template v-else>
                     <div class="user-info">
                         <div class="auth-buttons">
-                            <button @click="handleNavigation('/dashboard')" class="btn-dashboard">Mi Panel</button>
-                            <button @click="handleNavigation('/history')" class="btn-history">Historial</button>
+                            <!-- Botones para estudiante/titulado -->
+                            <template v-if="!authStore.isAdmin">
+                                <button @click="handleNavigation('/mi-perfil')" class="btn-profile">Mi Perfil</button>
+                                <button @click="handleNavigation('/mis-recomendaciones')" class="btn-recommendations">Recomendaciones</button>
+                            </template>
                             <!-- Admin button -->
                             <button
                                 v-if="authStore.isAdmin"
@@ -115,9 +118,14 @@ onMounted(() => {
             </template>
             <template v-else>
                 <hr />
-                <a @click.prevent="handleNavigation('/dashboard')">Mi Panel</a>
-                <a @click.prevent="handleNavigation('/history')">Historial</a>
-                <a v-if="authStore.isAdmin" @click.prevent="handleNavigation('/admin')">Administracion</a>
+                <template v-if="!authStore.isAdmin">
+                    <a @click.prevent="handleNavigation('/mi-perfil')">Mi Perfil</a>
+                    <a @click.prevent="handleNavigation('/subir-cv')">Subir CV</a>
+                    <a @click.prevent="handleNavigation('/mis-recomendaciones')">Mis Recomendaciones</a>
+                </template>
+                <a v-if="authStore.isAdmin" @click.prevent="handleNavigation('/admin')">Dashboard Admin</a>
+                <a v-if="authStore.isAdmin" @click.prevent="handleNavigation('/admin/ofertas')">Ofertas</a>
+                <a v-if="authStore.isAdmin" @click.prevent="handleNavigation('/admin/profiles')">Perfiles Inst.</a>
                 <a @click.prevent="authStore.logout()" class="text-red-600">Cerrar Sesion</a>
             </template>
         </div>
@@ -271,6 +279,42 @@ onMounted(() => {
 
 .btn-admin:hover {
     background: #d97706;
+    transform: translateY(-1px);
+}
+
+.btn-profile {
+    background: #8b5cf6;
+    color: white !important;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.btn-profile:hover {
+    background: #7c3aed;
+    transform: translateY(-1px);
+}
+
+.btn-recommendations {
+    background: #10b981;
+    color: white !important;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.btn-recommendations:hover {
+    background: #059669;
     transform: translateY(-1px);
 }
 

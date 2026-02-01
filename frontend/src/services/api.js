@@ -208,5 +208,183 @@ export const healthCheck = async () => {
     return response.data
 }
 
+// ============================================
+// Perfil del Usuario (v2)
+// ============================================
+
+/**
+ * Obtiene el perfil profesional del usuario autenticado
+ */
+export const getMyProfile = async () => {
+    const response = await api.get('/api/profile/me')
+    return response.data
+}
+
+/**
+ * Actualiza el perfil profesional manualmente
+ * @param {Object} updates - Campos a actualizar
+ */
+export const updateMyProfile = async (updates) => {
+    const response = await api.put('/api/profile/me', updates)
+    return response.data
+}
+
+/**
+ * Obtiene el score de completitud del perfil
+ */
+export const getProfileCompleteness = async () => {
+    const response = await api.get('/api/profile/completeness')
+    return response.data
+}
+
+/**
+ * Sube un CV y actualiza el perfil con los datos extraidos
+ * @param {File} file - Archivo PDF del CV
+ */
+export const uploadCV = async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await api.post('/api/profile/upload-cv', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    return response.data
+}
+
+/**
+ * Elimina/limpia los datos del perfil
+ */
+export const deleteMyProfile = async () => {
+    const response = await api.delete('/api/profile/me')
+    return response.data
+}
+
+/**
+ * Obtiene vista previa del perfil para recomendaciones
+ */
+export const getProfilePreview = async () => {
+    const response = await api.get('/api/profile/preview')
+    return response.data
+}
+
+// ============================================
+// Ofertas Laborales (Admin)
+// ============================================
+
+/**
+ * Lista todas las ofertas laborales
+ * @param {Object} params - Parametros de filtro
+ */
+export const listOfertas = async (params = {}) => {
+    const response = await api.get('/api/admin/ofertas', { params })
+    return response.data
+}
+
+/**
+ * Obtiene una oferta por ID
+ * @param {string} ofertaId - UUID de la oferta
+ */
+export const getOferta = async (ofertaId) => {
+    const response = await api.get(`/api/admin/ofertas/${ofertaId}`)
+    return response.data
+}
+
+/**
+ * Crea una nueva oferta laboral
+ * @param {Object} data - Datos de la oferta
+ */
+export const createOferta = async (data) => {
+    const response = await api.post('/api/admin/ofertas', data)
+    return response.data
+}
+
+/**
+ * Actualiza una oferta existente
+ * @param {string} ofertaId - UUID de la oferta
+ * @param {Object} data - Datos a actualizar
+ */
+export const updateOferta = async (ofertaId, data) => {
+    const response = await api.put(`/api/admin/ofertas/${ofertaId}`, data)
+    return response.data
+}
+
+/**
+ * Desactiva una oferta (soft delete)
+ * @param {string} ofertaId - UUID de la oferta
+ */
+export const deleteOferta = async (ofertaId) => {
+    const response = await api.delete(`/api/admin/ofertas/${ofertaId}`)
+    return response.data
+}
+
+/**
+ * Reactiva una oferta
+ * @param {string} ofertaId - UUID de la oferta
+ */
+export const activateOferta = async (ofertaId) => {
+    const response = await api.post(`/api/admin/ofertas/${ofertaId}/activate`)
+    return response.data
+}
+
+/**
+ * Obtiene estadisticas de ofertas
+ */
+export const getOfertasStats = async () => {
+    const response = await api.get('/api/admin/ofertas/stats/summary')
+    return response.data
+}
+
+// ============================================
+// Recomendaciones (v2)
+// ============================================
+
+/**
+ * Obtiene recomendaciones basadas en el perfil guardado
+ * @param {Object} params - Parametros de filtro
+ */
+export const getMyRecommendations = async (params = {}) => {
+    const response = await api.get('/api/recommendations', { params })
+    return response.data
+}
+
+/**
+ * Obtiene historial de recomendaciones
+ * @param {number} limit - Limite de resultados
+ * @param {number} offset - Offset para paginacion
+ */
+export const getRecommendationHistory = async (limit = 20, offset = 0) => {
+    const response = await api.get('/api/recommendations/history', {
+        params: { limit, offset }
+    })
+    return response.data
+}
+
+/**
+ * Marca una recomendacion como vista
+ * @param {string} recommendationId - UUID de la recomendacion
+ */
+export const markRecommendationViewed = async (recommendationId) => {
+    const response = await api.post(`/api/recommendations/${recommendationId}/viewed`)
+    return response.data
+}
+
+/**
+ * Verifica si el usuario puede recibir recomendaciones
+ */
+export const checkRecommendationEligibility = async () => {
+    const response = await api.get('/api/recommendations/check-eligibility')
+    return response.data
+}
+
+/**
+ * Obtiene estadisticas de recomendaciones del usuario
+ */
+export const getMyRecommendationStats = async () => {
+    const response = await api.get('/api/recommendations/stats')
+    return response.data
+}
+
 // Exportar instancia para uso directo si es necesario
 export default api
