@@ -1,9 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    body {
+        @apply font-sans antialiased text-gray-800 bg-slate-50;
+    }
 
-body {
-    @apply bg-slate-50 text-slate-900;
-    font-family: 'Inter', sans-serif;
+    /* Fondo general gris claro para dashboards */
+    .dashboard-bg {
+        @apply bg-[#F4F7F9] min-h-screen;
+    }
+}
+
+@layer components {
+    /* Cards con estilo EMI */
+    .card-emi {
+        @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+        @apply hover:shadow-md transition-shadow duration-200;
+    }
+
+    /* Boton primario EMI (Azul Marino) */
+    .btn-emi-primary {
+        @apply bg-emi-navy-500 text-white px-4 py-2 rounded-lg font-medium;
+        @apply hover:bg-emi-navy-600 transition-colors;
+    }
+
+    /* Boton secundario EMI (Dorado) */
+    .btn-emi-secondary {
+        @apply bg-emi-gold-500 text-emi-navy-800 px-4 py-2 rounded-lg font-medium;
+        @apply hover:bg-emi-gold-400 transition-colors;
+    }
+
+    /* Badge base */
+    .badge-emi {
+        @apply px-3 py-1 rounded-full text-sm font-medium;
+    }
+
+    /* Badge variantes */
+    .badge-navy {
+        @apply bg-emi-navy-100 text-emi-navy-700;
+    }
+
+    .badge-gold {
+        @apply bg-emi-gold-100 text-emi-gold-700;
+    }
+
+    .badge-neutral {
+        @apply bg-gray-100 text-gray-700;
+    }
+
+    .badge-success {
+        @apply bg-emi-gold-100 text-emi-gold-700;
+    }
+
+    .badge-danger {
+        @apply bg-danger-light text-danger-dark;
+    }
 }

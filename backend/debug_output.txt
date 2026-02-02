@@ -1,0 +1,32 @@
+--- Debugging Offers ---
+
+Listing active internships (pasantia):
+Found 1 active internships.
+- ID: aa07ad0c-645f-4218-8aa8-af377fd5eeea
+  Title: Pasantia en TechBolivia Test
+  Institution: TechBolivia Test
+  Close Date: 2026-03-03
+  Active: True
+
+Listing active jobs (empleo):
+Found 0 active jobs.
+
+Listing institutional profiles:
+Found 17 profiles.
+- TechBolivia Test (88559ce3-0242-471f-8217-85c7aa182ab4)
+- Biosfera (696f7210-c2b2-4e32-be64-1691df9502c6)
+- CODEROAD by Mojix (9f429aeb-0d92-44c8-8de3-126039d7dc56)
+- Belmonte Ingenieros SRL (ae2fb841-8af1-493c-99de-a5b42bc2bf6f)
+- Confederación Nacional de Profesionales de Bolivia (e490d148-3c4e-4a99-ac40-42338163ce1f)
+- Constructora Naffel SRL (1da84b03-765c-4f56-a0a2-5c4f61b1ed1f)
+- Drones y Tecnologías CREOTEC (7125201d-9f6e-4aab-bfd8-95ff868c0d71)
+- AGETIC - Agencia de Gobierno Electrónico (93083427-d076-4db2-8f01-1037742515d8)
+- Importadora Barrientos Terán Consultor (01b3dc77-f8df-4802-817e-f77789c4b0ea)
+- Consultora Steynar SRL (f2115feb-cf22-47bd-a7ce-8828ab0c6330)
+- Consultora y Planificación CYPLA SRL (387b62c2-82ef-4fc3-b3e2-5a4e1b0d0bb3)
+- Fundación FUNDAPIM (e5902d3e-01ba-4895-aed2-ab238bca6592)
+- Aztreza Energea SRL (9a8686d8-b991-4121-812b-25e64196a0c4)
+- GASPROBOL (2bb66ba5-eb69-4a94-b6ea-22194d05bea1)
+- ENVIE (bdec2aa1-be1e-4da0-951d-61e45b00c375)
+- Shigong Bolivia SRL (0ad94948-7e1a-4603-a7a5-551a59a9057a)
+- Fenrir SRL (3670ede7-433a-44ce-a397-a76f353d3426)

@@ -495,7 +495,7 @@ class OfertaLaboralCreate(BaseModel):
     tipo: str = Field(description="Tipo: 'pasantia' o 'empleo'")
     modalidad: Optional[str] = Field(default=None, description="Modalidad: 'presencial', 'remoto', 'hibrido'")
     ubicacion: Optional[str] = Field(default=None, max_length=200, description="Ubicacion geografica")
-    requisitos_especificos: Optional[Dict[str, Any]] = Field(default=None, description="Requisitos adicionales")
+    requisitos_especificos: Optional[Dict[str, Any]] = Field(default={}, description="Requisitos adicionales")
     fecha_inicio: Optional[str] = Field(default=None, description="Fecha inicio (YYYY-MM-DD)")
     fecha_cierre: Optional[str] = Field(default=None, description="Fecha cierre (YYYY-MM-DD)")
     cupos_disponibles: int = Field(default=1, ge=1, description="Numero de cupos")
@@ -571,7 +571,7 @@ class OfertaLaboralResponse(BaseModel):
     tipo: str
     modalidad: Optional[str] = None
     ubicacion: Optional[str] = None
-    requisitos_especificos: Dict[str, Any] = Field(default={})
+    requisitos_especificos: Optional[Dict[str, Any]] = Field(default={})
 
     is_active: bool
     fecha_inicio: Optional[str] = None

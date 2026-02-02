@@ -65,7 +65,7 @@ export const useMLStore = defineStore('ml', () => {
     })
 
     const isModelReady = computed(() => {
-        return modelInfo.value?.model_loaded === true
+        return modelInfo.value?.is_ready === true || modelInfo.value?.status === 'loaded'
     })
 
     // ============================================
