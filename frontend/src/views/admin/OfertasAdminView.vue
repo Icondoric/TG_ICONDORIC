@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <AdminLayout>
+    <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
         <div>
@@ -234,12 +234,13 @@
         </div>
       </div>
     </div>
-  </div>
+  </AdminLayout>
 </template>
 
 <script setup>
 import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { listOfertas, deleteOferta, activateOferta as activateOfertaApi, getOfertasStats } from '../../services/api'
+import AdminLayout from '../../components/admin/AdminLayout.vue'
 
 const ofertas = ref([])
 const stats = ref({

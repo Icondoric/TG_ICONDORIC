@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+  <AdminLayout>
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="mb-8">
         <router-link to="/admin/ofertas" class="text-blue-600 hover:text-blue-800 flex items-center mb-4">
@@ -165,13 +165,14 @@
         </div>
       </form>
     </div>
-  </div>
+  </AdminLayout>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getOferta, createOferta, updateOferta, listProfiles } from '../../services/api'
+import AdminLayout from '../../components/admin/AdminLayout.vue'
 
 const route = useRoute()
 const router = useRouter()

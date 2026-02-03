@@ -87,25 +87,25 @@ const router = createRouter({
             path: '/admin',
             name: 'admin',
             component: AdminDashboardView,
-            meta: { requiresAuth: true, requiresAdmin: true }
+            meta: { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
         },
         {
             path: '/admin/profiles',
             name: 'admin-profiles',
             component: ProfilesAdminView,
-            meta: { requiresAuth: true, requiresAdmin: true }
+            meta: { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
         },
         {
             path: '/admin/profiles/new',
             name: 'admin-profiles-new',
             component: ProfileFormView,
-            meta: { requiresAuth: true, requiresAdmin: true }
+            meta: { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
         },
         {
             path: '/admin/profiles/:id/edit',
             name: 'admin-profiles-edit',
             component: ProfileFormView,
-            meta: { requiresAuth: true, requiresAdmin: true }
+            meta: { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
         },
 
 
@@ -114,19 +114,19 @@ const router = createRouter({
             path: '/admin/users',
             name: 'admin-users',
             component: UsersAdminView,
-            meta: { requiresAuth: true, requiresAdmin: true }
+            meta: { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
         },
         {
             path: '/admin/users/:id',
             name: 'admin-users-detail',
             component: UserDetailView,
-            meta: { requiresAuth: true, requiresAdmin: true }
+            meta: { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
         },
         {
             path: '/admin/reports',
             name: 'admin-reports',
             component: ReportsView,
-            meta: { requiresAuth: true, requiresAdmin: true }
+            meta: { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
         },
 
         // Rutas v2 - Usuario
@@ -154,19 +154,19 @@ const router = createRouter({
             path: '/admin/ofertas',
             name: 'admin-ofertas',
             component: OfertasAdminView,
-            meta: { requiresAuth: true, requiresAdmin: true }
+            meta: { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
         },
         {
             path: '/admin/ofertas/new',
             name: 'admin-ofertas-new',
             component: OfertaFormView,
-            meta: { requiresAuth: true, requiresAdmin: true }
+            meta: { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
         },
         {
             path: '/admin/ofertas/edit/:id',
             name: 'admin-ofertas-edit',
             component: OfertaFormView,
-            meta: { requiresAuth: true, requiresAdmin: true }
+            meta: { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
         },
 
         // Catch-all redirect
