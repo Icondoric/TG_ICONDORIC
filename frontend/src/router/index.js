@@ -21,6 +21,9 @@ import HistoryView from '../views/HistoryView.vue'
 import AdminDashboardView from '../views/admin/AdminDashboardView.vue'
 import ProfilesAdminView from '../views/admin/ProfilesAdminView.vue'
 import ProfileFormView from '../views/admin/ProfileFormView.vue'
+import UsersAdminView from '../views/admin/UsersAdminView.vue'
+import UserDetailView from '../views/admin/UserDetailView.vue'
+
 
 // Views v2 - Sistema de Recomendaciones
 import MiPerfilView from '../views/MiPerfilView.vue'
@@ -101,6 +104,21 @@ const router = createRouter({
             path: '/admin/profiles/:id/edit',
             name: 'admin-profiles-edit',
             component: ProfileFormView,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+
+
+        // Rutas Admin Users - Fase 7+
+        {
+            path: '/admin/users',
+            name: 'admin-users',
+            component: UsersAdminView,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/admin/users/:id',
+            name: 'admin-users-detail',
+            component: UserDetailView,
             meta: { requiresAuth: true, requiresAdmin: true }
         },
 

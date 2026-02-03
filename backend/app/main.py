@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.endpoints import cv, auth
+from app.api.endpoints import cv, auth, users
 from app.api.routes import ml_predictions, institutional_profiles, profile, ofertas, recommendations
 from app.services.ml_integration_service import get_ml_service
 
@@ -89,6 +89,11 @@ app.include_router(
 app.include_router(
     recommendations.router,
     tags=["Recommendations"]
+)
+app.include_router(
+    users.router,
+    prefix="/api/users",
+    tags=["Admin - Users Management"]
 )
 
 

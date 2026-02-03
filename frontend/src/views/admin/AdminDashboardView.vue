@@ -118,6 +118,15 @@ const modelMetrics = computed(() => {
                             <span class="font-medium">Gestionar Perfiles</span>
                         </router-link>
                         <router-link
+                            to="/admin/users"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <span class="font-medium">Gestionar Usuarios</span>
+                        </router-link>
+                        <router-link
                             to="/admin/ofertas"
                             class="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-emi-gold-50 hover:text-emi-gold-600 rounded-lg transition-colors"
                         >
@@ -338,6 +347,26 @@ const modelMetrics = computed(() => {
                                         </div>
                                     </div>
                                     <svg class="w-5 h-5 text-emi-navy-400 group-hover:text-emi-gold-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </router-link>
+
+                                <router-link
+                                    to="/admin/users"
+                                    class="flex items-center justify-between p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors group"
+                                >
+                                    <div class="flex items-center">
+                                        <div class="p-2 bg-purple-100 rounded-lg mr-4 group-hover:bg-purple-200 transition-colors">
+                                           <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-purple-700">Gestionar Usuarios</p>
+                                            <p class="text-sm text-gray-500">Administrar estudiantes y titulados</p>
+                                        </div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-purple-400 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                     </svg>
                                 </router-link>
