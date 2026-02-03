@@ -4,7 +4,7 @@
  * Props: value (0-100), size (sm, md, lg), label
  * Colores: Dorado EMI >=70%, Azul >=50%, Rojo <50%
  */
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 
 const props = defineProps({
     value: {
@@ -29,12 +29,9 @@ const props = defineProps({
 
 const animatedValue = ref(0)
 
-onMounted(() => {
-    // Animate value on mount
+const animateValue = (startValue, endValue) => {
     const duration = 1000
     const startTime = performance.now()
-    const startValue = 0
-    const endValue = props.value
 
     const animate = (currentTime) => {
         const elapsed = currentTime - startTime
@@ -48,6 +45,18 @@ onMounted(() => {
         }
     }
     requestAnimationFrame(animate)
+}
+
+onMounted(() => {
+    // Animate value on mount
+    animateValue(0, props.value)
+})
+
+// Watch for changes in value prop and re-animate
+watch(() => props.value, (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+        animateValue(animatedValue.value, newValue)
+    }
 })
 
 const sizeConfig = {

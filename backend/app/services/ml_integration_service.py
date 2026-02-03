@@ -284,30 +284,48 @@ class MLIntegrationService:
         Returns:
             Dict con prediccion completa
         """
-        if not self.is_ready:
-            raise ValueError("Modelo ML no esta cargado")
-
+        # NOTA: Se ha cambiado a usar score heuristico directo para evitar
+        # problemas de saturacion (0 o 100%) del modelo ML actual.
+        # Esto garantiza granularidad en los resultados.
+        
         # Extraer features
         extractor = FeatureExtractor()
         features = extractor.extract_features(gemini_output, institutional_config)
 
-        # Predecir
-        prediction = self._predictor.predict_from_features(features)
+        # Calcular score heuristico (suma ponderada)
+        heuristic_score = extractor.calculate_weighted_score(features)
+        
+        # Clasificar
+        classification = extractor.classify(
+            heuristic_score, 
+            institutional_config.get('thresholds')
+        )
+        
+        # Obtener scores individuales para explicacion
+        cv_scores = features['cv_scores']
+        
+        # Generar fortalezas (scores mas altos)
+        sorted_scores = sorted(cv_scores.items(), key=lambda x: x[1], reverse=True)
+        top_strengths = [
+            {'feature': k, 'contribution': v}
+            for k, v in sorted_scores[:3]
+        ]
+        
+        # Generar debilidades (scores mas bajos)
+        bottom_scores = sorted(cv_scores.items(), key=lambda x: x[1])
+        top_weaknesses = [
+            {'feature': k, 'contribution': v}
+            for k, v in bottom_scores[:3]
+        ]
 
-        # Formatear respuesta
+        # Formatear respuesta compatible con lo esperado
         return {
-            'match_score': prediction['match_score'],
-            'classification': prediction['classification'],
-            'cv_scores': features['cv_scores'],
-            'top_strengths': [
-                {'feature': f, 'contribution': c}
-                for f, c in prediction.get('top_strengths', [])
-            ],
-            'top_weaknesses': [
-                {'feature': f, 'contribution': c}
-                for f, c in prediction.get('top_weaknesses', [])
-            ],
-            'feature_contributions': prediction.get('feature_contributions', {})
+            'match_score': heuristic_score,
+            'classification': classification,
+            'cv_scores': cv_scores,
+            'top_strengths': top_strengths,
+            'top_weaknesses': top_weaknesses,
+            'feature_contributions': cv_scores # Usar scores como proxy de contribuciones
         }
 
     def get_recommendations(
