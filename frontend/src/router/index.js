@@ -23,6 +23,7 @@ import ProfilesAdminView from '../views/admin/ProfilesAdminView.vue'
 import ProfileFormView from '../views/admin/ProfileFormView.vue'
 import UsersAdminView from '../views/admin/UsersAdminView.vue'
 import UserDetailView from '../views/admin/UserDetailView.vue'
+import ReportsView from '../views/admin/ReportsView.vue'
 
 
 // Views v2 - Sistema de Recomendaciones
@@ -119,6 +120,12 @@ const router = createRouter({
             path: '/admin/users/:id',
             name: 'admin-users-detail',
             component: UserDetailView,
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/admin/reports',
+            name: 'admin-reports',
+            component: ReportsView,
             meta: { requiresAuth: true, requiresAdmin: true }
         },
 
