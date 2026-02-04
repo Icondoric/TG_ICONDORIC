@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
-import '../assets/css/auth.css'
 
 const name = ref('')
 const email = ref('')
@@ -76,122 +75,161 @@ const handleRegister = async () => {
 </script>
 
 <template>
-<div class="auth-wrapper">
-    <!-- Watermark Background -->
-    <div class="watermark">EMI</div>
-    
-    <!-- Decorative Castles -->
-    <div class="castle-decoration castle-left">🏰</div>
-    <div class="castle-decoration castle-right">🏰</div>
+<div class="relative min-h-screen w-full flex items-center justify-center overflow-hidden py-3 pt-20">
+    <!-- Background Image with Better Visibility (40% smaller) -->
+    <div class="absolute inset-0 z-0 flex items-center justify-center">
+        <img 
+            src="../assets/images/backgroundEMI.png" 
+            alt="EMI Background" 
+            class="w-3/5 h-3/5 object-contain opacity-20"
+        />
+    </div>
 
-    <!-- Main Login Container -->
-    <div class="login-container">
-        <!-- Header -->
-        <div class="login-header">
-            <div class="emi-logo">🎓</div>
-            <h1 class="system-title">Estudiantes EMI</h1>
-            <p class="system-subtitle">Sistema de Vinculación Laboral</p>
-        </div>
+    <!-- Lighter Gradient Overlay -->
+    <div class="absolute inset-0 z-0 bg-gradient-to-br from-gray-50/70 via-gray-50/50 to-blue-50/70"></div>
 
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab" @click="goToLogin">Iniciar Sesión</button>
-            <button class="tab active">Registrarse</button>
-        </div>
+    <!-- Main Register Container with Glassmorphism -->
+    <div class="relative z-10 w-full max-w-md mx-4">
+        <div class="backdrop-blur-lg bg-white/70 rounded-2xl shadow-2xl border border-white/60 p-5 transition-all duration-300">
+            <!-- Header -->
+            <div class="text-center mb-3">
+                <img src="../assets/icons/logoEmi.png" alt="EMI Logo" class="w-14 h-14 mx-auto mb-2 object-contain" />
+            </div>
 
-        <!-- Register Form -->
-        <form @submit.prevent="handleRegister" class="form-section">
-            <div class="form-group">
-                <label>Tipo de Usuario</label>
-                <div class="role-selector">
-                    <label class="role-option" :class="{ selected: role === 'estudiante' }" @click="role = 'estudiante'">
-                        <input type="radio" value="estudiante" v-model="role">
-                        <div class="role-icon">👨🎓</div>
-                        <div class="role-label">Estudiante</div>
-                    </label>
-                    <label class="role-option" :class="{ selected: role === 'titulado' }" @click="role = 'titulado'">
-                        <input type="radio" value="titulado" v-model="role">
-                        <div class="role-icon">🎓</div>
-                        <div class="role-label">Titulado</div>
-                    </label>
+            <!-- Title -->
+            <h2 class="text-lg font-bold text-emi-navy-700 text-center mb-3">Registrarse</h2>
+
+            <!-- Register Form -->
+            <form @submit.prevent="handleRegister" class="space-y-2.5">
+                <!-- Role Selector -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1.5">Tipo de Usuario</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label 
+                            class="relative cursor-pointer"
+                            :class="role === 'estudiante' ? 'ring-2 ring-emi-navy-500' : ''"
+                            @click="role = 'estudiante'"
+                        >
+                            <input type="radio" value="estudiante" v-model="role" class="sr-only" />
+                            <div class="bg-white/60 backdrop-blur border-2 rounded-lg py-2 px-3 text-center transition-all hover:border-emi-navy-500"
+                                 :class="role === 'estudiante' ? 'border-emi-navy-500 bg-emi-navy-50/50' : 'border-gray-200'">
+                                <div class="text-xs font-semibold text-gray-700">Estudiante</div>
+                            </div>
+                        </label>
+                        <label 
+                            class="relative cursor-pointer"
+                            :class="role === 'titulado' ? 'ring-2 ring-emi-navy-500' : ''"
+                            @click="role = 'titulado'"
+                        >
+                            <input type="radio" value="titulado" v-model="role" class="sr-only" />
+                            <div class="bg-white/60 backdrop-blur border-2 rounded-lg py-2 px-3 text-center transition-all hover:border-emi-navy-500"
+                                 :class="role === 'titulado' ? 'border-emi-navy-500 bg-emi-navy-50/50' : 'border-gray-200'">
+                                <div class="text-xs font-semibold text-gray-700">Titulado</div>
+                            </div>
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="registerName">Nombre Completo</label>
-                <input 
-                    type="text" 
-                    id="registerName" 
-                    v-model="name"
-                    placeholder="Juan Pérez Gómez"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="registerEmail">Correo Electrónico</label>
-                <input 
-                    type="email" 
-                    id="registerEmail" 
-                    v-model="email"
-                    placeholder="juan.perez@est.emi.edu.bo"
-                    required
-                >
-            </div>
-
-            <!-- Removed CI and Carrera fields as requested -->
-
-            <div class="form-group">
-                <label for="registerPassword">Contraseña</label>
-                <input 
-                    type="password" 
-                    id="registerPassword" 
-                    v-model="password"
-                    @input="checkPasswordStrength"
-                    placeholder="Mínimo 8 caracteres"
-                    required
-                >
-                <div class="password-strength">
-                    <div class="password-strength-bar" :class="passwordStrength"></div>
+                <!-- Name Input -->
+                <div>
+                    <label for="registerName" class="block text-xs font-medium text-gray-700 mb-1">
+                        Nombre Completo
+                    </label>
+                    <input 
+                        type="text" 
+                        id="registerName" 
+                        v-model="name"
+                        placeholder="Juan Pérez Gómez"
+                        required
+                        class="w-full px-3 py-2 bg-white/60 backdrop-blur border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emi-navy-500 focus:ring-2 focus:ring-emi-navy-500/10 transition-all text-gray-800 placeholder-gray-400 text-sm"
+                    />
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="registerConfirmPassword">Confirmar Contraseña</label>
-                <input 
-                    type="password" 
-                    id="registerConfirmPassword" 
-                    v-model="confirmPassword"
-                    placeholder="Repite tu contraseña"
-                    required
+                <!-- Email Input -->
+                <div>
+                    <label for="registerEmail" class="block text-xs font-medium text-gray-700 mb-1">
+                        Correo Electrónico
+                    </label>
+                    <input 
+                        type="email" 
+                        id="registerEmail" 
+                        v-model="email"
+                        placeholder="correo@est.emi.edu.bo"
+                        required
+                        class="w-full px-3 py-2 bg-white/60 backdrop-blur border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emi-navy-500 focus:ring-2 focus:ring-emi-navy-500/10 transition-all text-gray-800 placeholder-gray-400 text-sm"
+                    />
+                </div>
+
+                <!-- Password Input -->
+                <div>
+                    <label for="registerPassword" class="block text-xs font-medium text-gray-700 mb-1">
+                        Contraseña
+                    </label>
+                    <input 
+                        type="password" 
+                        id="registerPassword" 
+                        v-model="password"
+                        @input="checkPasswordStrength"
+                        placeholder="Mínimo 8 caracteres"
+                        required
+                        class="w-full px-3 py-2 bg-white/60 backdrop-blur border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emi-navy-500 focus:ring-2 focus:ring-emi-navy-500/10 transition-all text-gray-800 placeholder-gray-400 text-sm"
+                    />
+                    <!-- Password Strength Indicator -->
+                    <div class="h-1 bg-gray-200 rounded-full mt-1 overflow-hidden">
+                        <div 
+                            class="h-full transition-all duration-300 rounded-full"
+                            :class="{
+                                'w-1/3 bg-red-500': passwordStrength === 'weak',
+                                'w-2/3 bg-yellow-500': passwordStrength === 'medium',
+                                'w-full bg-green-500': passwordStrength === 'strong'
+                            }"
+                        ></div>
+                    </div>
+                </div>
+
+                <!-- Confirm Password Input -->
+                <div>
+                    <label for="registerConfirmPassword" class="block text-xs font-medium text-gray-700 mb-1">
+                        Confirmar Contraseña
+                    </label>
+                    <input 
+                        type="password" 
+                        id="registerConfirmPassword" 
+                        v-model="confirmPassword"
+                        placeholder="Repite tu contraseña"
+                        required
+                        class="w-full px-3 py-2 bg-white/60 backdrop-blur border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emi-navy-500 focus:ring-2 focus:ring-emi-navy-500/10 transition-all text-gray-800 placeholder-gray-400 text-sm"
+                    />
+                </div>
+
+                <!-- Error/Success Messages -->
+                <div v-if="error" class="bg-red-50 border-l-4 border-red-500 text-red-700 p-2 rounded-lg text-xs">
+                    {{ error }}
+                </div>
+
+                <div v-if="successMessage" class="bg-green-50 border-l-4 border-green-500 text-green-700 p-2 rounded-lg text-xs">
+                    {{ successMessage }}
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    :disabled="isLoading"
+                    class="w-full py-2.5 bg-gradient-to-r from-emi-navy-500 to-emi-navy-700 text-white font-semibold rounded-lg shadow-lg shadow-emi-navy-500/30 hover:shadow-xl hover:shadow-emi-navy-500/40 hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm"
                 >
+                    {{ isLoading ? 'Creando cuenta...' : 'Crear Cuenta' }}
+                </button>
+            </form>
+
+
+            <!-- Footer -->
+            <div class="text-center mt-3 pt-3 border-t border-gray-200">
+                <div class="text-xs text-gray-500 italic mb-1">
+                    "Mcal. Antonio José de Sucre"<br>
+                    <strong class="text-emi-gold-600">Prestigio, Disciplina y Oportunidades</strong>
+                </div>
+                <p class="text-xs text-gray-400">© 2026 DNTIC - Escuela Militar de Ingeniería</p>
             </div>
-
-            <div v-if="error" class="validation-message error active">
-                {{ error }}
-            </div>
-
-            <div v-if="successMessage" class="validation-message success active">
-                {{ successMessage }}
-            </div>
-
-            <button type="submit" class="btn-primary" :disabled="isLoading">
-                {{ isLoading ? 'Creando cuenta...' : 'Crear Cuenta' }}
-            </button>
-        </form>
-
-        <!-- Administrative Access -->
-        <button class="btn-secondary" @click="alert('Esta funcionalidad estará disponible pronto')">
-            🔐 Acceso Administrativo
-        </button>
-
-        <!-- Footer -->
-        <div class="login-footer">
-            <div class="institutional-motto">
-                "Mcal. Antonio José de Sucre"<br>
-                <strong>Prestigio, Disciplina y Oportunidades</strong>
-            </div>
-            <p style="margin-top: 1rem;">© 2026 DNTIC - Escuela Militar de Ingeniería</p>
         </div>
     </div>
 </div>
