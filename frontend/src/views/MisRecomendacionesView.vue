@@ -1,8 +1,15 @@
 <template>
-  <div class="dashboard-bg min-h-screen pt-16">
+  <StudentLayout>
     <div class="flex">
-      <!-- Sidebar -->
-      <aside class="hidden lg:block fixed top-16 left-0 w-[280px] h-[calc(100vh-4rem)] bg-white border-r border-gray-200 overflow-y-auto">
+      <!-- Secondary Sidebar (Recommendations Info) -->
+      <CollapsibleSidebar 
+        v-model:isOpen="isSecondarySidebarOpen" 
+        width="280px" 
+        collapsedWidth="60px" 
+        persistenceKey="studentRecommendationsSidebar"
+        :leftOffset="uiStore.isSidebarOpen ? '256px' : '80px'"
+      >
+        <!-- Expanded Content -->
         <div class="p-6">
           <!-- Best Match Gauge -->
           <div v-if="bestMatch" class="text-center mb-6">
@@ -11,7 +18,7 @@
               size="lg"
               label="Mejor Match"
             />
-            <p class="text-sm text-gray-600 mt-2">{{ bestMatch.oferta?.titulo }}</p>
+            <p class="text-sm text-gray-600 mt-2 truncate" :title="bestMatch.oferta?.titulo">{{ bestMatch.oferta?.titulo }}</p>
           </div>
           <div v-else class="text-center mb-6">
             <GaugeChart
@@ -22,7 +29,7 @@
           </div>
 
           <!-- Stats Summary -->
-          <div class="mb-6 p-4 bg-emi-navy-50 rounded-xl">
+          <div class="mb-6 p-4 bg-emi-navy-50 rounded-xl border border-emi-navy-100">
             <h3 class="text-sm font-semibold text-emi-navy-700 mb-3">Resumen</h3>
             <div class="space-y-2">
               <div class="flex justify-between items-center">
@@ -63,13 +70,13 @@
               </div>
               <div v-if="perfilSummary.experience_years">
                 <p class="text-xs text-gray-500">Experiencia</p>
-                <p class="text-sm font-medium text-gray-700">{{ perfilSummary.experience_years }} anos</p>
+                <p class="text-sm font-medium text-gray-700">{{ perfilSummary.experience_years }} años</p>
               </div>
             </div>
           </div>
 
           <!-- Filter/Actions -->
-          <div class="space-y-3">
+          <div class="space-y-3 pt-4 border-t border-gray-100">
             <button
               @click="loadRecommendations(true)"
               :disabled="refreshing"
@@ -92,11 +99,44 @@
             </router-link>
           </div>
         </div>
-      </aside>
 
-      <!-- Main Content -->
-      <main class="flex-1 lg:ml-[280px]">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Collapsed Icons -->
+        <template #collapsed>
+            <div class="space-y-6 flex flex-col items-center w-full px-2">
+                <div class="text-center" title="Mejor Match">
+                     <div v-if="bestMatch" class="relative w-10 h-10 flex items-center justify-center">
+                         <svg class="w-full h-full transform -rotate-90">
+                             <circle cx="20" cy="20" r="16" fill="transparent" stroke="#e2e8f0" stroke-width="4"></circle>
+                             <circle cx="20" cy="20" r="16" fill="transparent" :stroke="bestMatch.match_score >= 0.7 ? '#10b981' : '#f59e0b'" stroke-width="4" 
+                                :stroke-dasharray="100" :stroke-dashoffset="100 - (bestMatch.match_score * 100)"></circle>
+                         </svg>
+                         <span class="absolute text-[10px] font-bold">{{ Math.round(bestMatch.match_score * 100) }}</span>
+                     </div>
+                     <div v-else class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                        <span class="text-xs text-gray-400">0%</span>
+                     </div>
+                </div>
+
+                <div class="flex flex-col gap-3 w-full border-t border-gray-100 pt-4">
+                     <div class="flex flex-col items-center" title="Nuevas Ofertas">
+                        <span class="text-xs font-bold text-emi-gold-600">{{ newCount }}</span>
+                        <div class="w-1 h-1 rounded-full bg-emi-gold-500 mt-0.5"></div>
+                     </div>
+                     <div class="flex flex-col items-center" title="Total Ofertas">
+                        <span class="text-xs font-bold text-emi-navy-600">{{ recommendations.length }}</span>
+                        <div class="w-1 h-1 rounded-full bg-emi-navy-500 mt-0.5"></div>
+                     </div>
+                </div>
+            </div>
+        </template>
+      </CollapsibleSidebar>
+
+      <!-- Main Content Container with Dynamic Margin -->
+      <div 
+        class="flex-1 transition-[margin] duration-300 ease-in-out min-h-screen"
+        :style="{ marginLeft: isSecondarySidebarOpen ? '280px' : '60px' }"
+      >
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <!-- Header -->
           <div class="mb-8">
             <h1 class="text-3xl font-bold text-emi-navy-500">Mis Recomendaciones</h1>
@@ -371,31 +411,26 @@
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
-
-    <!-- Mobile sidebar toggle -->
-    <button
-      @click="isMobileSidebarOpen = !isMobileSidebarOpen"
-      class="lg:hidden fixed bottom-4 right-4 z-40 p-3 bg-emi-navy-500 text-white rounded-full shadow-lg hover:bg-emi-navy-600 transition-colors"
-    >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
-  </div>
+  </StudentLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
+import { useUiStore } from '../stores/ui'
 import { getMyRecommendations, checkRecommendationEligibility, markRecommendationViewed } from '../services/api'
+import StudentLayout from '../components/student/StudentLayout.vue'
+import CollapsibleSidebar from '../components/ui/CollapsibleSidebar.vue'
 import Card from '../components/ui/Card.vue'
 import Badge from '../components/ui/Badge.vue'
 import GaugeChart from '../components/ui/GaugeChart.vue'
 import ProgressBar from '../components/ui/ProgressBar.vue'
 
 const authStore = useAuthStore()
+const uiStore = useUiStore()
+const isSecondarySidebarOpen = ref(true)
 
 const recommendations = ref([])
 const perfilSummary = ref(null)

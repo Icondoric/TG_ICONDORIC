@@ -54,6 +54,7 @@ onMounted(() => {
 
 <template>
     <nav
+        v-if="route.path === '/' || route.path === '/login' || route.path === '/register' || route.path === '/evaluation' || (!route.path.startsWith('/mi-perfil') && !route.path.startsWith('/mis-recomendaciones') && !route.path.startsWith('/admin'))"
         class="fixed w-full top-0 left-0 z-50 transition-all duration-300"
         :class="[
             isDashboardPage
@@ -75,8 +76,16 @@ onMounted(() => {
 
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center gap-6">
-                    <!-- Links publicos (solo en landing y NO autenticado) -->
-                    <template v-if="!isDashboardPage && !authStore.isAuthenticated">
+                    <!-- Links publicos y Estudiantes (Menu Común) -->
+                    <template v-if="!authStore.isAdmin">
+                        <!-- Link Inicio EXPLICITO -->
+                        <a
+                            @click.prevent="handleNavigation('/')"
+                            class="text-gray-700 hover:text-emi-gold-500 font-medium text-sm cursor-pointer transition-colors"
+                        >
+                            Inicio
+                        </a>
+
                         <a
                             @click.prevent="scrollToSection('features')"
                             class="text-gray-700 hover:text-emi-gold-500 font-medium text-sm cursor-pointer transition-colors"
@@ -95,21 +104,19 @@ onMounted(() => {
                         >
                             Acerca de
                         </a>
+                        <!-- Link Evaluar CV -->
+                        <a
+                            @click.prevent="handleNavigation('/evaluation')"
+                            :class="[
+                                'font-semibold text-sm cursor-pointer transition-colors',
+                                isDashboardPage
+                                    ? 'text-emi-gold-400 hover:text-emi-gold-300'
+                                    : 'text-emi-navy-500 hover:text-emi-gold-500'
+                            ]"
+                        >
+                            Evaluar CV
+                        </a>
                     </template>
-
-                    <!-- Link Evaluar CV - Solo para NO autenticados -->
-                    <a
-                        v-if="!authStore.isAuthenticated"
-                        @click.prevent="handleNavigation('/evaluation')"
-                        :class="[
-                            'font-semibold text-sm cursor-pointer transition-colors',
-                            isDashboardPage
-                                ? 'text-emi-gold-400 hover:text-emi-gold-300'
-                                : 'text-emi-navy-500 hover:text-emi-gold-500'
-                        ]"
-                    >
-                        Evaluar CV
-                    </a>
 
                     <!-- Usuario no autenticado -->
                     <template v-if="!authStore.isAuthenticated">
@@ -148,17 +155,6 @@ onMounted(() => {
                             Mi Perfil
                         </button>
                         <button
-                            @click="handleNavigation('/mis-recomendaciones')"
-                            :class="[
-                                'px-4 py-2 rounded-lg font-medium text-sm transition-all',
-                                isDashboardPage && route.path.startsWith('/mis-recomendaciones')
-                                    ? 'bg-white text-emi-gold-600'
-                                    : 'bg-emi-gold-500 text-emi-navy-800 hover:bg-emi-gold-400'
-                            ]"
-                        >
-                            Mis Recomendaciones
-                        </button>
-                        <button
                             @click="authStore.logout()"
                             :class="[
                                 'px-3 py-2 rounded-lg font-medium text-sm border transition-all',
@@ -167,12 +163,25 @@ onMounted(() => {
                                     : 'border-red-500 text-red-500 hover:bg-red-50'
                             ]"
                         >
-                            Salir
+                            Cerrar Sesión
                         </button>
                     </template>
 
                     <!-- Usuario admin -->
                     <template v-else>
+                        <!-- Link Inicio para Admin -->
+                        <a
+                            @click.prevent="handleNavigation('/')"
+                            :class="[
+                                'font-medium text-sm cursor-pointer transition-colors',
+                                isDashboardPage
+                                    ? 'text-white hover:text-emi-gold-300'
+                                    : 'text-gray-700 hover:text-emi-gold-500'
+                            ]"
+                        >
+                            Inicio
+                        </a>
+
                         <button
                             @click="handleNavigation('/admin')"
                             :class="[

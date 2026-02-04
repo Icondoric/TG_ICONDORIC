@@ -46,7 +46,13 @@ const handleLogout = () => {
     >
         <!-- Header -->
         <div class="flex items-center justify-between h-16 border-b border-emi-navy-700 bg-emi-navy-800 px-4">
-            <h1 v-if="uiStore.isSidebarOpen" class="text-xl font-bold tracking-wider uppercase truncate">Admin</h1>
+            <img 
+                v-if="uiStore.isSidebarOpen" 
+                src="@/assets/icons/logoEmi.png" 
+                alt="Logo EMI" 
+                class="h-10 w-auto cursor-pointer hover:opacity-80 transition-opacity" 
+                @click="router.push('/')"
+            />
             <button @click="uiStore.toggleSidebar" class="text-white hover:text-gray-300 focus:outline-none ml-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
