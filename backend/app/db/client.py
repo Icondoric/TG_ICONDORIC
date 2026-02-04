@@ -9,3 +9,6 @@ except ValueError as e:
     print(f"WARNING: Database setup issue: {e}")
     # We allow the app to start so we can see the error, but DB calls will fail.
     supabase = None
+
+def get_supabase_client() -> Client:
+    return supabase

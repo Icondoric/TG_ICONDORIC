@@ -1,37 +1,41 @@
 /**
- * Router - Fase 7
- * Configuracion de rutas incluyendo vistas ML y Admin
+ * Router - Optimized with Lazy Loading
+ * All routes use dynamic imports for code splitting
  */
 
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
-// Views existentes
-import DashboardView from '../views/DashboardView.vue'
+// Eager load only critical routes (Landing Page for fast initial render)
 import LandingPage from '../views/LandingPage.vue'
-import LoginView from '../views/LoginView.vue'
-import RegisterView from '../views/RegisterView.vue'
 
-// Views ML - Fase 7
-import EvaluationView from '../views/EvaluationView.vue'
-import RecommendationsView from '../views/RecommendationsView.vue'
-import HistoryView from '../views/HistoryView.vue'
+// Lazy load all other views for better performance
+const LoginView = () => import('../views/LoginView.vue')
+const RegisterView = () => import('../views/RegisterView.vue')
+const DashboardView = () => import('../views/DashboardView.vue')
 
-// Views Admin - Fase 7
-import AdminDashboardView from '../views/admin/AdminDashboardView.vue'
-import ProfilesAdminView from '../views/admin/ProfilesAdminView.vue'
-import ProfileFormView from '../views/admin/ProfileFormView.vue'
-import UsersAdminView from '../views/admin/UsersAdminView.vue'
-import UserDetailView from '../views/admin/UserDetailView.vue'
-import ReportsView from '../views/admin/ReportsView.vue'
+// ML Views - Lazy loaded
+const EvaluationView = () => import('../views/EvaluationView.vue')
+const RecommendationsView = () => import('../views/RecommendationsView.vue')
+const HistoryView = () => import('../views/HistoryView.vue')
 
+// Admin Views - Lazy loaded
+const AdminDashboardView = () => import('../views/admin/AdminDashboardView.vue')
+const ProfilesAdminView = () => import('../views/admin/ProfilesAdminView.vue')
+const ProfileFormView = () => import('../views/admin/ProfileFormView.vue')
+const UsersAdminView = () => import('../views/admin/UsersAdminView.vue')
+const UserDetailView = () => import('../views/admin/UserDetailView.vue')
+const ReportsView = () => import('../views/admin/ReportsView.vue')
 
-// Views v2 - Sistema de Recomendaciones
-import MiPerfilView from '../views/MiPerfilView.vue'
-import SubirCVView from '../views/SubirCVView.vue'
-import MisRecomendacionesView from '../views/MisRecomendacionesView.vue'
-import OfertasAdminView from '../views/admin/OfertasAdminView.vue'
-import OfertaFormView from '../views/admin/OfertaFormView.vue'
+// Student Views - Lazy loaded
+const MiPerfilView = () => import('../views/MiPerfilView.vue')
+const SubirCVView = () => import('../views/SubirCVView.vue')
+const MisRecomendacionesView = () => import('../views/MisRecomendacionesView.vue')
+const AccountSettingsView = () => import('../views/AccountSettingsView.vue')
+
+// Admin Ofertas - Lazy loaded
+const OfertasAdminView = () => import('../views/admin/OfertasAdminView.vue')
+const OfertaFormView = () => import('../views/admin/OfertaFormView.vue')
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -147,6 +151,12 @@ const router = createRouter({
             name: 'mis-recomendaciones',
             component: MisRecomendacionesView,
             meta: { requiresAuth: true }
+        },
+        {
+            path: '/configuracion-cuenta',
+            name: 'configuracion-cuenta',
+            component: AccountSettingsView,
+            meta: { requiresAuth: true, hideNavbar: true }
         },
 
         // Rutas v2 - Admin Ofertas

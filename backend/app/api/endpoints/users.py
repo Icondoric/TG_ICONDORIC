@@ -9,9 +9,149 @@ from app.api.schemas.ml_schemas import (
     UsuarioAdminResponse, 
     PerfilProfesionalResponse
 )
+from app.api.schemas.user_schemas import UserUpdateRequest, PasswordChangeRequest
 from app.services.profile_service import get_profile_service
 
 router = APIRouter()
+
+# ============================================
+# User Account Self-Management Endpoints
+# ============================================
+
+@router.get("/me/account")
+async def get_my_account(
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Obtener información de la cuenta del usuario actual.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Database connection not available")
+
+    try:
+        user_id = current_user['user_id']
+        response = supabase.table("usuarios").select("id, email, nombre_completo, rol, created_at").eq("id", user_id).execute()
+        
+        if not response.data:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        user_data = response.data[0]
+        
+        return {
+            "id": user_data['id'],
+            "email": user_data['email'],
+            "nombre_completo": user_data.get('nombre_completo'),
+            "rol": user_data['rol'],
+            "created_at": user_data['created_at']
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting account info: {e}")
+        raise HTTPException(status_code=500, detail=f"Error getting account info: {str(e)}")
+
+@router.put("/me")
+async def update_my_account(
+    user_update: UserUpdateRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Actualizar información de la cuenta del usuario actual (nombre, email).
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Database connection not available")
+
+    user_id = current_user['user_id']
+    
+    # Convert Pydantic model to dict, excluding None values
+    data = user_update.model_dump(exclude_unset=True)
+    
+    if not data:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+
+    try:
+        # If updating email, check if it's already taken by another user
+        if 'email' in data:
+            check = supabase.table("usuarios").select("id").eq("email", data['email']).neq("id", user_id).execute()
+            if check.data:
+                raise HTTPException(status_code=400, detail="Email ya está en uso por otro usuario")
+        
+        # Update user
+        response = supabase.table("usuarios").update(data).eq("id", user_id).execute()
+        
+        if not response.data:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        updated_user = response.data[0]
+        
+        return {
+            "message": "Cuenta actualizada exitosamente",
+            "user": {
+                "id": updated_user['id'],
+                "email": updated_user['email'],
+                "nombre_completo": updated_user.get('nombre_completo'),
+                "rol": updated_user['rol']
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error updating account: {e}")
+        raise HTTPException(status_code=500, detail=f"Error updating account: {str(e)}")
+
+@router.put("/me/password")
+async def change_my_password(
+    password_data: PasswordChangeRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Cambiar contraseña del usuario actual.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Database connection not available")
+
+    user_id = current_user['user_id']
+    
+    current_password = password_data.current_password
+    new_password = password_data.new_password
+    
+    if len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="La nueva contraseña debe tener al menos 6 caracteres")
+
+    try:
+        # Get current user data
+        response = supabase.table("usuarios").select("password_hash").eq("id", user_id).execute()
+        
+        if not response.data:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        db_user = response.data[0]
+        
+        # Verify current password
+        from app.core.security import verify_password, get_password_hash
+        if not verify_password(current_password, db_user['password_hash']):
+            raise HTTPException(status_code=400, detail="Contraseña actual incorrecta")
+        
+        # Hash new password
+        new_password_hash = get_password_hash(new_password)
+        
+        # Update password
+        update_response = supabase.table("usuarios").update({
+            "password_hash": new_password_hash
+        }).eq("id", user_id).execute()
+        
+        if not update_response.data:
+            raise HTTPException(status_code=500, detail="Error updating password")
+            
+        return {"message": "Contraseña actualizada exitosamente"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error changing password: {e}")
+        raise HTTPException(status_code=500, detail=f"Error changing password: {str(e)}")
 
 @router.get("/", response_model=UsuariosListResponse)
 async def list_users(
@@ -250,3 +390,5 @@ async def delete_user(
     except Exception as e:
         print(f"Error deleting user: {e}")
         raise HTTPException(status_code=500, detail=f"Error deleting user: {str(e)}")
+
+

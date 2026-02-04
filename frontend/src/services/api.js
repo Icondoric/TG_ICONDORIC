@@ -386,5 +386,39 @@ export const getMyRecommendationStats = async () => {
     return response.data
 }
 
+// ============================================
+// Account Management
+// ============================================
+
+/**
+ * Obtiene información de la cuenta del usuario actual
+ */
+export const getAccountInfo = async () => {
+    const response = await api.get('/api/users/me/account')
+    return response.data
+}
+
+/**
+ * Actualiza información de la cuenta (nombre, email)
+ * @param {Object} data - Datos a actualizar
+ */
+export const updateAccount = async (data) => {
+    const response = await api.put('/api/users/me', data)
+    return response.data
+}
+
+/**
+ * Cambia la contraseña del usuario
+ * @param {string} currentPassword - Contraseña actual
+ * @param {string} newPassword - Nueva contraseña
+ */
+export const changePassword = async (currentPassword, newPassword) => {
+    const response = await api.put('/api/users/me/password', {
+        current_password: currentPassword,
+        new_password: newPassword
+    })
+    return response.data
+}
+
 // Exportar instancia para uso directo si es necesario
 export default api

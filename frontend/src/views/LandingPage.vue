@@ -4,450 +4,365 @@
     <NavBar />
 
     <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-container">
-        <div class="hero-content">
-          <h1>Sistema de Evaluación de Perfiles Profesionales con IA</h1>
-          <p>Plataforma inteligente que aplica Procesamiento de Lenguaje Natural y Machine Learning para recomendar oportunidades laborales y de pasantía según tu perfil académico</p>
-          <div class="hero-stats">
-            <div class="stat">
-              <span class="stat-number">92%</span>
-              <span class="stat-label">Precisión en evaluación</span>
-            </div>
-            <div class="stat">
-              <span class="stat-number">&lt; 30s</span>
-              <span class="stat-label">Procesamiento NLP</span>
-            </div>
-            <div class="stat">
-              <span class="stat-number">100+</span>
-              <span class="stat-label">Convenios activos</span>
-            </div>
-          </div>
-        </div>
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-emi-navy-900 via-emi-navy-800 to-emi-navy-900">
+      <!-- Animated gradient mesh background -->
+      <div class="absolute inset-0 opacity-30">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-emi-gold-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse-slow"></div>
+        <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-emi-navy-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse-slow" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-1/4 left-1/3 w-96 h-96 bg-emi-gold-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
+      </div>
 
-        <div class="upload-card">
-          <h3>Digitaliza tu Perfil</h3>
-          <p>Carga tu CV y recibe recomendaciones personalizadas de la EMI</p>
-          <div 
-            class="dropzone" 
-            @click="triggerFileInput"
-            @dragover.prevent="handleDragOver"
-            @dragleave="handleDragLeave"
-            @drop.prevent="handleDrop"
-            :class="{ 'border-primary': isDragging }"
-          >
-            <div class="dropzone-content" v-if="!isProcessing">
-                <div class="dropzone-icon">📄</div>
-                <div style="color: var(--text-dark); font-weight: 500; margin-bottom: 0.5rem;">Arrastra tu CV aquí</div>
-                <div style="color: var(--text-light); font-size: 0.9rem;">o haz clic para seleccionar (PDF, máx. 2MB)</div>
-            </div>
-            <div class="dropzone-content" v-else>
-                 <div style="font-size: 4rem; margin-bottom: 1rem;">⏳</div>
-                <div style="color: var(--text-dark); font-weight: 500;">Procesando con NLP...</div>
-                <div style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.5rem;">{{ processingFileName }}</div>
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <!-- Left: Content -->
+          <div class="text-white space-y-8 animate-slide-up">
+            <h1 class="font-display font-bold text-5xl lg:text-6xl leading-tight">
+              Sistema de Evaluación de 
+              <span class="text-gradient-emi bg-clip-text text-transparent bg-gradient-to-r from-emi-gold-400 to-emi-gold-600">
+                Perfiles Profesionales
+              </span> 
+              con IA
+            </h1>
+            
+            <p class="text-xl text-gray-300 leading-relaxed">
+              Plataforma inteligente que aplica <span class="text-emi-gold-400 font-semibold">Procesamiento de Lenguaje Natural</span> y <span class="text-emi-gold-400 font-semibold">Machine Learning</span> para recomendar oportunidades laborales y de pasantía según tu perfil académico
+            </p>
+
+            <!-- Stats badges -->
+            <div class="flex flex-wrap gap-4 pt-4">
+              <div class="glass px-6 py-4 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
+                <div class="text-3xl font-bold text-emi-gold-400">92%</div>
+                <div class="text-sm text-gray-300 mt-1">Precisión en evaluación</div>
+              </div>
+              <div class="glass px-6 py-4 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
+                <div class="text-3xl font-bold text-emi-gold-400">&lt; 30s</div>
+                <div class="text-sm text-gray-300 mt-1">Procesamiento NLP</div>
+              </div>
+              <div class="glass px-6 py-4 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
+                <div class="text-3xl font-bold text-emi-gold-400">100+</div>
+                <div class="text-sm text-gray-300 mt-1">Convenios activos</div>
+              </div>
             </div>
           </div>
-          <input 
-            type="file" 
-            ref="fileInputRef" 
-            accept=".pdf" 
-            style="display: none;" 
-            @change="handleFileChange"
-          >
-          <button class="btn-upload" @click="triggerFileInput">Comenzar Evaluación</button>
+
+          <!-- Right: Upload Card -->
+          <div class="animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="glass backdrop-blur-xl bg-white/95 rounded-3xl shadow-emi-lg p-8 border border-white/20">
+              <h3 class="font-display font-bold text-2xl text-emi-navy-900 mb-2">Digitaliza tu Perfil</h3>
+              <p class="text-gray-600 mb-6">Carga tu CV y recibe recomendaciones personalizadas de la EMI</p>
+              
+              <!-- Dropzone -->
+              <div 
+                class="relative group cursor-pointer transition-all duration-300"
+                @click="triggerFileInput"
+                @dragover.prevent="handleDragOver"
+                @dragleave="handleDragLeave"
+                @drop.prevent="handleDrop"
+              >
+                <div 
+                  class="border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300"
+                  :class="isDragging ? 'border-emi-gold-500 bg-emi-gold-50' : 'border-gray-300 hover:border-emi-navy-400 hover:bg-gray-50'"
+                >
+                  <div v-if="!isProcessing" class="space-y-4">
+                    <!-- Icon -->
+                    <div class="mx-auto w-20 h-20 bg-gradient-to-br from-emi-navy-500 to-emi-navy-700 rounded-2xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                      <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    
+                    <div>
+                      <div class="text-lg font-semibold text-gray-900 mb-1">Arrastra tu CV aquí</div>
+                      <div class="text-sm text-gray-500">o haz clic para seleccionar</div>
+                      <div class="text-xs text-gray-400 mt-2">PDF, máx. 2MB</div>
+                    </div>
+                  </div>
+
+                  <div v-else class="space-y-4">
+                    <!-- Processing animation -->
+                    <div class="mx-auto w-20 h-20 bg-gradient-to-br from-emi-gold-400 to-emi-gold-600 rounded-2xl flex items-center justify-center">
+                      <svg class="w-10 h-10 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="text-lg font-semibold text-gray-900">Procesando con NLP...</div>
+                      <div class="text-sm text-gray-500 mt-1">{{ processingFileName }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <input 
+                type="file" 
+                ref="fileInputRef" 
+                accept=".pdf" 
+                class="hidden" 
+                @change="handleFileChange"
+              >
+
+              <button 
+                class="w-full mt-6 bg-gradient-to-r from-emi-navy-600 to-emi-navy-700 hover:from-emi-navy-700 hover:to-emi-navy-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-emi-lg flex items-center justify-center gap-2"
+                @click="triggerFileInput"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Comenzar Evaluación
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Features Section -->
-    <section class="features" id="features">
-      <div class="features-container">
-        <h2 class="section-title">Un Sistema de Apoyo a la Decisión</h2>
-        <p class="section-subtitle">Tecnología de vanguardia para conectar estudiantes y titulados de la EMI con oportunidades institucionales</p>
+    <section class="py-24 bg-gray-50" id="features">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 animate-slide-up">
+          <h2 class="font-display font-bold text-4xl lg:text-5xl text-emi-navy-900 mb-4">
+            Tecnología de Vanguardia
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Sistema inteligente que conecta estudiantes y titulados de la EMI con oportunidades institucionales
+          </p>
+        </div>
         
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">🤖</div>
-            <h3>Extracción Automática con NLP</h3>
-            <p>Procesamiento híbrido que combina expresiones regulares (Regex) para datos de contacto y spaCy para identificar competencias técnicas y blandas en español</p>
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Feature 1: NLP Extraction -->
+          <div class="group bg-white rounded-2xl p-8 shadow-md hover:shadow-emi-lg transition-all duration-300 hover:-translate-y-2 animate-slide-up">
+            <div class="w-16 h-16 bg-gradient-to-br from-emi-navy-500 to-emi-navy-700 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 class="font-display font-bold text-2xl text-emi-navy-900 mb-4">
+              Extracción Automática con NLP
+            </h3>
+            <p class="text-gray-600 leading-relaxed">
+              Procesamiento híbrido que combina <span class="font-semibold text-emi-navy-700">Regex</span> para datos de contacto y <span class="font-semibold text-emi-navy-700">spaCy</span> para identificar competencias técnicas y blandas en español
+            </p>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">🎯</div>
-            <h3>Evaluación Inteligente</h3>
-            <p>Modelo de Machine Learning (TF-IDF + Similitud Coseno) que calcula la correspondencia entre tu perfil y los perfiles laborales de referencia basados en convenios institucionales</p>
+          <!-- Feature 2: ML Matching -->
+          <div class="group bg-white rounded-2xl p-8 shadow-md hover:shadow-emi-lg transition-all duration-300 hover:-translate-y-2 animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="w-16 h-16 bg-gradient-to-br from-emi-gold-500 to-emi-gold-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h3 class="font-display font-bold text-2xl text-emi-navy-900 mb-4">
+              Evaluación Inteligente con ML
+            </h3>
+            <p class="text-gray-600 leading-relaxed">
+              Modelo de Machine Learning (<span class="font-semibold text-emi-navy-700">TF-IDF + Similitud Coseno</span>) que calcula la correspondencia entre tu perfil y las ofertas laborales con precisión del 92%
+            </p>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">⚡</div>
-            <h3>Validación Humana</h3>
-            <p>El sistema pre-llena tu información pero TÚ tienes la última palabra. Valida y corrige los datos extraídos antes de confirmar tu perfil</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">🔍</div>
-            <h3>Explicabilidad Total</h3>
-            <p>No solo recibes un porcentaje de compatibilidad. El sistema te muestra EXACTAMENTE qué competencias coinciden y cuáles te faltan para cada oferta</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">📊</div>
-            <h3>Recomendaciones, No Postulaciones</h3>
-            <p>El sistema genera sugerencias basadas en tu perfil. Para postular, debes seguir el conducto regular de la Unidad de Vinculación de la EMI</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">🛡️</div>
-            <h3>Seguridad JWT + bcrypt</h3>
-            <p>Autenticación stateless con tokens firmados y hashing irreversible de contraseñas. Tus datos están protegidos con estándares de la industria</p>
+          <!-- Feature 3: Explainability -->
+          <div class="group bg-white rounded-2xl p-8 shadow-md hover:shadow-emi-lg transition-all duration-300 hover:-translate-y-2 animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="w-16 h-16 bg-gradient-to-br from-emi-navy-500 to-emi-navy-700 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+            <h3 class="font-display font-bold text-2xl text-emi-navy-900 mb-4">
+              Explicabilidad Total
+            </h3>
+            <p class="text-gray-600 leading-relaxed">
+              No solo recibes un porcentaje de compatibilidad. El sistema te muestra <span class="font-semibold text-emi-navy-700">exactamente</span> qué competencias coinciden y cuáles te faltan para cada oferta
+            </p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- How it Works -->
-    <section class="how-it-works" id="how-it-works">
-      <div class="features-container">
-        <h2 class="section-title">¿Cómo Funciona el Sistema?</h2>
-        <p class="section-subtitle">Proceso validado mediante metodología CRISP-DM y desarrollo incremental con SCRUM</p>
+    <section class="py-24 bg-white" id="how-it-works">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 animate-slide-up">
+          <h2 class="font-display font-bold text-4xl lg:text-5xl text-emi-navy-900 mb-4">
+            ¿Cómo Funciona?
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Proceso simple y transparente en 4 pasos
+          </p>
+        </div>
 
-        <div class="steps">
-          <div class="step">
-            <div class="step-number">1</div>
-            <h3>Digitalización del CV</h3>
-            <p>Sube tu currículum en PDF. El módulo de NLP extrae datos de contacto (Regex), limpia el texto y detecta competencias usando diccionarios validados (spaCy es_core_news_md)</p>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- Step 1 -->
+          <div class="relative animate-slide-up">
+            <div class="bg-gradient-to-br from-emi-navy-50 to-white rounded-2xl p-6 border border-emi-navy-100 hover:shadow-emi transition-all duration-300">
+              <div class="w-12 h-12 bg-gradient-to-br from-emi-navy-600 to-emi-navy-700 rounded-xl flex items-center justify-center mb-4">
+                <span class="text-white font-bold text-xl">1</span>
+              </div>
+              <h3 class="font-display font-bold text-xl text-emi-navy-900 mb-3">
+                Sube tu CV
+              </h3>
+              <p class="text-gray-600 text-sm leading-relaxed">
+                Carga tu currículum en PDF. El sistema extrae automáticamente tu información usando NLP
+              </p>
+            </div>
+            <!-- Connector arrow (hidden on mobile) -->
+            <div class="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+              <svg class="w-8 h-8 text-emi-gold-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
           </div>
 
-          <div class="step">
-            <div class="step-number">2</div>
-            <h3>Validación Manual</h3>
-            <p>Revisas un formulario pre-llenado con la información extraída. Corriges errores de lectura y confirmas tu perfil antes de guardarlo en la base de datos híbrida (SQL + NoSQL)</p>
+          <!-- Step 2 -->
+          <div class="relative animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="bg-gradient-to-br from-emi-gold-50 to-white rounded-2xl p-6 border border-emi-gold-100 hover:shadow-gold transition-all duration-300">
+              <div class="w-12 h-12 bg-gradient-to-br from-emi-gold-500 to-emi-gold-600 rounded-xl flex items-center justify-center mb-4">
+                <span class="text-white font-bold text-xl">2</span>
+              </div>
+              <h3 class="font-display font-bold text-xl text-emi-navy-900 mb-3">
+                Valida tus Datos
+              </h3>
+              <p class="text-gray-600 text-sm leading-relaxed">
+                Revisa y corrige la información extraída. Tú tienes el control final sobre tu perfil
+              </p>
+            </div>
+            <!-- Connector arrow -->
+            <div class="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+              <svg class="w-8 h-8 text-emi-gold-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
           </div>
 
-          <div class="step">
-            <div class="step-number">3</div>
-            <h3>Evaluación de Correspondencia</h3>
-            <p>El modelo de ML compara tu texto normalizado con las convocatorias mediante vectorización TF-IDF y similitud coseno, generando un porcentaje de afinidad</p>
+          <!-- Step 3 -->
+          <div class="relative animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="bg-gradient-to-br from-emi-navy-50 to-white rounded-2xl p-6 border border-emi-navy-100 hover:shadow-emi transition-all duration-300">
+              <div class="w-12 h-12 bg-gradient-to-br from-emi-navy-600 to-emi-navy-700 rounded-xl flex items-center justify-center mb-4">
+                <span class="text-white font-bold text-xl">3</span>
+              </div>
+              <h3 class="font-display font-bold text-xl text-emi-navy-900 mb-3">
+                Evaluación ML
+              </h3>
+              <p class="text-gray-600 text-sm leading-relaxed">
+                El modelo calcula la compatibilidad entre tu perfil y las ofertas disponibles
+              </p>
+            </div>
+            <!-- Connector arrow -->
+            <div class="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+              <svg class="w-8 h-8 text-emi-gold-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
           </div>
 
-          <div class="step">
-            <div class="step-number">4</div>
-            <h3>Recomendaciones Personalizadas</h3>
-            <p>Recibes un ranking de oportunidades (Pasantías/Trabajos Dirigidos/Empleos) ordenadas por compatibilidad, con detalles sobre qué competencias posees y cuáles necesitas desarrollar</p>
+          <!-- Step 4 -->
+          <div class="animate-slide-up" style="animation-delay: 0.3s;">
+            <div class="bg-gradient-to-br from-emi-gold-50 to-white rounded-2xl p-6 border border-emi-gold-100 hover:shadow-gold transition-all duration-300">
+              <div class="w-12 h-12 bg-gradient-to-br from-emi-gold-500 to-emi-gold-600 rounded-xl flex items-center justify-center mb-4">
+                <span class="text-white font-bold text-xl">4</span>
+              </div>
+              <h3 class="font-display font-bold text-xl text-emi-navy-900 mb-3">
+                Recibe Recomendaciones
+              </h3>
+              <p class="text-gray-600 text-sm leading-relaxed">
+                Obtén un ranking personalizado de oportunidades ordenadas por compatibilidad
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- About Section -->
-    <section class="about-section" id="about">
-      <!-- Header -->
-      <div class="section-header">
-        <h1 class="section-title">Acerca del Sistema</h1>
-        <p class="section-subtitle">
-            Sistema de Evaluación de Perfiles Profesionales aplicando Procesamiento de Lenguaje Natural y Machine Learning para la Escuela Militar de Ingeniería
-        </p>
-      </div>
-
-      <!-- Main Description -->
-      <div class="main-description">
-        <h3>🎯 ¿Qué es este Sistema?</h3>
-        <p>
-            Este proyecto constituye un <strong>Trabajo de Grado</strong> desarrollado para el Vicerrectorado de Grado de la Escuela Militar de Ingeniería, que tiene como propósito central crear una plataforma web inteligente de intermediación entre estudiantes/titulados y las oportunidades laborales y de pasantía ofrecidas por instituciones y empresas con convenio vigente.
-        </p>
-        <p>
-            A diferencia de los sistemas tradicionales que funcionan como simples repositorios de archivos, esta plataforma es un <strong>sistema activo de apoyo a la toma de decisiones</strong> capaz de "leer", "entender" y "conectar" información académica con demandas reales del mercado laboral mediante técnicas avanzadas de Inteligencia Artificial.
-        </p>
-
-        <div class="highlight-box">
-            <strong>Alcance Explícito:</strong> El sistema se limita a la generación de recomendaciones de correspondencia entre perfiles y ofertas. <strong>NO gestiona postulaciones, selección final, entrevistas ni procesos de contratación</strong>, los cuales dependen exclusivamente de las empresas e instituciones y de los procedimientos establecidos por la Unidad de Vinculación de la EMI.
-        </div>
-
-        <p>
-            El sistema integra dos pilares tecnológicos fundamentales: el <strong>Procesamiento de Lenguaje Natural (PLN)</strong> para extraer y estructurar automáticamente la información contenida en los currículums, y el <strong>Machine Learning</strong> para evaluar matemáticamente el grado de correspondencia entre el perfil del candidato y los requisitos de cada convocatoria.
-        </p>
-      </div>
-
-      <!-- Problem-Solution -->
-      <div class="problem-solution">
-        <div class="ps-card problem">
-            <h4>❌ Problemática Identificada</h4>
-            <ul class="ps-list">
-                <li>Información dispersa en múltiples canales (Facebook, correos, tableros físicos)</li>
-                <li>CVs en formatos no estandarizados dificultan la comparación</li>
-                <li>Búsqueda manual consume tiempo valioso del estudiante</li>
-                <li>Ausencia de criterios objetivos para identificar oportunidades afines</li>
-                <li>Descentralización impide seguimiento institucional</li>
-                <li>Bolivia: 80.8% de informalidad laboral (OIT, 2024)</li>
-            </ul>
-        </div>
-
-        <div class="ps-card solution">
-            <h4>✅ Solución Propuesta</h4>
-            <ul class="ps-list">
-                <li>Centralización de información en plataforma única</li>
-                <li>Extracción automática de datos con NLP híbrido (Regex + spaCy)</li>
-                <li>Recomendaciones personalizadas en segundos</li>
-                <li>Evaluación objetiva mediante similitud coseno (0-100%)</li>
-                <li>Dashboard de métricas para gestión institucional</li>
-                <li>Explicabilidad total del porcentaje de match</li>
-            </ul>
-        </div>
-      </div>
-
-      <!-- Objectives -->
-      <div class="objectives">
-        <h3>🎓 Objetivos del Proyecto</h3>
-
-        <div class="objective-item">
-            <div class="objective-number">G</div>
-            <div class="objective-content">
-                <h4>Objetivo General</h4>
-                <p>Desarrollar un sistema de evaluación de perfiles profesionales aplicando procesamiento de lenguaje natural y machine learning, para centralizar la información de estudiantes y titulados con el propósito de apoyar la toma de decisiones en la identificación de correspondencia entre aptitudes y demandas, a fin de generar recomendaciones laborales y de pasantía en empresas e instituciones con convenio vigente en la EMI.</p>
-            </div>
-        </div>
-
-        <div class="objective-item">
-            <div class="objective-number">1</div>
-            <div class="objective-content">
-                <h4>Recopilación de Información</h4>
-                <p>Recopilar información de convenios gestionados a través de la EMI para determinar los requerimientos funcionales y técnicos del sistema de evaluación de perfiles profesionales.</p>
-            </div>
-        </div>
-
-        <div class="objective-item">
-            <div class="objective-number">2</div>
-            <div class="objective-content">
-                <h4>Diseño de Arquitectura</h4>
-                <p>Diseñar la arquitectura que permita la gestión de información de perfiles, considerando un módulo de procesamiento de lenguaje natural para la extracción y estructuración de información relevante contenida en los currículums.</p>
-            </div>
-        </div>
-
-        <div class="objective-item">
-            <div class="objective-number">3</div>
-            <div class="objective-content">
-                <h4>Integración del Modelo ML</h4>
-                <p>Integrar un modelo de machine learning que permita evaluar los perfiles profesionales con los perfiles laborales de referencia, determinando el nivel de correspondencia entre ambos.</p>
-            </div>
-        </div>
-
-        <div class="objective-item">
-            <div class="objective-number">4</div>
-            <div class="objective-content">
-                <h4>Validación Integral</h4>
-                <p>Realizar la validación integral del sistema mediante pruebas unitarias, de integración, funcionales, de rendimiento y de usabilidad, verificando el correcto desempeño de los módulos de procesamiento de lenguaje natural y machine learning.</p>
-            </div>
-        </div>
-      </div>
-
-      <!-- Methodologies -->
-      <h3 style="text-align: center; color: var(--primary); font-size: 1.8rem; margin: 3rem 0 2rem;">📐 Metodologías Aplicadas</h3>
-      
-      <div class="methodologies">
-        <div class="methodology-card">
-            <div class="methodology-icon">🔄</div>
-            <h4>SCRUM</h4>
-            <p>Marco ágil para el desarrollo incremental del software en sprints de 2 semanas</p>
-            <div class="methodology-phases">
-                <span class="phase-tag">Sprint Planning</span>
-                <span class="phase-tag">Daily Scrum</span>
-                <span class="phase-tag">Sprint Review</span>
-                <span class="phase-tag">Retrospectiva</span>
-            </div>
-        </div>
-
-        <div class="methodology-card">
-            <div class="methodology-icon">📊</div>
-            <h4>CRISP-DM</h4>
-            <p>Estándar internacional para el desarrollo del modelo de Machine Learning</p>
-            <div class="methodology-phases">
-                <span class="phase-tag">Comprensión del Negocio</span>
-                <span class="phase-tag">Comprensión de Datos</span>
-                <span class="phase-tag">Preparación</span>
-                <span class="phase-tag">Modelado</span>
-                <span class="phase-tag">Evaluación</span>
-                <span class="phase-tag">Despliegue</span>
-            </div>
-        </div>
-
-        <div class="methodology-card">
-            <div class="methodology-icon">📐</div>
-            <h4>UML 2.5.1</h4>
-            <p>Lenguaje de modelado unificado para el diseño arquitectónico del sistema</p>
-            <div class="methodology-phases">
-                <span class="phase-tag">Casos de Uso</span>
-                <span class="phase-tag">Clases</span>
-                <span class="phase-tag">Secuencia</span>
-                <span class="phase-tag">Componentes</span>
-                <span class="phase-tag">Despliegue</span>
-            </div>
-        </div>
-      </div>
-
-      <!-- Team Section -->
-      <div class="team-section">
-        <h3>👥 Equipo del Proyecto</h3>
-        <div class="team-grid">
-            <div class="team-member">
-                <div class="team-avatar">👨🎓</div>
-                <div class="team-name">Ivan Condori Choquehuanca</div>
-                <div class="team-role">Autor del Trabajo de Grado<br>Estudiante de Ingeniería de Sistemas</div>
-            </div>
-
-            <div class="team-member">
-                <div class="team-avatar">👩🏫</div>
-                <div class="team-name">Lic. Cynthia Rodriguez Canaviri</div>
-                <div class="team-role">Tutora del Proyecto<br>Escuela Militar de Ingeniería</div>
-            </div>
-
-            <div class="team-member">
-                <div class="team-avatar">🏛️</div>
-                <div class="team-name">Vicerrectorado de Grado</div>
-                <div class="team-role">Unidad Beneficiaria<br>Caso de Estudio: UALP</div>
-            </div>
-        </div>
-      </div>
-
-      <!-- Timeline -->
-      <div class="timeline">
-        <h3>📅 Línea de Tiempo del Desarrollo</h3>
-
-        <div class="timeline-item">
-            <div class="timeline-date">Fase 1</div>
-            <div class="timeline-content">
-                <h4>Recopilación y Análisis (Pre-Juego SCRUM)</h4>
-                <p>Análisis de la situación actual, identificación de actores, historias de usuario y Product Backlog</p>
-            </div>
-        </div>
-
-        <div class="timeline-item">
-            <div class="timeline-date">Fase 2</div>
-            <div class="timeline-content">
-                <h4>Diseño de Arquitectura (Comprensión CRISP-DM)</h4>
-                <p>Diseño del módulo NLP, arquitectura del sistema, base de datos híbrida y modelado UML</p>
-            </div>
-        </div>
-
-        <div class="timeline-item">
-            <div class="timeline-date">Fase 3</div>
-            <div class="timeline-content">
-                <h4>Integración del Modelo ML (Preparación y Modelado)</h4>
-                <p>Preparación de datos, vectorización TF-IDF, entrenamiento del modelo de similitud</p>
-            </div>
-        </div>
-
-        <div class="timeline-item">
-            <div class="timeline-date">Fase 4</div>
-            <div class="timeline-content">
-                <h4>Desarrollo por Sprints (Juego SCRUM)</h4>
-                <p>5 sprints de desarrollo incremental: Usuarios, Digitalización, Ofertas, Evaluación, Reportes</p>
-            </div>
-        </div>
-
-        <div class="timeline-item">
-            <div class="timeline-date">Fase 5</div>
-            <div class="timeline-content">
-                <h4>Validación Integral (Post-Juego + Evaluación)</h4>
-                <p>Pruebas unitarias, de integración, funcionales, de rendimiento y usabilidad</p>
-            </div>
-        </div>
-      </div>
-
-      <!-- Stats -->
-      <h3 style="text-align: center; color: var(--primary); font-size: 1.8rem; margin: 3rem 0 2rem;">📈 Datos del Contexto</h3>
-      
-      <div class="stats-grid">
-        <div class="stat-card">
-            <span class="stat-number">80.8%</span>
-            <span class="stat-label">Informalidad laboral en Bolivia (OIT, 2024)</span>
-        </div>
-
-        <div class="stat-card">
-            <span class="stat-number">100+</span>
-            <span class="stat-label">Convenios institucionales vigentes (EMI UALP)</span>
-        </div>
-
-        <div class="stat-card">
-            <span class="stat-number">50-100</span>
-            <span class="stat-label">Perfiles piloto para validación del sistema</span>
-        </div>
-
-        <div class="stat-card">
-            <span class="stat-number">6</span>
-            <span class="stat-label">Carreras de ingeniería en la UALP</span>
-        </div>
-
-        <div class="stat-card">
-            <span class="stat-number">92%</span>
-            <span class="stat-label">Precisión esperada en evaluación de perfiles</span>
-        </div>
-
-        <div class="stat-card">
-            <span class="stat-number">&lt; 30s</span>
-            <span class="stat-label">Tiempo de procesamiento NLP por CV</span>
-        </div>
-      </div>
-
-      <!-- Final Note -->
-      <div class="main-description" style="margin-top: 3rem;">
-        <h3>🔬 Fundamentación Académica</h3>
-        <p>
-            Este proyecto se sustenta en investigación académica y estándares internacionales reconocidos. El diseño del módulo de Procesamiento de Lenguaje Natural se basa en los trabajos de <strong>Manning, Raghavan & Schütze (2008)</strong> sobre recuperación de información, mientras que la arquitectura de Transformers sigue los lineamientos de <strong>Tunstall, von Werra & Wolf (2022)</strong>.
-        </p>
-        <p>
-            El modelo de Machine Learning se fundamenta en los principios establecidos por <strong>Mitchell (1997)</strong> y las técnicas de vectorización documentadas en <strong>Goodfellow, Bengio & Courville (2016)</strong>. La metodología de desarrollo sigue los estándares del <strong>IEEE SWEBOK</strong> y las mejores prácticas de ingeniería de software propuestas por <strong>Pressman (2010)</strong> y <strong>Sommerville (2011)</strong>.
-        </p>
-        <p>
-            El contexto sociolaboral se analizó utilizando datos de la <strong>Organización Internacional del Trabajo (OIT, 2024-2025)</strong> y estudios de habilidades de la <strong>OECD (2023)</strong>, que evidencian la problemática del desajuste de competencias en América Latina y el Caribe.
-        </p>
       </div>
     </section>
 
     <!-- CTA Section -->
-    <section class="cta">
-      <h2>¿Listo para Descubrir tus Oportunidades?</h2>
-      <p>Sistema desarrollado para el Vicerrectorado de Grado de la Escuela Militar de Ingeniería</p>
-      <button class="btn-cta" @click="scrollToTop">
-        Comenzar Evaluación
-      </button>
+    <section class="py-24 bg-gradient-to-br from-emi-navy-900 via-emi-navy-800 to-emi-navy-900 relative overflow-hidden">
+      <!-- Background decoration -->
+      <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-emi-gold-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emi-navy-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
+      </div>
+
+      <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="font-display font-bold text-4xl lg:text-5xl text-white mb-6 animate-slide-up">
+          ¿Listo para Descubrir tus Oportunidades?
+        </h2>
+        <p class="text-xl text-gray-300 mb-10 animate-slide-up" style="animation-delay: 0.1s;">
+          Sistema desarrollado para el Vicerrectorado de Grado de la Escuela Militar de Ingeniería
+        </p>
+        <button 
+          class="bg-gradient-to-r from-emi-gold-500 to-emi-gold-600 hover:from-emi-gold-600 hover:to-emi-gold-700 text-white font-bold py-4 px-10 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-gold animate-slide-up inline-flex items-center gap-3"
+          style="animation-delay: 0.2s;"
+          @click="scrollToTop"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Comenzar Evaluación
+        </button>
+      </div>
     </section>
 
     <!-- Footer -->
-    <footer>
-      <div class="footer-container">
-        <div class="footer-section">
-          <h4>Sobre el Sistema</h4>
-          <p>Trabajo de Grado: "Sistema de Evaluación de Perfiles Profesionales Aplicando Procesamiento de Lenguaje Natural y Machine Learning"</p>
-          <p style="margin-top: 1rem; font-size: 0.9rem;">Autor: Ivan Condori Choquehuanca<br>Tutora: Lic. Cynthia Rodriguez Canaviri</p>
+    <footer class="bg-emi-navy-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-3 gap-8 mb-8">
+          <!-- Column 1: About -->
+          <div>
+            <h3 class="font-display font-bold text-xl mb-4 text-emi-gold-400">Sistema EMI</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              Plataforma inteligente de evaluación de perfiles profesionales con IA para la Escuela Militar de Ingeniería
+            </p>
+          </div>
+
+          <!-- Column 2: Quick Links -->
+          <div>
+            <h3 class="font-display font-bold text-xl mb-4 text-emi-gold-400">Enlaces Rápidos</h3>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <a href="#features" class="text-gray-400 hover:text-emi-gold-400 transition-colors duration-200">Características</a>
+              </li>
+              <li>
+                <a href="#how-it-works" class="text-gray-400 hover:text-emi-gold-400 transition-colors duration-200">Cómo Funciona</a>
+              </li>
+              <li>
+                <router-link to="/login" class="text-gray-400 hover:text-emi-gold-400 transition-colors duration-200">Iniciar Sesión</router-link>
+              </li>
+              <li>
+                <router-link to="/register" class="text-gray-400 hover:text-emi-gold-400 transition-colors duration-200">Registrarse</router-link>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Column 3: Contact -->
+          <div>
+            <h3 class="font-display font-bold text-xl mb-4 text-emi-gold-400">Contacto</h3>
+            <ul class="space-y-2 text-sm text-gray-400">
+              <li class="flex items-start gap-2">
+                <svg class="w-5 h-5 text-emi-gold-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span>Escuela Militar de Ingeniería<br>Vicerrectorado de Grado</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emi-gold-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span>vinculacion@emi.edu.bo</span>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <div class="footer-section">
-          <h4>Alcance del Sistema</h4>
-          <p>✓ Digitalización de CVs con NLP</p>
-          <p>✓ Evaluación de correspondencia con ML</p>
-          <p>✓ Generación de recomendaciones</p>
-          <p>✗ NO gestiona postulaciones ni contratación</p>
+        <!-- Bottom bar -->
+        <div class="border-t border-gray-800 pt-8 text-center">
+          <p class="text-gray-400 text-sm">
+            © {{ new Date().getFullYear() }} Escuela Militar de Ingeniería. Trabajo de Grado - Ingeniería de Sistemas.
+          </p>
+          <p class="text-gray-500 text-xs mt-2">
+            Desarrollado con Vue.js, FastAPI, spaCy y scikit-learn
+          </p>
         </div>
-
-        <div class="footer-section">
-          <h4>Metodologías Aplicadas</h4>
-          <p>• CRISP-DM (Desarrollo del Modelo ML)</p>
-          <p>• SCRUM (Desarrollo de Software)</p>
-          <p>• UML 2.5.1 (Diseño Arquitectónico)</p>
-        </div>
-
-        <div class="footer-section">
-          <h4>Contacto EMI</h4>
-          <p>📧 vinculacion@emi.edu.bo</p>
-          <p>📞 +591 (2) 2482121</p>
-          <p>📍 Unidad Académica La Paz</p>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>&copy; 2025 Escuela Militar de Ingeniería "Mcal. Antonio José de Sucre" | Prestigio, Disciplina y Oportunidades</p>
       </div>
     </footer>
+
   </div>
 </template>
 
