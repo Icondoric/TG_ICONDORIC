@@ -8,34 +8,29 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
+            '@shared': path.resolve(__dirname, './src/shared'),
+            '@features': path.resolve(__dirname, './src/features'),
+            '@app': path.resolve(__dirname, './src/app'),
         },
     },
     build: {
-        // Optimize chunk size
         chunkSizeWarningLimit: 1000,
         rollupOptions: {
             output: {
-                // Manual chunking for better caching
                 manualChunks: {
-                    // Vendor chunks
                     'vue-vendor': ['vue', 'vue-router', 'pinia'],
-
-                    // UI components chunk
                     'ui-components': [
-                        './src/components/ui/Button.vue',
-                        './src/components/ui/Badge.vue',
-                        './src/components/ui/Card.vue',
+                        './src/shared/components/ui/Button.vue',
+                        './src/shared/components/ui/Badge.vue',
+                        './src/shared/components/ui/Card.vue',
                     ],
-
-                    // Admin views chunk
                     'admin': [
-                        './src/views/admin/AdminDashboardView.vue',
-                        './src/views/admin/ProfilesAdminView.vue',
-                        './src/views/admin/UsersAdminView.vue',
-                        './src/views/admin/OfertasAdminView.vue',
+                        './src/features/admin/views/AdminDashboardView.vue',
+                        './src/features/admin/views/ProfilesAdminView.vue',
+                        './src/features/admin/views/UsersAdminView.vue',
+                        './src/features/admin/views/OfertasAdminView.vue',
                     ],
                 },
-                // Optimize asset file names
                 assetFileNames: (assetInfo) => {
                     const info = assetInfo.name.split('.')
                     const ext = info[info.length - 1]
@@ -50,20 +45,16 @@ export default defineConfig({
                 entryFileNames: 'assets/js/[name]-[hash].js',
             },
         },
-        // Enable CSS code splitting
         cssCodeSplit: true,
-        // Source maps for production debugging (optional, can be disabled)
         sourcemap: false,
-        // Minification
         minify: 'terser',
         terserOptions: {
             compress: {
-                drop_console: true, // Remove console.logs in production
+                drop_console: true,
                 drop_debugger: true,
             },
         },
     },
-    // Optimize dependencies
     optimizeDeps: {
         include: ['vue', 'vue-router', 'pinia'],
     },
