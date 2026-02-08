@@ -23,6 +23,7 @@ const debounceTimeout = ref(null)
 const ROLES = [
     { value: 'estudiante', label: 'Estudiante' },
     { value: 'titulado', label: 'Titulado' },
+    { value: 'operador', label: 'Operador' },
     { value: 'administrador', label: 'Administrador' }
 ]
 
@@ -175,6 +176,7 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
                                     <span :class="[
                                         'px-2.5 py-1 rounded-full text-xs font-medium capitalize',
                                         user.rol === 'administrador' ? 'bg-purple-100 text-purple-700' :
+                                        user.rol === 'operador' ? 'bg-orange-100 text-orange-700' :
                                         user.rol === 'titulado' ? 'bg-indigo-100 text-indigo-700' :
                                         'bg-blue-100 text-blue-700'
                                     ]">

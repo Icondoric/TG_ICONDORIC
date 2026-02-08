@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const isAuthenticated = computed(() => !!token.value)
     const isAdmin = computed(() => user.value?.rol === 'admin' || user.value?.rol === 'administrador')
+    const isOperator = computed(() => user.value?.rol === 'operador' || user.value?.rol === 'administrador')
 
     async function login(email, password) {
         try {
@@ -72,5 +73,5 @@ export const useAuthStore = defineStore('auth', () => {
         router.push('/login')
     }
 
-    return { token, user, isAuthenticated, isAdmin, login, register, logout }
+    return { token, user, isAuthenticated, isAdmin, isOperator, login, register, logout }
 })

@@ -104,7 +104,7 @@ const handleRegister = async () => {
                 <!-- Role Selector -->
                 <div>
                     <label class="block text-xs font-medium text-gray-700 mb-1.5">Tipo de Usuario</label>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-3 gap-2">
                         <label 
                             class="relative cursor-pointer"
                             :class="role === 'estudiante' ? 'ring-2 ring-emi-navy-500' : ''"
@@ -125,6 +125,17 @@ const handleRegister = async () => {
                             <div class="bg-white/60 backdrop-blur border-2 rounded-lg py-2 px-3 text-center transition-all hover:border-emi-navy-500"
                                  :class="role === 'titulado' ? 'border-emi-navy-500 bg-emi-navy-50/50' : 'border-gray-200'">
                                 <div class="text-xs font-semibold text-gray-700">Titulado</div>
+                            </div>
+                        </label>
+                        <label 
+                            class="relative cursor-pointer"
+                            :class="role === 'operador' ? 'ring-2 ring-emi-navy-500' : ''"
+                            @click="role = 'operador'"
+                        >
+                            <input type="radio" value="operador" v-model="role" class="sr-only" />
+                            <div class="bg-white/60 backdrop-blur border-2 rounded-lg py-2 px-3 text-center transition-all hover:border-emi-navy-500"
+                                 :class="role === 'operador' ? 'border-emi-navy-500 bg-emi-navy-50/50' : 'border-gray-200'">
+                                <div class="text-xs font-semibold text-gray-700">Operador</div>
                             </div>
                         </label>
                     </div>

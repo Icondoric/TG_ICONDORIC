@@ -98,6 +98,29 @@ async def verify_admin_role(
     return current_user
 
 
+async def verify_operator_access(
+    current_user: dict = Depends(get_current_user)
+) -> dict:
+    """
+    Verifica que el usuario tenga rol de operador o administrador
+
+    Args:
+        current_user: Usuario actual
+
+    Returns:
+        Dict con user_id y role
+
+    Raises:
+        HTTPException 403: Si no es operador ni administrador
+    """
+    if current_user.get("role") not in ["operador", "administrador"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acceso denegado. Se requiere rol de operador o administrador."
+        )
+    return current_user
+
+
 async def verify_ml_model_loaded(
     ml_service: MLIntegrationService = Depends(get_ml_service)
 ) -> MLIntegrationService:

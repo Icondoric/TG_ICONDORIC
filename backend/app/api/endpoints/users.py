@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from typing import List, Optional
 from datetime import datetime
 
-from app.api.dependencies import get_current_user, verify_admin_role
+from app.api.dependencies import get_current_user, verify_admin_role, verify_operator_access
 from app.db.client import supabase
 from app.api.schemas.ml_schemas import (
     UsuariosListResponse, 
@@ -159,11 +159,11 @@ async def list_users(
     page_size: int = Query(20, ge=1, le=100),
     role: Optional[str] = None,
     search: Optional[str] = None,
-    current_user: dict = Depends(verify_admin_role)
+    current_user: dict = Depends(verify_operator_access)
 ):
     """
     Listar usuarios con paginacion y filtros.
-    Solo para administradores.
+    Solo para operadores y administradores.
     """
     if not supabase:
         raise HTTPException(status_code=500, detail="Database connection not available")
@@ -239,7 +239,7 @@ async def list_users(
 @router.get("/{user_id}", response_model=UsuarioAdminResponse)
 async def get_user_detail(
     user_id: str,
-    current_user: dict = Depends(verify_admin_role)
+    current_user: dict = Depends(verify_operator_access)
 ):
     """
     Obtener detalle de un usuario.
@@ -295,7 +295,7 @@ async def get_user_detail(
 @router.get("/{user_id}/profile", response_model=PerfilProfesionalResponse)
 async def get_user_profile_full(
     user_id: str,
-    current_user: dict = Depends(verify_admin_role)
+    current_user: dict = Depends(verify_operator_access)
 ):
     """
     Obtener el perfil profesional completo de un usuario (para ver aptitudes).
@@ -333,7 +333,7 @@ async def get_user_profile_full(
 async def update_user(
     user_id: str,
     user_update: dict,
-    current_user: dict = Depends(verify_admin_role)
+    current_user: dict = Depends(verify_operator_access)
 ):
     """
     Actualizar datos básicos de usuario (rol, nombre).
@@ -363,7 +363,7 @@ async def update_user(
 @router.delete("/{user_id}")
 async def delete_user(
     user_id: str,
-    current_user: dict = Depends(verify_admin_role)
+    current_user: dict = Depends(verify_operator_access)
 ):
     """
     Eliminar usuario (Caution: Physical delete).

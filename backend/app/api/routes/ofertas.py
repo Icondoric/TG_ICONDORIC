@@ -8,7 +8,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.api.dependencies import verify_admin_role
+from app.api.dependencies import verify_admin_role, verify_operator_access
 from app.api.schemas.ml_schemas import (
     OfertaLaboralCreate,
     OfertaLaboralUpdate,
@@ -32,12 +32,12 @@ async def list_ofertas(
     include_expired: bool = Query(False, description="Incluir ofertas expiradas"),
     page: int = Query(1, ge=1, description="Numero de pagina"),
     page_size: int = Query(20, ge=1, le=100, description="Tamano de pagina"),
-    admin_user: dict = Depends(verify_admin_role)
+    admin_user: dict = Depends(verify_operator_access)
 ):
     """
     Lista todas las ofertas laborales con filtros.
 
-    Solo accesible para administradores.
+    Solo accesible para operadores y administradores.
     """
     oferta_service = get_oferta_service()
 
@@ -89,12 +89,12 @@ async def list_ofertas(
 @router.get("/{oferta_id}", response_model=OfertaLaboralResponse)
 async def get_oferta(
     oferta_id: str,
-    admin_user: dict = Depends(verify_admin_role)
+    admin_user: dict = Depends(verify_operator_access)
 ):
     """
     Obtiene una oferta por ID.
 
-    Solo accesible para administradores.
+    Solo accesible para operadores y administradores.
     """
     oferta_service = get_oferta_service()
 
@@ -137,12 +137,12 @@ async def get_oferta(
 @router.post("", response_model=OfertaLaboralResponse, status_code=201)
 async def create_oferta(
     data: OfertaLaboralCreate,
-    admin_user: dict = Depends(verify_admin_role)
+    admin_user: dict = Depends(verify_operator_access)
 ):
     """
     Crea una nueva oferta laboral.
 
-    Solo accesible para administradores.
+    Solo accesible para operadores y administradores.
 
     Campos requeridos:
     - titulo: Titulo de la oferta
@@ -195,12 +195,12 @@ async def create_oferta(
 async def update_oferta(
     oferta_id: str,
     data: OfertaLaboralUpdate,
-    admin_user: dict = Depends(verify_admin_role)
+    admin_user: dict = Depends(verify_operator_access)
 ):
     """
     Actualiza una oferta existente.
 
-    Solo accesible para administradores.
+    Solo accesible para operadores y administradores.
     """
     oferta_service = get_oferta_service()
 
@@ -245,12 +245,12 @@ async def update_oferta(
 @router.delete("/{oferta_id}")
 async def delete_oferta(
     oferta_id: str,
-    admin_user: dict = Depends(verify_admin_role)
+    admin_user: dict = Depends(verify_operator_access)
 ):
     """
     Desactiva una oferta (soft delete).
 
-    Solo accesible para administradores.
+    Solo accesible para operadores y administradores.
     La oferta no se elimina, solo se marca como inactiva.
     """
     oferta_service = get_oferta_service()
@@ -279,12 +279,12 @@ async def delete_oferta(
 @router.post("/{oferta_id}/activate", response_model=OfertaLaboralResponse)
 async def activate_oferta(
     oferta_id: str,
-    admin_user: dict = Depends(verify_admin_role)
+    admin_user: dict = Depends(verify_operator_access)
 ):
     """
     Reactiva una oferta desactivada.
 
-    Solo accesible para administradores.
+    Solo accesible para operadores y administradores.
     """
     oferta_service = get_oferta_service()
 
@@ -320,12 +320,12 @@ async def activate_oferta(
 
 @router.get("/stats/summary")
 async def get_ofertas_stats(
-    admin_user: dict = Depends(verify_admin_role)
+    admin_user: dict = Depends(verify_operator_access)
 ):
     """
     Obtiene estadisticas de ofertas.
 
-    Solo accesible para administradores.
+    Solo accesible para operadores y administradores.
     """
     oferta_service = get_oferta_service()
 

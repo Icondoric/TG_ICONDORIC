@@ -21,11 +21,11 @@
               <span class="text-gradient-emi bg-clip-text text-transparent bg-gradient-to-r from-emi-gold-400 to-emi-gold-600">
                 Perfiles Profesionales
               </span> 
-              con IA
+              Aplicando IA
             </h1>
             
             <p class="text-xl text-gray-300 leading-relaxed">
-              Plataforma inteligente que aplica <span class="text-emi-gold-400 font-semibold">Procesamiento de Lenguaje Natural</span> y <span class="text-emi-gold-400 font-semibold">Machine Learning</span> para recomendar oportunidades laborales y de pasantía según tu perfil académico
+              Plataforma inteligente que aplica <span class="text-emi-gold-400 font-semibold">Procesamiento de Lenguaje Natural</span> y <span class="text-emi-gold-400 font-semibold">Machine Learning</span> para recomendar oportunidades laborales y de pasantía según tu perfil profesional
             </p>
 
             <!-- Stats badges -->

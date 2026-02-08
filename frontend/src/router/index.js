@@ -197,8 +197,8 @@ router.beforeEach((to, from, next) => {
         return
     }
 
-    // Verificar rol de admin
-    if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    // Verificar rol de admin o operador
+    if (to.meta.requiresAdmin && !authStore.isOperator) {
         next({ name: 'dashboard' })
         return
     }

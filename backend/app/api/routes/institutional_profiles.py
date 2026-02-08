@@ -15,7 +15,7 @@ from app.api.schemas.ml_schemas import (
     InstitutionalProfileResponse,
     InstitutionalProfileListResponse
 )
-from app.api.dependencies import verify_admin_role, get_ml_service_dependency
+from app.api.dependencies import verify_admin_role, verify_operator_access, get_ml_service_dependency
 from app.services.ml_integration_service import MLIntegrationService
 
 # Configurar logging
@@ -42,7 +42,7 @@ def check_database():
 async def list_institutional_profiles(
     include_inactive: bool = False,
     sector: str = None,
-    admin_user: dict = Depends(verify_admin_role)
+    admin_user: dict = Depends(verify_operator_access)
 ):
     """
     Lista todos los perfiles institucionales
@@ -99,7 +99,7 @@ async def list_institutional_profiles(
 )
 async def get_institutional_profile(
     profile_id: str,
-    admin_user: dict = Depends(verify_admin_role)
+    admin_user: dict = Depends(verify_operator_access)
 ):
     """
     Obtiene un perfil institucional especifico
@@ -153,7 +153,7 @@ async def get_institutional_profile(
 )
 async def create_institutional_profile(
     profile: InstitutionalProfileCreate,
-    admin_user: dict = Depends(verify_admin_role),
+    admin_user: dict = Depends(verify_operator_access),
     ml_service: MLIntegrationService = Depends(get_ml_service_dependency)
 ):
     """
@@ -240,7 +240,7 @@ async def create_institutional_profile(
 async def update_institutional_profile(
     profile_id: str,
     profile: InstitutionalProfileUpdate,
-    admin_user: dict = Depends(verify_admin_role),
+    admin_user: dict = Depends(verify_operator_access),
     ml_service: MLIntegrationService = Depends(get_ml_service_dependency)
 ):
     """
@@ -336,7 +336,7 @@ async def update_institutional_profile(
 )
 async def delete_institutional_profile(
     profile_id: str,
-    admin_user: dict = Depends(verify_admin_role),
+    admin_user: dict = Depends(verify_operator_access),
     ml_service: MLIntegrationService = Depends(get_ml_service_dependency)
 ):
     """
@@ -394,7 +394,7 @@ async def delete_institutional_profile(
 )
 async def activate_institutional_profile(
     profile_id: str,
-    admin_user: dict = Depends(verify_admin_role),
+    admin_user: dict = Depends(verify_operator_access),
     ml_service: MLIntegrationService = Depends(get_ml_service_dependency)
 ):
     """
@@ -457,7 +457,7 @@ async def activate_institutional_profile(
     description="Lista todos los sectores de perfiles institucionales"
 )
 async def list_sectors(
-    admin_user: dict = Depends(verify_admin_role)
+    admin_user: dict = Depends(verify_operator_access)
 ):
     """
     Lista los sectores unicos de los perfiles

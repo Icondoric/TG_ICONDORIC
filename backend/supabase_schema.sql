@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    rol TEXT NOT NULL CHECK (rol IN ('estudiante', 'titulado', 'administrador', 'admin')),
+    rol TEXT NOT NULL CHECK (rol IN ('estudiante', 'titulado', 'administrador', 'admin', 'operador')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 

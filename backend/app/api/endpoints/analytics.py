@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 from collections import Counter
 
-from app.api.dependencies import verify_admin_role
+from app.api.dependencies import verify_admin_role, verify_operator_access
 from app.db.client import supabase
 
 router = APIRouter()
@@ -28,7 +28,7 @@ def apply_date_filter(query, date_field, start_date, end_date):
 async def get_users_summary(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
-    current_user: dict = Depends(verify_admin_role)
+    current_user: dict = Depends(verify_operator_access)
 ):
     """
     Obtener resumen de usuarios. 
@@ -74,7 +74,7 @@ async def get_users_summary(
 async def get_user_growth(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
-    current_user: dict = Depends(verify_admin_role)
+    current_user: dict = Depends(verify_operator_access)
 ):
     """
     Obtener crecimiento de usuarios en el rango.
@@ -128,7 +128,7 @@ async def get_user_growth(
 async def get_skills_cloud(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
-    current_user: dict = Depends(verify_admin_role)
+    current_user: dict = Depends(verify_operator_access)
 ):
     """
     Obtener habilidades de perfiles actualizados en el rango.
@@ -168,7 +168,7 @@ async def get_skills_cloud(
 async def get_profile_completion(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
-    current_user: dict = Depends(verify_admin_role)
+    current_user: dict = Depends(verify_operator_access)
 ):
     """
     Estadísticas sobre el estado de completitud.
