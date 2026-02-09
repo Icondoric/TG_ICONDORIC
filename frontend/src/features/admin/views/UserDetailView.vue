@@ -8,7 +8,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from '@/features/admin/store/users.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import AppLayout from '@/shared/components/AppLayout.vue'
-import { adminMenuItems } from '@/shared/constants/navigation'
 
 const route = useRoute()
 const router = useRouter()
@@ -32,7 +31,7 @@ const ROLES = [
 ]
 
 onMounted(async () => {
-    if (!authStore.isAdmin) {
+    if (!authStore.isAdminOrOperator) {
         router.push('/dashboard')
         return
     }
@@ -108,7 +107,7 @@ const formatDate = (dateString, includeTime = false) => {
 </script>
 
 <template>
-    <AppLayout :menuItems="adminMenuItems" variant="dark">
+    <AppLayout>
         <div class="max-w-7xl mx-auto py-8 px-4">
             <!-- Header -->
             <header class="mb-6">

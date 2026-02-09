@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import { useUiStore } from '@/shared/stores/ui'
@@ -10,7 +11,7 @@ const props = defineProps({
     },
     variant: {
         type: String,
-        default: 'light', // 'light' | 'dark'
+        default: 'light',
         validator: (v) => ['light', 'dark'].includes(v)
     }
 })
@@ -20,14 +21,67 @@ const router = useRouter()
 const authStore = useAuthStore()
 const uiStore = useUiStore()
 
+const expandedItem = ref(null)
+
+const isDark = props.variant === 'dark'
+
 const isActive = (path) => route.path === path || route.path.startsWith(path + '/')
+
+const isChildActive = (item) => {
+    if (!item.children) return false
+    return item.children.some(child => isActive(child.path))
+}
+
+const toggleSubmenu = (label) => {
+    expandedItem.value = expandedItem.value === label ? null : label
+}
 
 const handleLogout = () => {
     authStore.logout()
     router.push('/login')
 }
 
-const isDark = props.variant === 'dark'
+// Item styling helpers
+const getItemClasses = (item) => {
+    const active = item.path ? isActive(item.path) : isChildActive(item)
+    return [
+        'group flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors duration-150',
+        active
+            ? isDark
+                ? 'bg-emi-navy-700 text-white'
+                : 'bg-emi-navy-500 text-white'
+            : isDark
+                ? 'text-gray-300 hover:bg-emi-navy-700 hover:text-white'
+                : 'text-gray-700 hover:bg-gray-100 hover:text-emi-navy-500',
+        !uiStore.isSidebarOpen ? 'justify-center' : ''
+    ]
+}
+
+const getIconClasses = (item) => {
+    const active = item.path ? isActive(item.path) : isChildActive(item)
+    return [
+        'h-6 w-6 flex-shrink-0',
+        active
+            ? isDark ? 'text-white' : 'text-current'
+            : isDark
+                ? 'text-gray-400 group-hover:text-white'
+                : 'text-gray-500 group-hover:text-emi-navy-500',
+        uiStore.isSidebarOpen ? 'mr-3' : ''
+    ]
+}
+
+const getChildClasses = (child) => {
+    return [
+        'flex items-center px-3 py-2 text-xs font-medium rounded-md transition-colors duration-150 ml-9',
+        isActive(child.path)
+            ? isDark
+                ? 'bg-emi-navy-600 text-white'
+                : 'bg-emi-navy-100 text-emi-navy-700'
+            : isDark
+                ? 'text-gray-400 hover:bg-emi-navy-700 hover:text-white'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-emi-navy-500'
+    ]
+}
 </script>
 
 <template>
@@ -68,43 +122,85 @@ const isDark = props.variant === 'dark'
         <!-- Menu Items -->
         <div class="flex-1 overflow-y-auto py-4">
             <nav class="space-y-1 px-2">
-                <router-link
-                    v-for="item in menuItems"
-                    :key="item.path"
-                    :to="item.path"
-                    :title="!uiStore.isSidebarOpen ? item.label : ''"
-                    :class="[
-                        'group flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors duration-150',
-                        isActive(item.path)
-                            ? isDark
-                                ? 'bg-emi-navy-700 text-white'
-                                : item.path === '/mi-perfil'
-                                    ? 'bg-emi-navy-500 text-white'
-                                    : 'bg-emi-gold-500 text-emi-navy-800'
-                            : isDark
-                                ? 'text-gray-300 hover:bg-emi-navy-700 hover:text-white'
-                                : 'text-gray-700 hover:bg-gray-100 hover:text-emi-navy-500',
-                        !uiStore.isSidebarOpen ? 'justify-center' : ''
-                    ]"
-                >
-                    <svg
-                        class="h-6 w-6 flex-shrink-0"
-                        :class="[
-                            isActive(item.path)
-                                ? isDark ? 'text-white' : 'text-current'
-                                : isDark
-                                    ? 'text-gray-400 group-hover:text-white'
-                                    : 'text-gray-500 group-hover:text-emi-navy-500',
-                            uiStore.isSidebarOpen ? 'mr-3' : ''
-                        ]"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                <template v-for="item in menuItems" :key="item.label">
+                    <!-- Simple item (no children) -->
+                    <router-link
+                        v-if="!item.children"
+                        :to="item.path"
+                        :title="!uiStore.isSidebarOpen ? item.label : ''"
+                        :class="getItemClasses(item)"
                     >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
-                    </svg>
-                    <span v-if="uiStore.isSidebarOpen" class="truncate">{{ item.label }}</span>
-                </router-link>
+                        <svg :class="getIconClasses(item)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
+                        </svg>
+                        <span v-if="uiStore.isSidebarOpen" class="truncate">{{ item.label }}</span>
+                    </router-link>
+
+                    <!-- Item with submenu -->
+                    <div v-else>
+                        <button
+                            @click="toggleSubmenu(item.label)"
+                            :title="!uiStore.isSidebarOpen ? item.label : ''"
+                            :class="getItemClasses(item)"
+                            class="w-full"
+                        >
+                            <svg :class="getIconClasses(item)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
+                            </svg>
+                            <span v-if="uiStore.isSidebarOpen" class="truncate flex-1 text-left">{{ item.label }}</span>
+                            <svg
+                                v-if="uiStore.isSidebarOpen"
+                                class="h-4 w-4 ml-auto transition-transform duration-200"
+                                :class="expandedItem === item.label ? 'rotate-180' : ''"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <!-- Submenu children (expanded sidebar) -->
+                        <div
+                            v-if="uiStore.isSidebarOpen && expandedItem === item.label"
+                            class="mt-1 space-y-1"
+                        >
+                            <router-link
+                                v-for="child in item.children"
+                                :key="child.path"
+                                :to="child.path"
+                                :class="getChildClasses(child)"
+                            >
+                                <span class="w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0"
+                                    :class="isActive(child.path)
+                                        ? isDark ? 'bg-white' : 'bg-emi-navy-500'
+                                        : isDark ? 'bg-gray-500' : 'bg-gray-400'"
+                                ></span>
+                                {{ child.label }}
+                            </router-link>
+                        </div>
+
+                        <!-- Collapsed sidebar: show children as tooltip on hover -->
+                        <div
+                            v-if="!uiStore.isSidebarOpen && expandedItem === item.label"
+                            class="absolute left-20 mt-[-48px] z-50 py-2 px-1 rounded-lg shadow-xl min-w-[160px]"
+                            :class="isDark ? 'bg-emi-navy-800 border border-emi-navy-600' : 'bg-white border border-gray-200'"
+                        >
+                            <router-link
+                                v-for="child in item.children"
+                                :key="child.path"
+                                :to="child.path"
+                                @click="expandedItem = null"
+                                :class="[
+                                    'block px-3 py-2 text-xs font-medium rounded-md transition-colors',
+                                    isActive(child.path)
+                                        ? isDark ? 'bg-emi-navy-600 text-white' : 'bg-emi-navy-100 text-emi-navy-700'
+                                        : isDark ? 'text-gray-300 hover:bg-emi-navy-700' : 'text-gray-600 hover:bg-gray-100'
+                                ]"
+                            >
+                                {{ child.label }}
+                            </router-link>
+                        </div>
+                    </div>
+                </template>
             </nav>
         </div>
 
@@ -149,31 +245,69 @@ const isDark = props.variant === 'dark'
             </div>
 
             <!-- Mobile Menu -->
-            <div class="py-4">
+            <div class="py-4 overflow-y-auto" style="max-height: calc(100vh - 128px)">
                 <nav class="space-y-1 px-2">
-                    <router-link
-                        v-for="item in menuItems"
-                        :key="item.path"
-                        :to="item.path"
-                        @click="uiStore.closeMobileSidebar"
-                        :class="[
-                            'group flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors',
-                            isActive(item.path)
-                                ? isDark
-                                    ? 'bg-emi-navy-700 text-white'
-                                    : item.path === '/mi-perfil'
-                                        ? 'bg-emi-navy-500 text-white'
-                                        : 'bg-emi-gold-500 text-emi-navy-800'
-                                : isDark
-                                    ? 'text-gray-300 hover:bg-emi-navy-700'
-                                    : 'text-gray-700 hover:bg-gray-100'
-                        ]"
-                    >
-                        <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
-                        </svg>
-                        <span>{{ item.label }}</span>
-                    </router-link>
+                    <template v-for="item in menuItems" :key="item.label">
+                        <!-- Simple item -->
+                        <router-link
+                            v-if="!item.children"
+                            :to="item.path"
+                            @click="uiStore.closeMobileSidebar"
+                            :class="[
+                                'group flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors',
+                                isActive(item.path)
+                                    ? isDark ? 'bg-emi-navy-700 text-white' : 'bg-emi-navy-500 text-white'
+                                    : isDark ? 'text-gray-300 hover:bg-emi-navy-700' : 'text-gray-700 hover:bg-gray-100'
+                            ]"
+                        >
+                            <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
+                            </svg>
+                            <span>{{ item.label }}</span>
+                        </router-link>
+
+                        <!-- Item with submenu (mobile) -->
+                        <div v-else>
+                            <button
+                                @click="toggleSubmenu(item.label)"
+                                :class="[
+                                    'w-full group flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors',
+                                    isChildActive(item)
+                                        ? isDark ? 'bg-emi-navy-700 text-white' : 'bg-emi-navy-500 text-white'
+                                        : isDark ? 'text-gray-300 hover:bg-emi-navy-700' : 'text-gray-700 hover:bg-gray-100'
+                                ]"
+                            >
+                                <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
+                                </svg>
+                                <span class="flex-1 text-left">{{ item.label }}</span>
+                                <svg
+                                    class="h-4 w-4 ml-auto transition-transform duration-200"
+                                    :class="expandedItem === item.label ? 'rotate-180' : ''"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                >
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <div v-if="expandedItem === item.label" class="mt-1 space-y-1">
+                                <router-link
+                                    v-for="child in item.children"
+                                    :key="child.path"
+                                    :to="child.path"
+                                    @click="uiStore.closeMobileSidebar"
+                                    :class="getChildClasses(child)"
+                                >
+                                    <span class="w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0"
+                                        :class="isActive(child.path)
+                                            ? isDark ? 'bg-white' : 'bg-emi-navy-500'
+                                            : isDark ? 'bg-gray-500' : 'bg-gray-400'"
+                                    ></span>
+                                    {{ child.label }}
+                                </router-link>
+                            </div>
+                        </div>
+                    </template>
                 </nav>
             </div>
 

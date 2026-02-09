@@ -1,4 +1,4 @@
-import LandingPage from '@/features/landing/views/LandingPage.vue'
+import LandingPage from './views/LandingPage.vue'
 
 export default [
     {

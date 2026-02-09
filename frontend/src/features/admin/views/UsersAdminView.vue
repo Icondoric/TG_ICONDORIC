@@ -8,7 +8,6 @@ import { useRouter } from 'vue-router'
 import { useUsersStore } from '@/features/admin/store/users.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import AppLayout from '@/shared/components/AppLayout.vue'
-import { adminMenuItems } from '@/shared/constants/navigation'
 
 const router = useRouter()
 const usersStore = useUsersStore()
@@ -29,7 +28,7 @@ const ROLES = [
 ]
 
 onMounted(async () => {
-    if (!authStore.isAdmin) {
+    if (!authStore.isAdminOrOperator) {
         router.push('/dashboard')
         return
     }
@@ -80,6 +79,21 @@ const formatDate = (dateString) => {
     })
 }
 
+// PDF Generation
+import html2pdf from 'html2pdf.js'
+
+const generateReport = () => {
+    const element = document.getElementById('users-report-content')
+    const opt = {
+        margin: 10,
+        filename: 'reporte-usuarios-emi.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    }
+    html2pdf().set(opt).from(element).save()
+}
+
 // Computed helper for total pages (simple approximation based on Store total)
 // Assuming page size is 20 as per store default
 const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
@@ -87,7 +101,7 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
 </script>
 
 <template>
-    <AppLayout :menuItems="adminMenuItems" variant="dark">
+    <AppLayout>
         <div class="max-w-7xl mx-auto py-8 px-4">
             <!-- Header -->
             <header class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -97,6 +111,15 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
                         Administra las cuentas de estudiantes, titulados y administradores.
                     </p>
                 </div>
+                <button
+                    @click="generateReport"
+                    class="flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                >
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Generar Reporte
+                </button>
             </header>
 
             <!-- Filters -->
@@ -148,7 +171,7 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
             </div>
 
             <!-- Users Table -->
-            <div v-else class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div v-else id="users-report-content" class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>

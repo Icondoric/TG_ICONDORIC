@@ -8,13 +8,14 @@ const OfertasAdminView = () => import('@/features/admin/views/OfertasAdminView.v
 const OfertaFormView = () => import('@/features/admin/views/OfertaFormView.vue')
 
 const adminMeta = { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
+const adminOnlyMeta = { requiresAuth: true, requiresAdminOnly: true, hideNavbar: true }
 
 export default [
     {
         path: '/admin',
         name: 'admin',
         component: AdminDashboardView,
-        meta: adminMeta
+        meta: adminOnlyMeta
     },
     {
         path: '/admin/profiles',

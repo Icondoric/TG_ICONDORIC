@@ -9,7 +9,6 @@ import { useAuthStore } from '@/features/auth/store/auth.store'
 import axios from 'axios'
 import html2pdf from 'html2pdf.js'
 import AppLayout from '@/shared/components/AppLayout.vue'
-import { adminMenuItems } from '@/shared/constants/navigation'
 
 // Charts
 import UserDistributionChart from '../components/charts/UserDistributionChart.vue'
@@ -36,7 +35,7 @@ const skillsCloud = ref(null)
 const profileStats = ref(null)
 
 onMounted(async () => {
-    if (!authStore.isAdmin) {
+    if (!authStore.isAdminOrOperator) {
         router.push('/dashboard')
         return
     }
@@ -140,7 +139,7 @@ const formatDate = (dateStr) => {
 </script>
 
 <template>
-    <AppLayout :menuItems="adminMenuItems" variant="dark">
+    <AppLayout>
         <div class="max-w-7xl mx-auto py-8 px-4">
             <!-- Header & Filters -->
             <header class="mb-8 flex flex-col xl:flex-row xl:items-end justify-between gap-6">

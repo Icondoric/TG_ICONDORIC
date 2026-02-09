@@ -1,5 +1,5 @@
 <template>
-  <AppLayout :menuItems="adminMenuItems" variant="dark">
+  <AppLayout>
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="mb-8">
@@ -174,7 +174,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { getOferta, createOferta, updateOferta } from '@/features/admin/api/ofertas.api'
 import { listProfiles } from '@/features/admin/api/profiles.api'
 import AppLayout from '@/shared/components/AppLayout.vue'
-import { adminMenuItems } from '@/shared/constants/navigation'
 
 const route = useRoute()
 const router = useRouter()

@@ -1,19 +1,15 @@
 <script setup>
+import { computed } from 'vue'
 import AppSidebar from './AppSidebar.vue'
 import { useUiStore } from '@/shared/stores/ui'
-
-defineProps({
-    menuItems: {
-        type: Array,
-        required: true
-    },
-    variant: {
-        type: String,
-        default: 'light'
-    }
-})
+import { useAuthStore } from '@/features/auth/store/auth.store'
+import { getMenuItems, getSidebarVariant } from '@/shared/constants/navigation'
 
 const uiStore = useUiStore()
+const authStore = useAuthStore()
+
+const menuItems = computed(() => getMenuItems(authStore.user?.rol))
+const variant = computed(() => getSidebarVariant(authStore.user?.rol))
 </script>
 
 <template>

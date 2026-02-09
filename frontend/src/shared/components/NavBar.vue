@@ -18,7 +18,7 @@
         <!-- Desktop Navigation -->
         <div class="hidden lg:flex items-center gap-6">
           <!-- Public Links (for non-admin users) -->
-          <template v-if="!authStore.isAdmin">
+          <template v-if="!authStore.isAdminOrOperator">
             <a
               @click.prevent="handleNavigation('/')"
               :class="linkClasses"
@@ -58,7 +58,7 @@
           </template>
 
           <!-- Student/Graduate Menu -->
-          <template v-else-if="!authStore.isAdmin">
+          <template v-else-if="!authStore.isAdminOrOperator">
             <Button
               :variant="route.path.startsWith('/mi-perfil') ? 'primary' : 'outline'"
               size="sm"
@@ -156,7 +156,7 @@
       >
         <div class="px-4 py-4 space-y-3">
           <!-- Public Links Mobile -->
-          <template v-if="!authStore.isAdmin">
+          <template v-if="!authStore.isAdminOrOperator">
             <a
               @click.prevent="handleNavigation('/')"
               :class="mobileLinkClasses"
@@ -198,7 +198,7 @@
           </template>
 
           <!-- Student Menu Mobile -->
-          <template v-else-if="!authStore.isAdmin">
+          <template v-else-if="!authStore.isAdminOrOperator">
             <Button
               variant="primary"
               size="md"

@@ -9,7 +9,6 @@ import { useAdminProfilesStore } from '@/features/admin/store/adminProfiles.stor
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import { useRouter } from 'vue-router'
 import AppLayout from '@/shared/components/AppLayout.vue'
-import { adminMenuItems } from '@/shared/constants/navigation'
 
 const adminProfilesStore = useAdminProfilesStore()
 const authStore = useAuthStore()
@@ -23,7 +22,7 @@ const deleteConfirm = ref(null)
 
 // Cargar al montar
 onMounted(async () => {
-    if (!authStore.isAdmin) {
+    if (!authStore.isAdminOrOperator) {
         router.push('/dashboard')
         return
     }
@@ -121,7 +120,7 @@ const formatWeights = (weights) => {
 </script>
 
 <template>
-    <AppLayout :menuItems="adminMenuItems" variant="dark">
+    <AppLayout>
         <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <header class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">

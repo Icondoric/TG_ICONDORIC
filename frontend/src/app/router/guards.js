@@ -10,8 +10,14 @@ export function setupGuards(router) {
             return
         }
 
+        // Verificar rol de admin solamente (ej: dashboard admin)
+        if (to.meta.requiresAdminOnly && !authStore.isAdmin) {
+            next({ name: 'admin-users' })
+            return
+        }
+
         // Verificar rol de admin o operador
-        if (to.meta.requiresAdmin && !authStore.isOperator) {
+        if (to.meta.requiresAdmin && !authStore.isAdminOrOperator) {
             next({ name: 'dashboard' })
             return
         }

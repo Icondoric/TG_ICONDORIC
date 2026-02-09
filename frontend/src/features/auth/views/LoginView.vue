@@ -54,6 +54,8 @@ const handleLogin = async () => {
         // Redireccionar segun el rol
         if (authStore.isAdmin) {
             router.push('/admin')
+        } else if (authStore.isOperator) {
+            router.push('/admin/users')
         } else {
             router.push('/mi-perfil')
         }

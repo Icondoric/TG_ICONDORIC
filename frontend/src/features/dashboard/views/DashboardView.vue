@@ -6,11 +6,13 @@ import { useAuthStore } from '@/features/auth/store/auth.store'
 const router = useRouter()
 const auth = useAuthStore()
 
-// Redirigir al nuevo sistema de perfil
+// Redirigir segun el rol
 onMounted(() => {
   if (auth.isAuthenticated) {
     if (auth.isAdmin) {
       router.replace('/admin')
+    } else if (auth.isOperator) {
+      router.replace('/admin/users')
     } else {
       router.replace('/mi-perfil')
     }

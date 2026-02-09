@@ -1,5 +1,5 @@
 <template>
-  <AppLayout :menuItems="adminMenuItems" variant="dark">
+  <AppLayout>
     <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
@@ -241,7 +241,6 @@
 import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { listOfertas, deleteOferta, activateOferta as activateOfertaApi, getOfertasStats } from '@/features/admin/api/ofertas.api'
 import AppLayout from '@/shared/components/AppLayout.vue'
-import { adminMenuItems } from '@/shared/constants/navigation'
 
 const ofertas = ref([])
 const stats = ref({

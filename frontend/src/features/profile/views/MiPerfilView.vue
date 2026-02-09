@@ -1,5 +1,5 @@
 <template>
-  <AppLayout :menuItems="studentMenuItems" variant="light">
+  <AppLayout>
     <div class="flex">
       <!-- Secondary Sidebar -->
       <ProfileSidebar
@@ -220,7 +220,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import { studentMenuItems } from '@/shared/constants/navigation'
 import AppLayout from '@/shared/components/AppLayout.vue'
 import Card from '@/shared/components/ui/Card.vue'
 import Badge from '@/shared/components/ui/Badge.vue'

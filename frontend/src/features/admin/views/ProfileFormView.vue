@@ -9,7 +9,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAdminProfilesStore } from '@/features/admin/store/adminProfiles.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import AppLayout from '@/shared/components/AppLayout.vue'
-import { adminMenuItems } from '@/shared/constants/navigation'
 
 const route = useRoute()
 const router = useRouter()
@@ -122,7 +121,7 @@ const canSave = computed(() => {
 
 // Cargar datos si es edicion
 onMounted(async () => {
-    if (!authStore.isAdmin) {
+    if (!authStore.isAdminOrOperator) {
         router.push('/dashboard')
         return
     }
@@ -251,7 +250,7 @@ const cancel = () => {
 </script>
 
 <template>
-    <AppLayout :menuItems="adminMenuItems" variant="dark">
+    <AppLayout>
         <div class="max-w-4xl mx-auto py-8 px-4">
             <!-- Header -->
             <header class="mb-8">

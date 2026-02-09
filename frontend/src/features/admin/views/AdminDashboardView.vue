@@ -8,11 +8,11 @@ import { ref, onMounted, computed } from 'vue'
 import { useAdminProfilesStore } from '@/features/admin/store/adminProfiles.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import { useRouter } from 'vue-router'
+import { getModelInfo } from '@/shared/api/ml.api'
 import Card from '@/shared/components/ui/Card.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
 import ProgressBar from '@/shared/components/ui/ProgressBar.vue'
 import AppLayout from '@/shared/components/AppLayout.vue'
-import { adminMenuItems } from '@/shared/constants/navigation'
 
 const adminProfilesStore = useAdminProfilesStore()
 const authStore = useAuthStore()
@@ -24,6 +24,8 @@ const stats = ref({
     activeProfiles: 0,
     sectors: []
 })
+
+const modelInfo = ref(null)
 
 // Cargar datos al montar
 onMounted(async () => {
@@ -39,6 +41,9 @@ onMounted(async () => {
 
         // Cargar sectores
         await adminProfilesStore.loadSectors()
+        
+        // Cargar info del modelo
+        modelInfo.value = await getModelInfo()
 
         // Calcular stats
         stats.value.totalProfiles = adminProfilesStore.profiles.length
@@ -51,16 +56,17 @@ onMounted(async () => {
 
 // Computed
 const modelStatus = computed(() => {
-    return 'Desconocido'
+    if (!modelInfo.value) return 'Cargando...'
+    return modelInfo.value.is_ready ? 'Activo' : 'Inactivo'
 })
 
 const modelMetrics = computed(() => {
-    return {}
+    return modelInfo.value?.training_metrics || {}
 })
 </script>
 
 <template>
-    <AppLayout :menuItems="adminMenuItems" variant="dark">
+    <AppLayout>
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Header -->
             <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -158,8 +164,33 @@ const modelMetrics = computed(() => {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Info del Modelo -->
                 <Card title="Informacion del Modelo ML">
-                    <div class="text-center py-8">
-                        <p class="text-gray-400">Informacion del modelo no disponible en este store.</p>
+                    <div v-if="modelInfo" class="py-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                <p class="text-xs text-gray-500 uppercase">Tipo</p>
+                                <p class="font-semibold text-emi-navy-600">{{ modelInfo.model_type }}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                <p class="text-xs text-gray-500 uppercase">Version</p>
+                                <p class="font-semibold text-emi-navy-600">{{ modelInfo.model_version }}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                <p class="text-xs text-gray-500 uppercase">R2 Score</p>
+                                <p class="font-bold text-green-600">{{ modelMetrics.r2_score?.toFixed(3) || '-' }}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                <p class="text-xs text-gray-500 uppercase">Accuracy</p>
+                                <p class="font-bold text-blue-600">{{ modelMetrics.accuracy ? (modelMetrics.accuracy * 100).toFixed(1) + '%' : '-' }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <Badge :variant="modelInfo.is_ready ? 'success' : 'warning'">
+                                {{ modelInfo.status }}
+                            </Badge>
+                        </div>
+                    </div>
+                    <div v-else class="text-center py-8">
+                        <p class="text-gray-400">Cargando informacion del modelo...</p>
                     </div>
                 </Card>
             </div>

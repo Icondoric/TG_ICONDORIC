@@ -1,5 +1,5 @@
 <template>
-  <AppLayout :menuItems="studentMenuItems" variant="light">
+  <AppLayout>
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="mb-8">
@@ -168,7 +168,6 @@ import { ref, computed, onMounted } from 'vue'
 import { getAccountInfo, updateAccount, changePassword } from '@/features/account/api/account.api'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import AppLayout from '@/shared/components/AppLayout.vue'
-import { studentMenuItems } from '@/shared/constants/navigation'
 import Card from '@/shared/components/ui/Card.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
 
