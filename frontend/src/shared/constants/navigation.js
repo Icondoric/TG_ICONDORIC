@@ -19,7 +19,13 @@ export function getMenuItems(role) {
         case 'administrador':
             return [
                 { label: 'Gestión de Usuarios', path: '/admin/users', icon: icons.users },
-                { label: 'Digitalización de Perfiles', path: '/mi-perfil', icon: icons.profile },
+                {
+                    label: 'Digitalización de Perfiles', icon: icons.profile, children: [
+                        { label: 'Subir CV', path: '/digitalizacion/subir-cv' },
+                        { label: 'Mi Perfil', path: '/digitalizacion/mi-perfil' },
+                        { label: 'Editar Perfil', path: '/digitalizacion/editar' },
+                    ]
+                },
                 {
                     label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
                         { label: 'Evaluar CV', path: '/evaluation' },
@@ -44,7 +50,13 @@ export function getMenuItems(role) {
         default:
             return [
                 { label: 'Gestión de Usuarios', path: '/configuracion-cuenta', icon: icons.settings },
-                { label: 'Digitalización de Perfiles', path: '/mi-perfil', icon: icons.profile },
+                {
+                    label: 'Digitalización de Perfiles', icon: icons.profile, children: [
+                        { label: 'Subir CV', path: '/digitalizacion/subir-cv' },
+                        { label: 'Mi Perfil', path: '/digitalizacion/mi-perfil' },
+                        { label: 'Editar Perfil', path: '/digitalizacion/editar' },
+                    ]
+                },
                 {
                     label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
                         { label: 'Evaluar CV', path: '/evaluation' },

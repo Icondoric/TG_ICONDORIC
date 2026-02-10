@@ -78,7 +78,7 @@
         </button>
 
         <router-link
-          to="/mi-perfil"
+          to="/digitalizacion/mi-perfil"
           class="w-full flex items-center justify-center gap-2 px-4 py-2 border border-emi-navy-300 text-emi-navy-600 rounded-lg hover:bg-emi-navy-50 transition-colors"
         >
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

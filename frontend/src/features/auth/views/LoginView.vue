@@ -57,7 +57,7 @@ const handleLogin = async () => {
         } else if (authStore.isOperator) {
             router.push('/admin/users')
         } else {
-            router.push('/mi-perfil')
+            router.push('/digitalizacion/mi-perfil')
         }
     } catch (e) {
         console.error('Login error:', e)

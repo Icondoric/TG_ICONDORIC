@@ -60,9 +60,9 @@
           <!-- Student/Graduate Menu -->
           <template v-else-if="!authStore.isAdminOrOperator">
             <Button
-              :variant="route.path.startsWith('/mi-perfil') ? 'primary' : 'outline'"
+              :variant="route.path.startsWith('/digitalizacion') ? 'primary' : 'outline'"
               size="sm"
-              @click="handleNavigation('/mi-perfil')"
+              @click="handleNavigation('/digitalizacion/mi-perfil')"
             >
               Mi Perfil
             </Button>
@@ -203,7 +203,7 @@
               variant="primary"
               size="md"
               full-width
-              @click="handleNavigation('/mi-perfil')"
+              @click="handleNavigation('/digitalizacion/mi-perfil')"
             >
               Mi Perfil
             </Button>
@@ -272,7 +272,7 @@ const isMobileMenuOpen = ref(false)
 
 // Detect if we're on a dashboard page
 const isDashboardPage = computed(() => {
-  const dashboardRoutes = ['/mi-perfil', '/mis-recomendaciones', '/admin']
+  const dashboardRoutes = ['/digitalizacion', '/mis-recomendaciones', '/admin']
   return dashboardRoutes.some(r => route.path.startsWith(r))
 })
 

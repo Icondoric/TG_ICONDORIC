@@ -14,7 +14,7 @@ onMounted(() => {
     } else if (auth.isOperator) {
       router.replace('/admin/users')
     } else {
-      router.replace('/mi-perfil')
+      router.replace('/digitalizacion/mi-perfil')
     }
   } else {
     router.replace('/')

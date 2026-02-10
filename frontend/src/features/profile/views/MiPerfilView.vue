@@ -15,20 +15,34 @@
       >
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <!-- Header -->
-          <div class="mb-8">
-            <h1 class="text-3xl font-bold text-emi-navy-500">Digitalización de Perfiles</h1>
-            <p class="mt-2 text-gray-600">
-              Sube tu CV para extraer automáticamente tus competencias y experiencia profesional
-            </p>
+          <div class="mb-8 flex items-center justify-between">
+            <div>
+              <h1 class="text-3xl font-bold text-emi-navy-500">Mi Perfil Digitalizado</h1>
+              <p class="mt-2 text-gray-600">
+                Resumen de tus competencias y experiencia extraidas de tu CV
+              </p>
+            </div>
+            <div class="flex gap-3">
+              <router-link
+                to="/digitalizacion/subir-cv"
+                class="inline-flex items-center gap-2 btn-emi-secondary"
+              >
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                {{ profile.cv_filename ? 'Actualizar CV' : 'Subir CV' }}
+              </router-link>
+              <router-link
+                to="/digitalizacion/editar"
+                class="inline-flex items-center gap-2 btn-emi-primary"
+              >
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+                Editar Perfil
+              </router-link>
+            </div>
           </div>
-
-          <!-- CV Upload/Update Section -->
-          <CVUploadSection
-            :profile="profile"
-            :formatDate="formatDate"
-            @showUpload="showUploadModal = true"
-            @showDelete="showDeleteConfirm = true"
-          />
 
           <!-- Loading -->
           <div v-if="loading" class="flex justify-center py-12">
@@ -65,15 +79,6 @@
                   label="Completitud del perfil"
                 />
               </div>
-              <button
-                @click="showUploadModal = true"
-                class="mt-4 w-full flex items-center justify-center gap-2 btn-emi-primary"
-              >
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                {{ profile.cv_filename ? 'Actualizar CV' : 'Subir CV' }}
-              </button>
             </Card>
 
             <!-- Missing Fields -->
@@ -89,6 +94,9 @@
                   <ul class="mt-2 list-disc list-inside text-sm text-emi-gold-700 space-y-1">
                     <li v-for="rec in completeness.recommendations" :key="rec">{{ rec }}</li>
                   </ul>
+                  <router-link to="/digitalizacion/editar" class="mt-3 inline-block text-sm font-medium text-emi-navy-500 hover:underline">
+                    Completar perfil &rarr;
+                  </router-link>
                 </div>
               </div>
             </Card>
@@ -130,27 +138,36 @@
                   <p class="mt-1 text-emi-gold-700">
                     Nuestro sistema extraera automaticamente tus competencias, formacion y experiencia.
                   </p>
-                  <button @click="showUploadModal = true" class="mt-4 btn-emi-primary">
+                  <router-link to="/digitalizacion/subir-cv" class="mt-4 inline-block btn-emi-primary">
                     Subir CV ahora
-                  </button>
+                  </router-link>
                 </div>
               </div>
             </Card>
 
-            <!-- Competencias -->
-            <CompetenciasCard :profile="profile" @edit="openEditModal" />
+            <!-- Competencias (read-only) -->
+            <CompetenciasCard :profile="profile" :readOnly="true" />
 
-            <!-- Education & Experience -->
+            <!-- Education & Experience (read-only) -->
             <EducationExperienceGrid
               :profile="profile"
               :geminiEducation="geminiEducation"
               :geminiExperience="geminiExperience"
-              @edit="openEditModal"
+              :readOnly="true"
             />
 
             <!-- Actions Card -->
             <Card title="Acciones">
               <div class="flex flex-wrap gap-4">
+                <router-link
+                  to="/digitalizacion/editar"
+                  class="inline-flex items-center gap-2 btn-emi-primary"
+                >
+                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                  Editar Perfil
+                </router-link>
                 <router-link
                   to="/mis-recomendaciones"
                   class="inline-flex items-center gap-2 btn-emi-secondary"
@@ -161,58 +178,10 @@
                   </svg>
                   Ver Recomendaciones
                 </router-link>
-                <button
-                  @click="showDeleteConfirm = true"
-                  class="inline-flex items-center gap-2 px-4 py-2 border border-red-300 rounded-lg text-red-700 bg-white hover:bg-red-50 transition-colors"
-                >
-                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Limpiar Perfil
-                </button>
               </div>
             </Card>
           </div>
         </div>
-
-        <!-- Modals -->
-        <CVUploadModal
-          :show="showUploadModal"
-          :uploadFile="uploadFile"
-          :uploading="uploading"
-          :isDragging="isDragging"
-          :formatFileSize="formatFileSize"
-          @close="showUploadModal = false; uploadFile = null"
-          @dragOver="isDragging = true"
-          @dragLeave="isDragging = false"
-          @drop="handleDrop"
-          @fileSelect="handleFileSelect"
-          @process="processCV"
-        />
-
-        <EditProfileModal
-          :editModal="editModal"
-          :editForm="editForm"
-          :saving="saving"
-          :newHardSkill="newHardSkill"
-          :newSoftSkill="newSoftSkill"
-          :newLanguage="newLanguage"
-          @close="closeEditModal"
-          @save="saveChanges"
-          @addSkill="addSkill"
-          @removeSkill="removeSkill"
-          @updateField="(field, val) => editForm[field] = val"
-          @update:newHardSkill="v => newHardSkill = v"
-          @update:newSoftSkill="v => newSoftSkill = v"
-          @update:newLanguage="v => newLanguage = v"
-        />
-
-        <DeleteConfirmModal
-          :show="showDeleteConfirm"
-          :deleting="deleting"
-          @cancel="showDeleteConfirm = false"
-          @confirm="deleteProfile"
-        />
       </div>
     </div>
   </AppLayout>
@@ -226,12 +195,8 @@ import Badge from '@/shared/components/ui/Badge.vue'
 import GaugeChart from '@/shared/components/ui/GaugeChart.vue'
 import ProgressBar from '@/shared/components/ui/ProgressBar.vue'
 import ProfileSidebar from '../components/ProfileSidebar.vue'
-import CVUploadSection from '../components/CVUploadSection.vue'
-import CVUploadModal from '../components/CVUploadModal.vue'
 import CompetenciasCard from '../components/CompetenciasCard.vue'
 import EducationExperienceGrid from '../components/EducationExperienceGrid.vue'
-import EditProfileModal from '../components/EditProfileModal.vue'
-import DeleteConfirmModal from '../components/DeleteConfirmModal.vue'
 import DigitalizationSummary from '../components/DigitalizationSummary.vue'
 import { useProfileEditor } from '../composables/useProfileEditor'
 
@@ -242,33 +207,11 @@ const {
   completeness,
   loading,
   error,
-  showDeleteConfirm,
-  deleting,
-  showUploadModal,
-  uploadFile,
-  uploading,
-  isDragging,
-  editModal,
-  editForm,
-  saving,
-  newHardSkill,
-  newSoftSkill,
-  newLanguage,
   geminiEducation,
   geminiExperience,
   geminiPersonalInfo,
   hasGeminiData,
   formatDate,
-  formatFileSize,
-  loadProfile,
-  deleteProfile,
-  handleFileSelect,
-  handleDrop,
-  processCV,
-  openEditModal,
-  closeEditModal,
-  addSkill,
-  removeSkill,
-  saveChanges
+  loadProfile
 } = useProfileEditor()
 </script>

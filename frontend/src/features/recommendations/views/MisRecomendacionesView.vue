@@ -95,7 +95,7 @@
               </div>
               <div class="mt-6 flex justify-center gap-4">
                 <router-link
-                  to="/mi-perfil"
+                  to="/digitalizacion/mi-perfil"
                   class="inline-flex items-center gap-2 px-4 py-2 border border-emi-navy-300 text-emi-navy-600 rounded-lg hover:bg-emi-navy-50 transition-colors"
                 >
                   Revisar Mi Perfil

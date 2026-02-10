@@ -19,7 +19,7 @@
         </div>
 
         <router-link
-          to="/subir-cv"
+          to="/digitalizacion/subir-cv"
           class="mt-4 inline-flex items-center gap-2 btn-emi-secondary"
         >
           Completar Perfil

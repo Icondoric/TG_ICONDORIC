@@ -3,6 +3,7 @@
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-semibold text-gray-900">Competencias</h2>
       <button
+        v-if="!readOnly"
         @click="$emit('edit', 'skills')"
         class="flex items-center gap-1 text-sm text-emi-navy-500 hover:text-emi-gold-500 transition-colors"
       >
@@ -25,7 +26,7 @@
         </Badge>
         <span v-if="profile.hard_skills.length === 0" class="text-gray-400 text-sm">
           No hay habilidades registradas -
-          <button @click="$emit('edit', 'skills')" class="text-emi-navy-500 hover:underline">Agregar</button>
+          <button v-if="!readOnly" @click="$emit('edit', 'skills')" class="text-emi-navy-500 hover:underline">Agregar</button>
         </span>
       </div>
     </div>
@@ -42,7 +43,7 @@
         </Badge>
         <span v-if="profile.soft_skills.length === 0" class="text-gray-400 text-sm">
           No hay habilidades registradas -
-          <button @click="$emit('edit', 'skills')" class="text-emi-navy-500 hover:underline">Agregar</button>
+          <button v-if="!readOnly" @click="$emit('edit', 'skills')" class="text-emi-navy-500 hover:underline">Agregar</button>
         </span>
       </div>
     </div>
@@ -59,7 +60,7 @@
         </Badge>
         <span v-if="profile.languages.length === 0" class="text-gray-400 text-sm">
           No hay idiomas registrados -
-          <button @click="$emit('edit', 'skills')" class="text-emi-navy-500 hover:underline">Agregar</button>
+          <button v-if="!readOnly" @click="$emit('edit', 'skills')" class="text-emi-navy-500 hover:underline">Agregar</button>
         </span>
       </div>
     </div>
@@ -71,7 +72,8 @@ import Card from '@/shared/components/ui/Card.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
 
 defineProps({
-  profile: { type: Object, required: true }
+  profile: { type: Object, required: true },
+  readOnly: { type: Boolean, default: false }
 })
 
 defineEmits(['edit'])

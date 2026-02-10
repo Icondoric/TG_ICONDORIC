@@ -5,6 +5,7 @@
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-gray-900">Formacion Academica</h2>
         <button
+          v-if="!readOnly"
           @click="$emit('edit', 'education')"
           class="flex items-center gap-1 text-sm text-emi-navy-500 hover:text-emi-gold-500 transition-colors"
         >
@@ -28,8 +29,8 @@
         </div>
       </div>
       <p v-else class="text-gray-400 text-sm">
-        No hay formacion registrada -
-        <button @click="$emit('edit', 'education')" class="text-emi-navy-500 hover:underline">Agregar</button>
+        No hay formacion registrada<template v-if="!readOnly"> -
+        <button @click="$emit('edit', 'education')" class="text-emi-navy-500 hover:underline">Agregar</button></template>
       </p>
 
       <!-- Education Details from Gemini -->
@@ -47,6 +48,7 @@
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-gray-900">Experiencia Laboral</h2>
         <button
+          v-if="!readOnly"
           @click="$emit('edit', 'experience')"
           class="flex items-center gap-1 text-sm text-emi-navy-500 hover:text-emi-gold-500 transition-colors"
         >
@@ -78,8 +80,8 @@
         </div>
       </div>
       <p v-else-if="geminiExperience.length === 0 && profile.experience_years === 0" class="text-gray-400 text-sm">
-        No hay experiencia registrada -
-        <button @click="$emit('edit', 'experience')" class="text-emi-navy-500 hover:underline">Agregar</button>
+        No hay experiencia registrada<template v-if="!readOnly"> -
+        <button @click="$emit('edit', 'experience')" class="text-emi-navy-500 hover:underline">Agregar</button></template>
       </p>
     </Card>
   </div>
@@ -91,7 +93,8 @@ import Card from '@/shared/components/ui/Card.vue'
 defineProps({
   profile: { type: Object, required: true },
   geminiEducation: { type: Array, default: () => [] },
-  geminiExperience: { type: Array, default: () => [] }
+  geminiExperience: { type: Array, default: () => [] },
+  readOnly: { type: Boolean, default: false }
 })
 
 defineEmits(['edit'])
