@@ -190,9 +190,9 @@ async def upload_cv(
         # Codificar a base64
         pdf_base64 = base64.b64encode(contents).decode('utf-8')
 
-        # Extraer con Gemini
+        # Extraer con Gemini (async - no bloquea event loop)
         logger.info(f"Procesando CV: {file.filename}")
-        gemini_output = ml_service.extract_cv_with_gemini(pdf_base64)
+        gemini_output = await ml_service.extract_cv_with_gemini(pdf_base64)
 
         # Actualizar perfil
         profile = profile_service.update_profile_from_cv(

@@ -58,7 +58,7 @@ async def evaluate_cv(
     try:
         # 1. Extraer CV con Gemini
         logger.info(f"Procesando CV para perfil: {request.institutional_profile_id}")
-        gemini_output = ml_service.extract_cv_with_gemini(request.cv_file)
+        gemini_output = await ml_service.extract_cv_with_gemini(request.cv_file)
 
         # 2. Cargar perfil institucional
         profile = ml_service.load_institutional_profile(request.institutional_profile_id)
@@ -134,7 +134,7 @@ async def get_recommendations(
     try:
         # 1. Extraer CV con Gemini
         logger.info(f"Generando recomendaciones (top {request.top_n})")
-        gemini_output = ml_service.extract_cv_with_gemini(request.cv_file)
+        gemini_output = await ml_service.extract_cv_with_gemini(request.cv_file)
 
         # 2. Obtener recomendaciones
         recommendations = ml_service.get_recommendations(

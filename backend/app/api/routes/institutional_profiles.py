@@ -15,7 +15,7 @@ from app.api.schemas.ml_schemas import (
     InstitutionalProfileResponse,
     InstitutionalProfileListResponse
 )
-from app.api.dependencies import verify_admin_role, verify_operator_access, get_ml_service_dependency
+from app.api.dependencies import get_current_user, verify_admin_role, verify_operator_access, get_ml_service_dependency
 from app.services.ml_integration_service import MLIntegrationService
 
 # Configurar logging
@@ -30,6 +30,56 @@ def check_database():
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Base de datos no configurada"
+        )
+
+
+@router.get(
+    "/institutional-profiles/active",
+    response_model=InstitutionalProfileListResponse,
+    summary="Listar perfiles institucionales activos (todos los usuarios)",
+    description="Lista perfiles institucionales activos. Accesible para cualquier usuario autenticado."
+)
+async def list_active_institutional_profiles(
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Lista perfiles institucionales activos (endpoint publico para evaluacion).
+    """
+    check_database()
+
+    try:
+        query = supabase.table("institutional_profiles").select("*") \
+            .eq("is_active", True) \
+            .order("created_at", desc=True)
+        response = query.execute()
+
+        profiles = [
+            InstitutionalProfileResponse(
+                id=str(p['id']),
+                institution_name=p['institution_name'],
+                sector=p['sector'],
+                description=p.get('description'),
+                weights=p.get('weights', {}),
+                requirements=p.get('requirements', {}),
+                thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),
+                is_active=True,
+                created_at=p['created_at'],
+                updated_at=p['updated_at'],
+                created_by=str(p.get('created_by')) if p.get('created_by') else None
+            )
+            for p in response.data
+        ]
+
+        return InstitutionalProfileListResponse(
+            profiles=profiles,
+            total=len(profiles)
+        )
+
+    except Exception as e:
+        logger.error(f"Error listando perfiles activos: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error obteniendo perfiles: {str(e)}"
         )
 
 

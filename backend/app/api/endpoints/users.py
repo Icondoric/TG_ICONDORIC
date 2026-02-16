@@ -9,7 +9,7 @@ from app.api.schemas.ml_schemas import (
     UsuarioAdminResponse, 
     PerfilProfesionalResponse
 )
-from app.api.schemas.user_schemas import UserUpdateRequest, PasswordChangeRequest
+from app.api.schemas.user_schemas import UserUpdateRequest, PasswordChangeRequest, UserCreateRequest
 from app.services.profile_service import get_profile_service
 
 router = APIRouter()
@@ -152,6 +152,65 @@ async def change_my_password(
     except Exception as e:
         print(f"Error changing password: {e}")
         raise HTTPException(status_code=500, detail=f"Error changing password: {str(e)}")
+
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_user(
+    user_data: UserCreateRequest,
+    current_user: dict = Depends(verify_operator_access)
+):
+    """
+    Crear un nuevo usuario (solo admin/operador).
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Database connection not available")
+
+    valid_roles = ["estudiante", "titulado", "operador", "administrador"]
+    if user_data.rol not in valid_roles:
+        raise HTTPException(status_code=400, detail=f"Rol inválido. Roles válidos: {', '.join(valid_roles)}")
+
+    if len(user_data.password) < 6:
+        raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 6 caracteres")
+
+    try:
+        # Check email uniqueness
+        check = supabase.table("usuarios").select("id").eq("email", user_data.email).execute()
+        if check.data:
+            raise HTTPException(status_code=400, detail="Email ya registrado")
+
+        # Hash password and create user
+        from app.core.security import get_password_hash
+        hashed_password = get_password_hash(user_data.password)
+
+        new_user = {
+            "email": user_data.email,
+            "password_hash": hashed_password,
+            "rol": user_data.rol,
+            "nombre_completo": user_data.nombre_completo
+        }
+
+        response = supabase.table("usuarios").insert(new_user).execute()
+        created_user = response.data[0]
+        user_id = created_user["id"]
+
+        # Create empty profile
+        supabase.table("perfiles_profesionales").insert({"usuario_id": user_id}).execute()
+
+        return {
+            "message": "Usuario creado exitosamente",
+            "user": {
+                "id": user_id,
+                "email": created_user["email"],
+                "nombre_completo": created_user.get("nombre_completo"),
+                "rol": created_user["rol"],
+                "created_at": created_user["created_at"]
+            }
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error creating user: {e}")
+        raise HTTPException(status_code=500, detail=f"Error creando usuario: {str(e)}")
 
 @router.get("/", response_model=UsuariosListResponse)
 async def list_users(

@@ -7,9 +7,12 @@
 import { ref, onMounted, computed } from 'vue'
 import { useEvaluationStore } from '@/features/evaluation/store/evaluation.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
+import AppLayout from '@/shared/components/AppLayout.vue'
+import EvaluationSidebar from '@/features/evaluation/components/EvaluationSidebar.vue'
 
 const mlStore = useEvaluationStore()
 const authStore = useAuthStore()
+const isSecondarySidebarOpen = ref(true)
 
 // Estado local
 const currentPage = ref(1)
@@ -83,14 +86,29 @@ const formatScore = (score) => {
 </script>
 
 <template>
-    <div class="max-w-5xl mx-auto py-8 px-4">
-        <!-- Header -->
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-slate-800">Historial de Evaluaciones</h1>
-            <p class="mt-2 text-slate-600">
-                Revisa todas tus evaluaciones de CV anteriores
-            </p>
-        </header>
+    <AppLayout>
+        <div class="flex">
+            <!-- Secondary Sidebar -->
+            <EvaluationSidebar
+                v-model:isOpen="isSecondarySidebarOpen"
+                :lastEvaluation="selectedEvaluation"
+                :profileCount="0"
+                :isEvaluating="false"
+            />
+
+            <!-- Main Content -->
+            <div
+                class="flex-1 transition-[margin] duration-300 ease-in-out min-h-screen"
+                :style="{ marginLeft: isSecondarySidebarOpen ? '280px' : '60px' }"
+            >
+                <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <!-- Header -->
+                    <header class="mb-8">
+                        <h1 class="text-3xl font-bold text-slate-800">Historial de Evaluaciones</h1>
+                        <p class="mt-2 text-slate-600">
+                            Revisa todas tus evaluaciones de CV anteriores
+                        </p>
+                    </header>
 
         <!-- No autenticado -->
         <div v-if="!authStore.isAuthenticated" class="bg-white rounded-xl shadow-md p-8 text-center">
@@ -242,6 +260,9 @@ const formatScore = (score) => {
                         Siguiente
                     </button>
                 </div>
+                </div>
+            </div>
+                </div>
             </div>
         </div>
 
@@ -318,9 +339,42 @@ const formatScore = (score) => {
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Fortalezas y Debilidades -->
+                        <div v-if="selectedEvaluation.top_strengths?.length || selectedEvaluation.top_weaknesses?.length"
+                             class="grid grid-cols-2 gap-4">
+                            <!-- Fortalezas -->
+                            <div v-if="selectedEvaluation.top_strengths?.length">
+                                <h4 class="font-medium text-green-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Fortalezas
+                                </h4>
+                                <ul class="space-y-1">
+                                    <li v-for="(s, i) in selectedEvaluation.top_strengths" :key="i" class="text-sm text-slate-600 flex items-start">
+                                        <span class="text-green-500 mr-1">+</span> {{ s }}
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Areas de Mejora -->
+                            <div v-if="selectedEvaluation.top_weaknesses?.length">
+                                <h4 class="font-medium text-red-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    Areas de Mejora
+                                </h4>
+                                <ul class="space-y-1">
+                                    <li v-for="(w, i) in selectedEvaluation.top_weaknesses" :key="i" class="text-sm text-slate-600 flex items-start">
+                                        <span class="text-red-500 mr-1">-</span> {{ w }}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </Teleport>
-    </div>
+    </AppLayout>
 </template>

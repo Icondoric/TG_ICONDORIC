@@ -22,6 +22,7 @@ const authStore = useAuthStore()
 const uiStore = useUiStore()
 
 const expandedItem = ref(null)
+const hoveredItem = ref(null)
 
 const isDark = props.variant === 'dark'
 
@@ -124,23 +125,41 @@ const getChildClasses = (child) => {
             <nav class="space-y-1 px-2">
                 <template v-for="item in menuItems" :key="item.label">
                     <!-- Simple item (no children) -->
-                    <router-link
-                        v-if="!item.children"
-                        :to="item.path"
-                        :title="!uiStore.isSidebarOpen ? item.label : ''"
-                        :class="getItemClasses(item)"
-                    >
-                        <svg :class="getIconClasses(item)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
-                        </svg>
-                        <span v-if="uiStore.isSidebarOpen" class="truncate">{{ item.label }}</span>
-                    </router-link>
+                    <div v-if="!item.children" class="relative">
+                        <router-link
+                            :to="item.path"
+                            :class="getItemClasses(item)"
+                            @mouseenter="hoveredItem = item.label"
+                            @mouseleave="hoveredItem = null"
+                        >
+                            <svg :class="getIconClasses(item)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
+                            </svg>
+                            <span v-if="uiStore.isSidebarOpen" class="truncate">{{ item.label }}</span>
+                        </router-link>
+                        <!-- Tooltip on hover (collapsed or truncated) -->
+                        <transition name="tooltip">
+                            <div
+                                v-if="!uiStore.isSidebarOpen && hoveredItem === item.label"
+                                class="absolute left-full top-1/2 -translate-y-1/2 ml-3 z-50 px-3 py-2 text-xs font-medium rounded-md shadow-lg whitespace-nowrap pointer-events-none"
+                                :class="isDark ? 'bg-emi-navy-700 text-white' : 'bg-gray-800 text-white'"
+                            >
+                                {{ item.label }}
+                                <div
+                                    class="absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent"
+                                    :class="isDark ? 'border-r-emi-navy-700' : 'border-r-gray-800'"
+                                ></div>
+                            </div>
+                        </transition>
+                    </div>
 
                     <!-- Item with submenu -->
-                    <div v-else>
+                    <div v-else class="relative"
+                        @mouseenter="hoveredItem = item.label"
+                        @mouseleave="hoveredItem = null"
+                    >
                         <button
                             @click="toggleSubmenu(item.label)"
-                            :title="!uiStore.isSidebarOpen ? item.label : ''"
                             :class="getItemClasses(item)"
                             class="w-full"
                         >
@@ -159,46 +178,61 @@ const getChildClasses = (child) => {
                         </button>
 
                         <!-- Submenu children (expanded sidebar) -->
-                        <div
-                            v-if="uiStore.isSidebarOpen && expandedItem === item.label"
-                            class="mt-1 space-y-1"
-                        >
-                            <router-link
-                                v-for="child in item.children"
-                                :key="child.path"
-                                :to="child.path"
-                                :class="getChildClasses(child)"
+                        <transition name="submenu">
+                            <div
+                                v-if="uiStore.isSidebarOpen && expandedItem === item.label"
+                                class="mt-1 space-y-1 overflow-hidden"
                             >
-                                <span class="w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0"
-                                    :class="isActive(child.path)
-                                        ? isDark ? 'bg-white' : 'bg-emi-navy-500'
-                                        : isDark ? 'bg-gray-500' : 'bg-gray-400'"
-                                ></span>
-                                {{ child.label }}
-                            </router-link>
-                        </div>
+                                <router-link
+                                    v-for="child in item.children"
+                                    :key="child.path"
+                                    :to="child.path"
+                                    :class="getChildClasses(child)"
+                                >
+                                    <span class="w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0"
+                                        :class="isActive(child.path)
+                                            ? isDark ? 'bg-white' : 'bg-emi-navy-500'
+                                            : isDark ? 'bg-gray-500' : 'bg-gray-400'"
+                                    ></span>
+                                    {{ child.label }}
+                                </router-link>
+                            </div>
+                        </transition>
 
-                        <!-- Collapsed sidebar: show children as tooltip on hover -->
-                        <div
-                            v-if="!uiStore.isSidebarOpen && expandedItem === item.label"
-                            class="absolute left-20 mt-[-48px] z-50 py-2 px-1 rounded-lg shadow-xl min-w-[160px]"
-                            :class="isDark ? 'bg-emi-navy-800 border border-emi-navy-600' : 'bg-white border border-gray-200'"
-                        >
-                            <router-link
-                                v-for="child in item.children"
-                                :key="child.path"
-                                :to="child.path"
-                                @click="expandedItem = null"
-                                :class="[
-                                    'block px-3 py-2 text-xs font-medium rounded-md transition-colors',
-                                    isActive(child.path)
-                                        ? isDark ? 'bg-emi-navy-600 text-white' : 'bg-emi-navy-100 text-emi-navy-700'
-                                        : isDark ? 'text-gray-300 hover:bg-emi-navy-700' : 'text-gray-600 hover:bg-gray-100'
-                                ]"
+                        <!-- Collapsed sidebar: popover with label + children on hover -->
+                        <transition name="tooltip">
+                            <div
+                                v-if="!uiStore.isSidebarOpen && hoveredItem === item.label"
+                                class="absolute left-full top-0 ml-3 z-50 py-2 px-1 rounded-lg shadow-xl min-w-[180px]"
+                                :class="isDark ? 'bg-emi-navy-800 border border-emi-navy-600' : 'bg-white border border-gray-200 shadow-lg'"
                             >
-                                {{ child.label }}
-                            </router-link>
-                        </div>
+                                <!-- Title -->
+                                <div class="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide mb-1"
+                                    :class="isDark ? 'text-gray-400' : 'text-gray-400'"
+                                >
+                                    {{ item.label }}
+                                </div>
+                                <router-link
+                                    v-for="child in item.children"
+                                    :key="child.path"
+                                    :to="child.path"
+                                    @click="hoveredItem = null"
+                                    :class="[
+                                        'block px-3 py-2 text-xs font-medium rounded-md transition-colors',
+                                        isActive(child.path)
+                                            ? isDark ? 'bg-emi-navy-600 text-white' : 'bg-emi-navy-100 text-emi-navy-700'
+                                            : isDark ? 'text-gray-300 hover:bg-emi-navy-700' : 'text-gray-600 hover:bg-gray-100'
+                                    ]"
+                                >
+                                    {{ child.label }}
+                                </router-link>
+                                <!-- Arrow pointing left -->
+                                <div
+                                    class="absolute right-full top-4 w-0 h-0 border-t-[6px] border-b-[6px] border-r-[6px] border-transparent"
+                                    :class="isDark ? 'border-r-emi-navy-800' : 'border-r-white'"
+                                ></div>
+                            </div>
+                        </transition>
                     </div>
                 </template>
             </nav>
@@ -290,22 +324,25 @@ const getChildClasses = (child) => {
                                 </svg>
                             </button>
 
-                            <div v-if="expandedItem === item.label" class="mt-1 space-y-1">
-                                <router-link
-                                    v-for="child in item.children"
-                                    :key="child.path"
-                                    :to="child.path"
-                                    @click="uiStore.closeMobileSidebar"
-                                    :class="getChildClasses(child)"
-                                >
-                                    <span class="w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0"
-                                        :class="isActive(child.path)
-                                            ? isDark ? 'bg-white' : 'bg-emi-navy-500'
-                                            : isDark ? 'bg-gray-500' : 'bg-gray-400'"
-                                    ></span>
-                                    {{ child.label }}
-                                </router-link>
-                            </div>
+                            <!-- Submenu animation mobile -->
+                            <transition name="submenu">
+                                <div v-if="expandedItem === item.label" class="mt-1 space-y-1 overflow-hidden">
+                                    <router-link
+                                        v-for="child in item.children"
+                                        :key="child.path"
+                                        :to="child.path"
+                                        @click="uiStore.closeMobileSidebar"
+                                        :class="getChildClasses(child)"
+                                    >
+                                        <span class="w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0"
+                                            :class="isActive(child.path)
+                                                ? isDark ? 'bg-white' : 'bg-emi-navy-500'
+                                                : isDark ? 'bg-gray-500' : 'bg-gray-400'"
+                                        ></span>
+                                        {{ child.label }}
+                                    </router-link>
+                                </div>
+                            </transition>
                         </div>
                     </template>
                 </nav>
@@ -337,3 +374,39 @@ const getChildClasses = (child) => {
         </svg>
     </button>
 </template>
+
+<style scoped>
+/* Tooltip animation */
+.tooltip-enter-active {
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.tooltip-leave-active {
+    transition: opacity 0.1s ease, transform 0.1s ease;
+}
+.tooltip-enter-from {
+    opacity: 0;
+    transform: translateX(-4px);
+}
+.tooltip-leave-to {
+    opacity: 0;
+    transform: translateX(-4px);
+}
+
+/* Submenu slide animation */
+.submenu-enter-active {
+    transition: max-height 0.25s ease-out, opacity 0.2s ease-out;
+    max-height: 300px;
+}
+.submenu-leave-active {
+    transition: max-height 0.2s ease-in, opacity 0.15s ease-in;
+    max-height: 300px;
+}
+.submenu-enter-from {
+    max-height: 0;
+    opacity: 0;
+}
+.submenu-leave-to {
+    max-height: 0;
+    opacity: 0;
+}
+</style>

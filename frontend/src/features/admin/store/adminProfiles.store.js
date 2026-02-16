@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import {
-    listProfiles, getProfile, createProfile, updateProfile,
+    listProfiles, listActiveProfiles, getProfile, createProfile, updateProfile,
     deleteProfile, activateProfile, listSectors
 } from '@/features/admin/api/profiles.api'
 
@@ -20,6 +20,21 @@ export const useAdminProfilesStore = defineStore('adminProfiles', () => {
         profilesError.value = null
         try {
             const result = await listProfiles(includeInactive, sector)
+            profiles.value = result.profiles || []
+            return result
+        } catch (error) {
+            profilesError.value = error.response?.data?.detail || 'Error al cargar perfiles'
+            throw error
+        } finally {
+            isLoadingProfiles.value = false
+        }
+    }
+
+    async function loadActiveProfiles() {
+        isLoadingProfiles.value = true
+        profilesError.value = null
+        try {
+            const result = await listActiveProfiles()
             profiles.value = result.profiles || []
             return result
         } catch (error) {
@@ -123,7 +138,7 @@ export const useAdminProfilesStore = defineStore('adminProfiles', () => {
     return {
         profiles, currentProfile, isLoadingProfiles, profilesError, sectors,
         hasActiveProfiles, activeProfiles,
-        loadProfiles, loadProfile, createProfileAction, updateProfileAction,
+        loadProfiles, loadActiveProfiles, loadProfile, createProfileAction, updateProfileAction,
         deleteProfileAction, activateProfileAction, loadSectors
     }
 })

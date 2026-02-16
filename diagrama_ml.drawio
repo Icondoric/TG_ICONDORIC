@@ -1,0 +1,290 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="26.0.0">
+  <diagram name="ML Pipeline - Evaluación por Competencias" id="ml-pipeline">
+    <mxGraphModel dx="1800" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ============== TÍTULO ============== -->
+        <mxCell id="title" value="Pipeline de Machine Learning — Evaluación por Competencias" style="text;html=1;align=center;verticalAlign=middle;fontSize=22;fontStyle=1;fontColor=#1a1a2e;fontFamily=Segoe UI;" vertex="1" parent="1">
+          <mxGeometry x="250" y="20" width="1300" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ============== BLOQUE 1: ENTRADA - CV del Candidato ============== -->
+        <mxCell id="input_header" value="VALORES DE ENTRADA" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#16537e;fontFamily=Segoe UI;" vertex="1" parent="1">
+          <mxGeometry x="20" y="75" width="370" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Grupo CV Scores -->
+        <mxCell id="cv_group" value="&lt;b style='font-size:13px;color:#16537e'&gt;Puntuaciones del CV&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px;color:#666'&gt;(5 features — rango [0, 1])&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=center;verticalAlign=top;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="20" y="110" width="370" height="210" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cv1" value="&lt;b&gt;hard_skills_score&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;TF-IDF + Similitud Jaccard&lt;br&gt;50% match exacto requeridas&lt;br&gt;25% similitud semántica&lt;br&gt;15% habilidades preferidas&lt;br&gt;10% bonus amplitud&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="30" y="150" width="170" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cv2" value="&lt;b&gt;soft_skills_score&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;Match exacto + por categoría&lt;br&gt;4 categorías: interpersonal,&lt;br&gt;cognitiva, organizacional, personal&lt;br&gt;70% exacto, 30% categoría&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="210" y="150" width="170" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cv3" value="&lt;b&gt;experience_score&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;Función logarítmica&lt;br&gt;total_years vs min_required&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="30" y="260" width="110" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cv4" value="&lt;b&gt;education_score&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;Mapeo de nivel educativo&lt;br&gt;Bach(0.25)→Doc(1.0)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="150" y="260" width="110" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cv5" value="&lt;b&gt;languages_score&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;Nivel de competencia&lt;br&gt;idiomática&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6c8ebf;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="270" y="260" width="110" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Grupo Pesos Institucionales -->
+        <mxCell id="inst_group" value="&lt;b style='font-size:13px;color:#16537e'&gt;Pesos Institucionales&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px;color:#666'&gt;(5 features — suma ≈ 1.0)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=center;verticalAlign=top;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="20" y="340" width="370" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="iw1" value="&lt;b&gt;inst_weight_hard&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="30" y="385" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="iw2" value="&lt;b&gt;inst_weight_soft&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="140" y="385" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="iw3" value="&lt;b&gt;inst_weight_exp&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="250" y="385" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="iw4" value="&lt;b&gt;inst_weight_edu&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="70" y="425" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="iw5" value="&lt;b&gt;inst_weight_lang&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="210" y="425" width="100" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Grupo Features de Interacción -->
+        <mxCell id="inter_group" value="&lt;b style='font-size:13px;color:#16537e'&gt;Features de Interacción&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px;color:#666'&gt;(5 features — CV score × peso institucional)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=center;verticalAlign=top;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="20" y="490" width="370" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="int1" value="&lt;span style='font-size:9px'&gt;&lt;b&gt;interaction_hard&lt;/b&gt;&lt;br&gt;= hard_score × w_hard&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="30" y="535" width="105" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="int2" value="&lt;span style='font-size:9px'&gt;&lt;b&gt;interaction_soft&lt;/b&gt;&lt;br&gt;= soft_score × w_soft&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="145" y="535" width="105" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="int3" value="&lt;span style='font-size:9px'&gt;&lt;b&gt;interaction_exp&lt;/b&gt;&lt;br&gt;= exp_score × w_exp&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="535" width="105" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="int4" value="&lt;span style='font-size:9px'&gt;&lt;b&gt;interaction_edu&lt;/b&gt;&lt;br&gt;= edu_score × w_edu&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="75" y="575" width="105" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="int5" value="&lt;span style='font-size:9px'&gt;&lt;b&gt;interaction_lang&lt;/b&gt;&lt;br&gt;= lang_score × w_lang&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="210" y="575" width="105" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- Grupo Contexto de Experiencia -->
+        <mxCell id="ctx_group" value="&lt;b style='font-size:13px;color:#16537e'&gt;Features de Contexto&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px;color:#666'&gt;(3 features — experiencia)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=center;verticalAlign=top;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="20" y="620" width="370" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ctx1" value="&lt;b&gt;total_experience_years&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:9px'&gt;Años totales del CV [0-10+]&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="30" y="665" width="105" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="ctx2" value="&lt;b&gt;min_required_years&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:9px'&gt;Mínimo requerido [0-5+]&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="145" y="665" width="105" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="ctx3" value="&lt;b&gt;experience_delta&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:9px'&gt;= total - requerido&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="665" width="105" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- Total features label -->
+        <mxCell id="total_label" value="&lt;b&gt;Vector de 18 dimensiones&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=0;fontColor=#333;fontFamily=Segoe UI;fillColor=#f5f5f5;rounded=1;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="100" y="725" width="210" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ============== FLECHAS DE ENTRADA AL MODELO ============== -->
+        <mxCell id="arrow_in" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#16537e;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="total_label" target="model_box">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="430" y="725" />
+              <mxPoint x="430" y="440" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow_in_label" value="18 features" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#16537e;" vertex="1" connectable="0" parent="arrow_in">
+          <mxGeometry x="-0.2" relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============== BLOQUE 2: MODELO ML ============== -->
+        <mxCell id="model_header" value="PROCESAMIENTO ML" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#9c1d1d;fontFamily=Segoe UI;" vertex="1" parent="1">
+          <mxGeometry x="490" y="75" width="420" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Caja principal del modelo -->
+        <mxCell id="model_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="460" y="110" width="480" height="660" as="geometry" />
+        </mxCell>
+
+        <!-- Paso 1: Datos Sintéticos -->
+        <mxCell id="step1" value="&lt;b style='font-size:12px'&gt;1. Generación de Datos Sintéticos&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;• 5,000+ ejemplos de entrenamiento&lt;br&gt;• Distribución: 40% APTO, 35% CONSIDERADO, 25% NO_APTO&lt;br&gt;• Generados con distribuciones Beta, Dirichlet, Gamma&lt;br&gt;• &lt;b&gt;15 reglas expertas&lt;/b&gt; codifican conocimiento de dominio:&lt;br&gt;&amp;nbsp;&amp;nbsp;- Penalización experiencia insuficiente (-30% a -50%)&lt;br&gt;&amp;nbsp;&amp;nbsp;- Bonus perfil completo (+10% si todos ≥ 0.7)&lt;br&gt;&amp;nbsp;&amp;nbsp;- Sinergia hard+soft (+7% si ambos &gt; 0.75)&lt;br&gt;&amp;nbsp;&amp;nbsp;- Penalización desbalance (-10% si std &gt; 0.35)&lt;br&gt;&amp;nbsp;&amp;nbsp;- Ruido gaussiano (±4%) para variación realista&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#b85450;align=left;spacingLeft=10;spacingRight=5;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="475" y="120" width="450" height="175" as="geometry" />
+        </mxCell>
+
+        <!-- Flecha 1→2 -->
+        <mxCell id="arr12" value="" style="endArrow=block;endFill=1;html=1;strokeWidth=2;strokeColor=#b85450;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="700" y="295" as="sourcePoint" />
+            <mxPoint x="700" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Paso 2: Normalización -->
+        <mxCell id="step2" value="&lt;b style='font-size:12px'&gt;2. Preprocesamiento — StandardScaler&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;• Normaliza cada feature a &lt;b&gt;media=0, desviación=1&lt;/b&gt;&lt;br&gt;• Mejora la convergencia del modelo Ridge&lt;br&gt;• Fórmula: z = (x - μ) / σ&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#b85450;align=left;spacingLeft=10;spacingRight=5;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="475" y="310" width="450" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- Flecha 2→3 -->
+        <mxCell id="arr23" value="" style="endArrow=block;endFill=1;html=1;strokeWidth=2;strokeColor=#b85450;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="700" y="385" as="sourcePoint" />
+            <mxPoint x="700" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Paso 3: Entrenamiento -->
+        <mxCell id="step3" value="&lt;b style='font-size:12px'&gt;3. Entrenamiento — Ridge Regression (L2)&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;• &lt;b&gt;Algoritmo&lt;/b&gt;: sklearn.linear_model.Ridge&lt;br&gt;• &lt;b&gt;Regularización L2&lt;/b&gt;: previene sobreajuste&lt;br&gt;• División: 80% entrenamiento / 20% prueba&lt;br&gt;• &lt;b&gt;Validación cruzada&lt;/b&gt;: 5-fold sobre conjunto de entrenamiento&lt;br&gt;• &lt;b&gt;Grid Search&lt;/b&gt; sobre alpha: [0.01, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0, 50.0, 100.0]&lt;br&gt;• Selección del mejor alpha según &lt;b&gt;R² score&lt;/b&gt;&lt;br&gt;• Modelo final entrenado con todo el conjunto de entrenamiento&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#b85450;align=left;spacingLeft=10;spacingRight=5;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="475" y="400" width="450" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Flecha 3→4 -->
+        <mxCell id="arr34" value="" style="endArrow=block;endFill=1;html=1;strokeWidth=2;strokeColor=#b85450;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="700" y="540" as="sourcePoint" />
+            <mxPoint x="700" y="555" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Paso 4: Predicción -->
+        <mxCell id="step4" value="&lt;b style='font-size:12px'&gt;4. Predicción&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;• &lt;b&gt;Fórmula&lt;/b&gt;: match_score = intercept + Σ(coef_i × feature_i)&lt;br&gt;• Se recorta el resultado al rango &lt;b&gt;[0.0, 1.0]&lt;/b&gt;&lt;br&gt;• El modelo aprende los 18 coeficientes óptimos del entrenamiento&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#b85450;align=left;spacingLeft=10;spacingRight=5;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="475" y="555" width="450" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- Flecha 4→5 -->
+        <mxCell id="arr45" value="" style="endArrow=block;endFill=1;html=1;strokeWidth=2;strokeColor=#b85450;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="700" y="630" as="sourcePoint" />
+            <mxPoint x="700" y="645" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Paso 5: Clasificación -->
+        <mxCell id="step5" value="&lt;b style='font-size:12px'&gt;5. Clasificación por Umbrales&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;• score ≥ &lt;b&gt;0.70&lt;/b&gt; → &lt;span style='color:#2e7d32;font-weight:bold'&gt;APTO&lt;/span&gt;&lt;br&gt;• 0.50 ≤ score &lt; 0.70 → &lt;span style='color:#f57f17;font-weight:bold'&gt;CONSIDERADO&lt;/span&gt;&lt;br&gt;• score &lt; &lt;b&gt;0.50&lt;/b&gt; → &lt;span style='color:#c62828;font-weight:bold'&gt;NO_APTO&lt;/span&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#b85450;align=left;spacingLeft=10;spacingRight=5;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="475" y="645" width="450" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- Métricas del modelo -->
+        <mxCell id="metrics" value="&lt;b style='font-size:11px'&gt;Métricas del Modelo&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;R² ≈ 0.80 | RMSE ≈ 0.092 | MAE ≈ 0.074 | Accuracy ≈ 77%&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=center;verticalAlign=middle;spacingTop=3;" vertex="1" parent="1">
+          <mxGeometry x="530" y="735" width="340" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ============== FLECHA DE SALIDA ============== -->
+        <mxCell id="arrow_out" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#2e7d32;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="model_box" target="out_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_out_label" value="Resultados" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#2e7d32;" vertex="1" connectable="0" parent="arrow_out">
+          <mxGeometry x="-0.2" relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============== BLOQUE 3: SALIDA ============== -->
+        <mxCell id="output_header" value="VALORES DE SALIDA" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#2e7d32;fontFamily=Segoe UI;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="75" width="380" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Grupo principal de salida -->
+        <mxCell id="out_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#2e7d32;strokeWidth=2;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="110" width="380" height="620" as="geometry" />
+        </mxCell>
+
+        <!-- Salida 1: Match Score -->
+        <mxCell id="out1" value="&lt;b style='font-size:13px;color:#2e7d32'&gt;match_score&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;Valor continuo en rango &lt;b&gt;[0.0 — 1.0]&lt;/b&gt;&lt;br&gt;Representa el grado de coincidencia&lt;br&gt;entre candidato y puesto&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2e7d32;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="125" width="350" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- Salida 2: Clasificación -->
+        <mxCell id="out2_box" value="&lt;b style='font-size:13px;color:#2e7d32'&gt;classification&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;Categoría basada en umbrales del score&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2e7d32;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="215" width="350" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="out2_apto" value="&lt;b&gt;APTO&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:9px'&gt;score ≥ 0.70&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=12;fontColor=#2e7d32;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="270" width="95" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="out2_consid" value="&lt;b&gt;CONSIDERADO&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:9px'&gt;0.50 ≤ score &lt; 0.70&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f57f17;fontSize=12;fontColor=#f57f17;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="270" width="105" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="out2_noapto" value="&lt;b&gt;NO_APTO&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:9px'&gt;score &lt; 0.50&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#c62828;fontSize=12;fontColor=#c62828;" vertex="1" parent="1">
+          <mxGeometry x="1270" y="270" width="90" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- Salida 3: Contribuciones -->
+        <mxCell id="out3" value="&lt;b style='font-size:13px;color:#2e7d32'&gt;feature_contributions&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;Para cada una de las 18 features:&lt;br&gt;&lt;b&gt;contribución = coeficiente × valor_feature&lt;/b&gt;&lt;br&gt;Muestra cuánto aporta (o resta) cada&lt;br&gt;dimensión a la predicción final&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2e7d32;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="370" width="350" height="95" as="geometry" />
+        </mxCell>
+
+        <!-- Salida 4: Fortalezas -->
+        <mxCell id="out4" value="&lt;b style='font-size:13px;color:#2e7d32'&gt;top_strengths&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;Las &lt;b&gt;3 features&lt;/b&gt; con mayor contribución positiva&lt;br&gt;Formato: [(nombre_feature, valor_contribución), ...]&lt;br&gt;&lt;br&gt;&lt;i&gt;Ejemplo:&lt;/i&gt;&lt;br&gt;[(&quot;interaction_hard&quot;, 0.052),&lt;br&gt; (&quot;hard_skills_score&quot;, 0.041),&lt;br&gt; (&quot;inst_weight_hard&quot;, 0.018)]&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2e7d32;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="480" width="350" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- Salida 5: Debilidades -->
+        <mxCell id="out5" value="&lt;b style='font-size:13px;color:#2e7d32'&gt;top_weaknesses&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:10px'&gt;Las &lt;b&gt;3 features&lt;/b&gt; con contribución más negativa&lt;br&gt;Formato: [(nombre_feature, valor_contribución), ...]&lt;br&gt;&lt;br&gt;&lt;i&gt;Ejemplo:&lt;/i&gt;&lt;br&gt;[(&quot;soft_skills_score&quot;, -0.027),&lt;br&gt; (&quot;inst_weight_soft&quot;, -0.005),&lt;br&gt; (&quot;interaction_soft&quot;, -0.003)]&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2e7d32;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="610" width="350" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- ============== LEYENDA ============== -->
+        <mxCell id="legend_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#cccccc;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="780" width="370" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_title" value="&lt;b&gt;Leyenda de Colores&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=0;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="30" y="785" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" value="" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="35" y="810" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1t" value="Puntuaciones del CV (Scorers)" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;spacingLeft=3;" vertex="1" parent="1">
+          <mxGeometry x="55" y="808" width="170" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="35" y="830" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2t" value="Pesos Institucionales (Perfil)" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;spacingLeft=3;" vertex="1" parent="1">
+          <mxGeometry x="55" y="828" width="170" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="35" y="850" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3t" value="Interacciones (CV × Peso)" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;spacingLeft=3;" vertex="1" parent="1">
+          <mxGeometry x="55" y="848" width="170" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" value="" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="35" y="870" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4t" value="Contexto de Experiencia" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;spacingLeft=3;" vertex="1" parent="1">
+          <mxGeometry x="55" y="868" width="170" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5" value="" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="230" y="810" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5t" value="Procesamiento ML" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;spacingLeft=3;" vertex="1" parent="1">
+          <mxGeometry x="250" y="808" width="130" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg6" value="" style="rounded=1;fillColor=#e8f5e9;strokeColor=#2e7d32;" vertex="1" parent="1">
+          <mxGeometry x="230" y="830" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="leg6t" value="Valores de Salida" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;spacingLeft=3;" vertex="1" parent="1">
+          <mxGeometry x="250" y="828" width="130" height="18" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

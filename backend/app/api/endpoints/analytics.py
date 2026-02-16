@@ -164,6 +164,217 @@ async def get_skills_cloud(
         print(f"Error fetching skills cloud: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/users-report")
+async def get_users_report(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    role: Optional[str] = Query(None),
+    has_cv: Optional[bool] = Query(None),
+    profile_complete: Optional[bool] = Query(None),
+    current_user: dict = Depends(verify_operator_access)
+):
+    """
+    Reporte detallado de usuarios con filtros.
+    """
+    try:
+        query = supabase.table("usuarios").select("id, email, nombre_completo, rol, created_at")
+        query = apply_date_filter(query, "created_at", start_date, end_date)
+
+        if role:
+            query = query.eq("rol", role)
+
+        response = query.order("created_at", desc=True).execute()
+        users = response.data
+
+        # Fetch profile info for all users
+        profile_response = supabase.table("perfiles_profesionales") \
+            .select("usuario_id, is_complete, cv_filename, cv_uploaded_at, completeness_score") \
+            .execute()
+
+        profiles_map = {}
+        for p in profile_response.data:
+            profiles_map[p['usuario_id']] = p
+
+        result_users = []
+        for user in users:
+            profile = profiles_map.get(user['id'], {})
+            has_cv_flag = bool(profile.get('cv_filename'))
+            is_complete = profile.get('is_complete', False)
+
+            # Apply client-side filters
+            if has_cv is not None and has_cv_flag != has_cv:
+                continue
+            if profile_complete is not None and is_complete != profile_complete:
+                continue
+
+            result_users.append({
+                "id": user['id'],
+                "email": user['email'],
+                "nombre_completo": user.get('nombre_completo'),
+                "rol": user['rol'],
+                "fecha_registro": user['created_at'],
+                "tiene_cv": has_cv_flag,
+                "perfil_completo": is_complete,
+                "completeness_score": float(profile.get('completeness_score', 0))
+            })
+
+        # Stats
+        total = len(result_users)
+        roles_count = Counter(u['rol'] for u in result_users)
+        with_cv = sum(1 for u in result_users if u['tiene_cv'])
+        complete = sum(1 for u in result_users if u['perfil_completo'])
+
+        return {
+            "users": result_users,
+            "stats": {
+                "total": total,
+                "by_role": dict(roles_count),
+                "with_cv": with_cv,
+                "with_cv_pct": round((with_cv / total * 100), 1) if total > 0 else 0,
+                "profile_complete": complete,
+                "profile_complete_pct": round((complete / total * 100), 1) if total > 0 else 0
+            }
+        }
+    except Exception as e:
+        print(f"Error fetching users report: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/offers-report")
+async def get_offers_report(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    tipo: Optional[str] = Query(None),
+    estado: Optional[str] = Query(None),
+    current_user: dict = Depends(verify_operator_access)
+):
+    """
+    Reporte detallado de ofertas laborales con filtros.
+    """
+    try:
+        query = supabase.table("ofertas_laborales") \
+            .select("*, institutional_profiles(institution_name, sector)")
+        query = apply_date_filter(query, "created_at", start_date, end_date)
+
+        if tipo:
+            query = query.eq("tipo", tipo)
+
+        response = query.order("created_at", desc=True).execute()
+        ofertas = response.data
+
+        today = datetime.now().strftime("%Y-%m-%d")
+        result_ofertas = []
+        for o in ofertas:
+            # Determine status
+            is_active = o.get('is_active', True)
+            fecha_cierre = o.get('fecha_cierre')
+            is_expired = bool(fecha_cierre and fecha_cierre < today)
+
+            if is_expired:
+                oferta_estado = 'expirada'
+            elif is_active:
+                oferta_estado = 'activa'
+            else:
+                oferta_estado = 'inactiva'
+
+            # Apply state filter
+            if estado and oferta_estado != estado:
+                continue
+
+            inst = o.get('institutional_profiles') or {}
+            result_ofertas.append({
+                "id": o['id'],
+                "titulo": o['titulo'],
+                "tipo": o['tipo'],
+                "modalidad": o.get('modalidad'),
+                "ubicacion": o.get('ubicacion'),
+                "institucion": inst.get('institution_name'),
+                "sector": inst.get('sector'),
+                "estado": oferta_estado,
+                "is_active": is_active,
+                "fecha_inicio": o.get('fecha_inicio'),
+                "fecha_cierre": fecha_cierre,
+                "cupos_disponibles": o.get('cupos_disponibles', 1),
+                "created_at": o['created_at']
+            })
+
+        total = len(result_ofertas)
+        activas = sum(1 for o in result_ofertas if o['estado'] == 'activa')
+        inactivas = sum(1 for o in result_ofertas if o['estado'] == 'inactiva')
+        expiradas = sum(1 for o in result_ofertas if o['estado'] == 'expirada')
+        by_tipo = Counter(o['tipo'] for o in result_ofertas)
+
+        return {
+            "ofertas": result_ofertas,
+            "stats": {
+                "total": total,
+                "activas": activas,
+                "inactivas": inactivas,
+                "expiradas": expiradas,
+                "by_tipo": dict(by_tipo)
+            }
+        }
+    except Exception as e:
+        print(f"Error fetching offers report: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/profiles-report")
+async def get_profiles_report(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    sector: Optional[str] = Query(None),
+    current_user: dict = Depends(verify_operator_access)
+):
+    """
+    Reporte detallado de perfiles institucionales con filtros.
+    """
+    try:
+        query = supabase.table("institutional_profiles").select("*")
+        query = apply_date_filter(query, "created_at", start_date, end_date)
+
+        if sector:
+            query = query.eq("sector", sector)
+
+        response = query.order("created_at", desc=True).execute()
+        profiles = response.data
+
+        result_profiles = []
+        all_skills = Counter()
+
+        for p in profiles:
+            reqs = p.get('requirements') or {}
+            skills = reqs.get('hard_skills', []) if isinstance(reqs, dict) else []
+            for s in skills:
+                if s:
+                    all_skills[s.strip().lower()] += 1
+
+            result_profiles.append({
+                "id": p['id'],
+                "institution_name": p.get('institution_name'),
+                "sector": p.get('sector'),
+                "is_active": p.get('is_active', True),
+                "min_score": reqs.get('min_score') if isinstance(reqs, dict) else None,
+                "created_at": p['created_at'],
+                "updated_at": p.get('updated_at')
+            })
+
+        total = len(result_profiles)
+        activos = sum(1 for p in result_profiles if p['is_active'])
+        by_sector = Counter(p['sector'] for p in result_profiles if p.get('sector'))
+        top_skills = [{"name": k, "count": v} for k, v in all_skills.most_common(15)]
+
+        return {
+            "profiles": result_profiles,
+            "stats": {
+                "total": total,
+                "activos": activos,
+                "by_sector": dict(by_sector),
+                "top_skills_required": top_skills
+            }
+        }
+    except Exception as e:
+        print(f"Error fetching profiles report: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/profile-completion")
 async def get_profile_completion(
     start_date: Optional[str] = Query(None),

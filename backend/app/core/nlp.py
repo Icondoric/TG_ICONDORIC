@@ -1,6 +1,6 @@
 import re
 import spacy
-from .llm_extractor import extract_skills_with_llm
+from .llm_extractor import extract_skills_with_llm_sync as extract_skills_with_llm
 
 def load_spacy_model():
     try:

@@ -18,7 +18,12 @@ export function getMenuItems(role) {
         case 'admin':
         case 'administrador':
             return [
-                { label: 'Gestión de Usuarios', path: '/admin/users', icon: icons.users },
+                {
+                    label: 'Gestión de Usuarios', icon: icons.users, children: [
+                        { label: 'Ver Usuarios', path: '/admin/users' },
+                        { label: 'Nuevo Usuario', path: '/admin/users/new' },
+                    ]
+                },
                 {
                     label: 'Digitalización de Perfiles', icon: icons.profile, children: [
                         { label: 'Subir CV', path: '/digitalizacion/subir-cv' },
@@ -28,28 +33,71 @@ export function getMenuItems(role) {
                 },
                 {
                     label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
-                        { label: 'Evaluar CV', path: '/evaluation' },
                         { label: 'Dashboard', path: '/admin' },
+                        { label: 'Recomendaciones', path: '/mis-recomendaciones' },
                     ]
                 },
-                { label: 'Gestión de Oferta Laboral', path: '/admin/ofertas', icon: icons.ofertas },
-                { label: 'Perfiles Institucionales', path: '/admin/profiles', icon: icons.instituciones },
-                { label: 'Informes y Reportes', path: '/admin/reports', icon: icons.reports },
+                {
+                    label: 'Gestión de Oferta Laboral', icon: icons.ofertas, children: [
+                        { label: 'Ver Ofertas', path: '/admin/ofertas' },
+                        { label: 'Nueva Oferta', path: '/admin/ofertas/new' },
+                    ]
+                },
+                {
+                    label: 'Perfiles Institucionales', icon: icons.instituciones, children: [
+                        { label: 'Ver Perfiles', path: '/admin/profiles' },
+                        { label: 'Nuevo Perfil', path: '/admin/profiles/new' },
+                    ]
+                },
+                {
+                    label: 'Informes y Reportes', icon: icons.reports, children: [
+                        { label: 'Resumen General', path: '/admin/reports' },
+                        { label: 'Reporte de Usuarios', path: '/admin/reports/users' },
+                        { label: 'Reporte de Ofertas', path: '/admin/reports/offers' },
+                        { label: 'Reporte de Perfiles', path: '/admin/reports/profiles' },
+                    ]
+                },
             ]
 
         case 'operador':
             return [
-                { label: 'Gestión de Usuarios', path: '/admin/users', icon: icons.users },
-                { label: 'Gestión de Oferta Laboral', path: '/admin/ofertas', icon: icons.ofertas },
-                { label: 'Perfiles Institucionales', path: '/admin/profiles', icon: icons.instituciones },
-                { label: 'Informes y Reportes', path: '/admin/reports', icon: icons.reports },
+                {
+                    label: 'Gestión de Usuarios', icon: icons.users, children: [
+                        { label: 'Ver Usuarios', path: '/admin/users' },
+                        { label: 'Nuevo Usuario', path: '/admin/users/new' },
+                    ]
+                },
+                {
+                    label: 'Gestión de Oferta Laboral', icon: icons.ofertas, children: [
+                        { label: 'Ver Ofertas', path: '/admin/ofertas' },
+                        { label: 'Nueva Oferta', path: '/admin/ofertas/new' },
+                    ]
+                },
+                {
+                    label: 'Perfiles Institucionales', icon: icons.instituciones, children: [
+                        { label: 'Ver Perfiles', path: '/admin/profiles' },
+                        { label: 'Nuevo Perfil', path: '/admin/profiles/new' },
+                    ]
+                },
+                {
+                    label: 'Informes y Reportes', icon: icons.reports, children: [
+                        { label: 'Resumen General', path: '/admin/reports' },
+                        { label: 'Reporte de Usuarios', path: '/admin/reports/users' },
+                        { label: 'Reporte de Ofertas', path: '/admin/reports/offers' },
+                        { label: 'Reporte de Perfiles', path: '/admin/reports/profiles' },
+                    ]
+                },
             ]
 
         case 'estudiante':
         case 'titulado':
         default:
             return [
-                { label: 'Gestión de Usuarios', path: '/configuracion-cuenta', icon: icons.settings },
+                {
+                    label: 'Mi Cuenta', icon: icons.settings, children: [
+                        { label: 'Configuración', path: '/configuracion-cuenta' },
+                    ]
+                },
                 {
                     label: 'Digitalización de Perfiles', icon: icons.profile, children: [
                         { label: 'Subir CV', path: '/digitalizacion/subir-cv' },
@@ -59,7 +107,6 @@ export function getMenuItems(role) {
                 },
                 {
                     label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
-                        { label: 'Evaluar CV', path: '/evaluation' },
                         { label: 'Historial', path: '/history' },
                         { label: 'Recomendaciones', path: '/mis-recomendaciones' },
                     ]

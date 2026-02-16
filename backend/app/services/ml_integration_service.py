@@ -4,6 +4,7 @@ Servicio que integra el modulo ML con el backend FastAPI
 """
 
 import os
+import asyncio
 import base64
 import io
 import logging
@@ -39,6 +40,7 @@ class MLIntegrationService:
     _profile_cache = {}
     _cache_timestamp = None
     _cache_ttl = timedelta(minutes=5)
+    _cache_lock = None  # asyncio.Lock, initialized lazily
 
     def __new__(cls):
         if cls._instance is None:
@@ -92,24 +94,13 @@ class MLIntegrationService:
         info['n_features'] = 18
         return info
 
-    def extract_cv_from_base64(self, pdf_base64: str) -> str:
+    def _extract_pdf_text_sync(self, pdf_base64: str) -> str:
         """
-        Extrae texto de un PDF en base64
-
-        Args:
-            pdf_base64: PDF codificado en base64
-
-        Returns:
-            Texto extraido del PDF
-
-        Raises:
-            ValueError: Si el PDF es invalido o no se puede leer
+        Extrae texto de un PDF en base64 (sync, CPU-bound).
+        Se ejecuta en thread executor desde el metodo async.
         """
         try:
-            # Decodificar base64
             pdf_bytes = base64.b64decode(pdf_base64)
-
-            # Extraer texto con pdfplumber
             text = ""
             with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
                 for page in pdf.pages:
@@ -126,30 +117,29 @@ class MLIntegrationService:
             logger.error(f"Error extrayendo PDF: {e}")
             raise ValueError(f"PDF invalido: {str(e)}")
 
-    def extract_cv_with_gemini(self, pdf_base64: str) -> Dict:
+    # Keep sync version for backward compat (used by deprecated cv.py endpoint)
+    def extract_cv_from_base64(self, pdf_base64: str) -> str:
+        return self._extract_pdf_text_sync(pdf_base64)
+
+    async def extract_cv_with_gemini(self, pdf_base64: str) -> Dict:
         """
-        Extrae informacion estructurada del CV usando Gemini
+        Extrae informacion estructurada del CV usando Gemini (async).
 
-        Args:
-            pdf_base64: PDF codificado en base64
-
-        Returns:
-            Dict con estructura del CV
-
-        Raises:
-            ValueError: Si Gemini falla o retorna error
+        - PDF text extraction runs in thread executor (no event loop blocking)
+        - Gemini call is async with semaphore, timeout and retries
         """
-        # Extraer texto del PDF
-        text = self.extract_cv_from_base64(pdf_base64)
+        # Extract PDF text in thread (CPU-bound, don't block event loop)
+        loop = asyncio.get_event_loop()
+        text = await loop.run_in_executor(None, self._extract_pdf_text_sync, pdf_base64)
 
-        # Llamar a Gemini
-        logger.info("Extrayendo CV con Gemini...")
-        result = extract_skills_with_llm(text)
+        # Call Gemini (async with semaphore + retries + timeout)
+        logger.info("Extrayendo CV con Gemini (async)...")
+        result = await extract_skills_with_llm(text)
 
         if 'error' in result and result['error']:
             raise ValueError(f"Error de Gemini: {result['error']}")
 
-        # Validar estructura minima
+        # Validate minimum structure
         required_keys = ['hard_skills', 'soft_skills', 'education', 'experience']
         for key in required_keys:
             if key not in result:
@@ -193,14 +183,19 @@ class MLIntegrationService:
             logger.error(f"Error cargando perfil {profile_id}: {e}")
             raise
 
+    def _get_cache_lock(self):
+        """Lazy-init asyncio.Lock (must be created inside running event loop)."""
+        if self._cache_lock is None:
+            self._cache_lock = asyncio.Lock()
+        return self._cache_lock
+
     def load_all_active_profiles(self) -> List[Dict]:
         """
-        Carga todos los perfiles institucionales activos
+        Carga todos los perfiles institucionales activos (sync version).
 
         Returns:
             Lista de perfiles formateados para ML
         """
-        # Verificar cache
         if self._is_cache_valid():
             return list(self._profile_cache.values())
 
@@ -214,13 +209,15 @@ class MLIntegrationService:
                 .execute()
 
             profiles = []
-            self._profile_cache = {}
+            new_cache = {}
 
             for profile in response.data:
                 formatted = self._format_profile_for_ml(profile)
                 profiles.append(formatted)
-                self._profile_cache[profile['id']] = formatted
+                new_cache[profile['id']] = formatted
 
+            # Atomic swap to avoid partial state
+            self._profile_cache = new_cache
             self._cache_timestamp = datetime.utcnow()
             logger.info(f"Cargados {len(profiles)} perfiles institucionales")
 

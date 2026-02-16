@@ -7,6 +7,11 @@ export const listProfiles = async (includeInactive = false, sector = null) => {
     return response.data
 }
 
+export const listActiveProfiles = async () => {
+    const response = await api.get('/api/admin/institutional-profiles/active')
+    return response.data
+}
+
 export const getProfile = async (profileId) => {
     const response = await api.get(`/api/admin/institutional-profiles/${profileId}`)
     return response.data

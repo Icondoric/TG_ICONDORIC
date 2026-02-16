@@ -26,3 +26,8 @@ export const updateUser = async (userId, userData) => {
 export const deleteUser = async (userId) => {
     await api.delete(`/api/users/${userId}`)
 }
+
+export const createUser = async (userData) => {
+    const response = await api.post('/api/users/', userData)
+    return response.data
+}

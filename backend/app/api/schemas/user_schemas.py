@@ -12,6 +12,13 @@ class PasswordChangeRequest(BaseModel):
     current_password: str
     new_password: str
 
+class UserCreateRequest(BaseModel):
+    """Request model for admin creating a new user"""
+    email: EmailStr
+    password: str
+    nombre_completo: str
+    rol: str  # estudiante, titulado, operador, administrador
+
 class UserAccountResponse(BaseModel):
     """Response model for user account information"""
     id: str
@@ -19,6 +26,6 @@ class UserAccountResponse(BaseModel):
     nombre_completo: Optional[str] = None
     rol: str
     created_at: str
-    
+
     class Config:
         from_attributes = True
