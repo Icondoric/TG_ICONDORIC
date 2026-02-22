@@ -132,10 +132,19 @@
         </div>
       </div>
 
+      <!-- Match Details (Skills Analysis) -->
+      <div v-if="rec.match_details" class="mt-6 pt-4 border-t border-gray-100">
+        <h4 class="font-semibold text-gray-900 mb-4">Analisis de Compatibilidad</h4>
+        <MatchDetailSection
+          :matchDetails="rec.match_details"
+          :clasificacion="rec.clasificacion"
+        />
+      </div>
+
       <!-- Action Note -->
       <div class="mt-6 p-4 bg-emi-navy-50 rounded-xl">
         <p class="text-sm text-emi-navy-700">
-          <strong>Nota:</strong> Para postular a esta oferta, contacta a la Unidad de Vinculacion de la EMI.
+          <strong>Nota:</strong> Para postular a esta oferta, contacta a tu jefatura de tu respectiva carrera.
           Este sistema solo genera recomendaciones de correspondencia.
         </p>
       </div>
@@ -147,6 +156,7 @@
 import Card from '@/shared/components/ui/Card.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
 import ProgressBar from '@/shared/components/ui/ProgressBar.vue'
+import MatchDetailSection from './MatchDetailSection.vue'
 
 defineProps({
   rec: { type: Object, required: true },

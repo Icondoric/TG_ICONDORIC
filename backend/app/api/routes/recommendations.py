@@ -203,10 +203,10 @@ async def check_recommendation_eligibility(
         completeness = profile_service.calculate_completeness(profile)
 
         # Verificar rol
-        if current_user['role'] not in ['estudiante', 'titulado']:
+        if current_user['role'] not in ['estudiante', 'titulado', 'admin', 'administrador']:
             return {
                 'eligible': False,
-                'reason': 'Solo estudiantes y titulados pueden recibir recomendaciones',
+                'reason': 'Solo estudiantes, titulados y administradores pueden recibir recomendaciones',
                 'action_required': None,
                 'profile_exists': True,
                 'completeness_score': completeness['score']
@@ -225,7 +225,12 @@ async def check_recommendation_eligibility(
             }
 
         # Determinar tipo de ofertas
-        offer_type = 'pasantias' if current_user['role'] == 'estudiante' else 'empleos'
+        if current_user['role'] == 'estudiante':
+            offer_type = 'pasantias'
+        elif current_user['role'] in ['admin', 'administrador']:
+            offer_type = 'pasantias y empleos'
+        else:
+            offer_type = 'empleos'
 
         return {
             'eligible': True,

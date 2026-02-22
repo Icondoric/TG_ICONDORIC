@@ -107,7 +107,6 @@ export function getMenuItems(role) {
                 },
                 {
                     label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
-                        { label: 'Historial', path: '/history' },
                         { label: 'Recomendaciones', path: '/mis-recomendaciones' },
                     ]
                 },

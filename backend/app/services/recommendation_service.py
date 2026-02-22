@@ -100,11 +100,13 @@ class RecommendationService:
             }
 
         # Determinar tipo de ofertas segun rol
+        # Admin ve tanto pasantias como empleos (tipo queda None = sin filtro)
         if tipo is None:
             if user_role == 'estudiante':
                 tipo = 'pasantia'
             elif user_role == 'titulado':
                 tipo = 'empleo'
+            # admin/administrador: tipo queda None, obtiene todas las ofertas
 
         # Obtener ofertas activas
         ofertas_result = oferta_service.list_ofertas(
@@ -209,7 +211,8 @@ class RecommendationService:
                     'clasificacion': result['classification'],
                     'scores_detalle': result['cv_scores'],
                     'fortalezas': self._extract_fortalezas(result),
-                    'debilidades': self._extract_debilidades(result)
+                    'debilidades': self._extract_debilidades(result),
+                    'match_details': result.get('match_details')
                 }
 
         # Si no tiene perfil institucional, crear uno generico
@@ -221,7 +224,8 @@ class RecommendationService:
             'clasificacion': result['classification'],
             'scores_detalle': result['cv_scores'],
             'fortalezas': self._extract_fortalezas(result),
-            'debilidades': self._extract_debilidades(result)
+            'debilidades': self._extract_debilidades(result),
+            'match_details': result.get('match_details')
         }
 
     def _create_generic_profile(self, oferta: Dict) -> Dict:
@@ -295,6 +299,7 @@ class RecommendationService:
                     'scores_detalle': rec['scores_detalle'],
                     'fortalezas': rec['fortalezas'],
                     'debilidades': rec['debilidades'],
+                    'match_details': rec.get('match_details'),
                     'fue_vista': False
                 }
 
@@ -365,6 +370,7 @@ class RecommendationService:
                     'scores_detalle': rec.get('scores_detalle', {}),
                     'fortalezas': rec.get('fortalezas', []),
                     'debilidades': rec.get('debilidades', []),
+                    'match_details': rec.get('match_details'),
                     'fue_vista': rec['fue_vista'],
                     'vista_at': rec.get('vista_at'),
                     'created_at': rec['created_at']
@@ -431,6 +437,7 @@ class RecommendationService:
                     'scores_detalle': rec.get('scores_detalle', {}),
                     'fortalezas': rec.get('fortalezas', []),
                     'debilidades': rec.get('debilidades', []),
+                    'match_details': rec.get('match_details'),
                     'fue_vista': rec['fue_vista'],
                     'vista_at': rec.get('vista_at'),
                     'created_at': rec['created_at']

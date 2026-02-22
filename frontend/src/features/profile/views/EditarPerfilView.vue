@@ -1,18 +1,8 @@
 <template>
   <AppLayout>
-    <div class="flex">
-      <!-- Secondary Sidebar -->
-      <ProfileSidebar
-        :profile="profile"
-        v-model:isOpen="isSecondarySidebarOpen"
-        @refresh="loadProfile"
-      />
-
+    <div class="flex min-h-screen">
       <!-- Main Content -->
-      <div
-        class="flex-1 transition-[margin] duration-300 ease-in-out min-h-screen"
-        :style="{ marginLeft: isSecondarySidebarOpen ? '280px' : '60px' }"
-      >
+      <div class="flex-1 min-w-0">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <!-- Header -->
           <div class="mb-8 flex items-center justify-between">
@@ -125,6 +115,13 @@
           @confirm="deleteProfile"
         />
       </div>
+
+      <!-- Profile Panel (derecho) -->
+      <ProfileSidebar
+        :profile="profile"
+        v-model:isOpen="isSecondarySidebarOpen"
+        @refresh="loadProfile"
+      />
     </div>
   </AppLayout>
 </template>

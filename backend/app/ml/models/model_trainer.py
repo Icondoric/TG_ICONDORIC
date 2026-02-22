@@ -200,65 +200,7 @@ class ModelTrainer:
 
         return results
 
-    def evaluate_model(
-        self,
-        model: InstitutionalMatchModel,
-        X_test: np.ndarray,
-        y_test: np.ndarray
-    ) -> Dict[str, float]:
-        """
-        Evalua modelo en test set
-
-        Args:
-            model: Modelo entrenado
-            X_test: Features de test
-            y_test: Target de test
-
-        Returns:
-            Dict con metricas
-        """
-        print(f"\nEvaluando en Test Set...")
-
-        # Predicciones
-        y_pred = model.predict(X_test)
-
-        # Calcular metricas
-        metrics = {
-            'r2_score': r2_score(y_test, y_pred),
-            'mse': mean_squared_error(y_test, y_pred),
-            'rmse': np.sqrt(mean_squared_error(y_test, y_pred)),
-            'mae': mean_absolute_error(y_test, y_pred)
-        }
-
-        print(f"\n   Metricas en Test:")
-        print(f"   R2 Score: {metrics['r2_score']:.4f}")
-        print(f"   MSE:      {metrics['mse']:.4f}")
-        print(f"   RMSE:     {metrics['rmse']:.4f}")
-        print(f"   MAE:      {metrics['mae']:.4f}")
-
-        # Clasificacion
-        y_test_class = np.array([self._classify(s) for s in y_test])
-        y_pred_class = np.array([self._classify(s) for s in y_pred])
-
-        accuracy = (y_test_class == y_pred_class).mean()
-        print(f"   Accuracy (clasificacion): {accuracy:.4f}")
-
-        metrics['classification_accuracy'] = accuracy
-
-        # Guardar
-        self.training_history['test_metrics'] = metrics
-
-        return metrics
-
-    def _classify(self, score: float) -> str:
-        """Clasifica un score"""
-        if score >= 0.70:
-            return 'APTO'
-        elif score >= 0.50:
-            return 'CONSIDERADO'
-        else:
-            return 'NO_APTO'
-
+  
     def plot_predictions(
         self,
         model: InstitutionalMatchModel,

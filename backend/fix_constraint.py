@@ -1,4 +1,4 @@
-
+    
 import asyncio
 from app.db.client import supabase
 

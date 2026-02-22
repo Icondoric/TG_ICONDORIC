@@ -1,30 +1,14 @@
 <template>
   <AppLayout>
-    <div class="flex">
-      <!-- Secondary Sidebar -->
-      <RecommendationsSidebar
-        v-model:isOpen="isSecondarySidebarOpen"
-        :bestMatch="bestMatch"
-        :perfilSummary="perfilSummary"
-        :totalCount="recommendations.length"
-        :newCount="newCount"
-        :aptoCount="aptoCount"
-        :consideradoCount="consideradoCount"
-        :refreshing="refreshing"
-        @refresh="loadRecommendations(true)"
-      />
-
+    <div class="flex min-h-screen">
       <!-- Main Content -->
-      <div
-        class="flex-1 transition-[margin] duration-300 ease-in-out min-h-screen"
-        :style="{ marginLeft: isSecondarySidebarOpen ? '280px' : '60px' }"
-      >
+      <div class="flex-1 min-w-0">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <!-- Header -->
           <div class="mb-8">
             <h1 class="text-3xl font-bold text-emi-navy-500">Mis Recomendaciones</h1>
             <p class="mt-2 text-gray-600">
-              {{ userRole === 'estudiante' ? 'Pasantias recomendadas' : 'Empleos recomendados' }} basados en tu perfil
+              {{ userRole === 'estudiante' ? 'Pasantias recomendadas' : ['admin', 'administrador'].includes(userRole) ? 'Pasantias y empleos recomendados' : 'Empleos recomendados' }} basados en tu perfil
             </p>
           </div>
 
@@ -83,7 +67,7 @@
               </svg>
               <h3 class="mt-4 text-lg font-semibold text-gray-900">No hay recomendaciones disponibles</h3>
               <p class="mt-2 text-gray-500">
-                No hay {{ userRole === 'estudiante' ? 'pasantias' : 'empleos' }} activos en este momento.
+                No hay {{ userRole === 'estudiante' ? 'pasantias' : ['admin', 'administrador'].includes(userRole) ? 'pasantias ni empleos' : 'empleos' }} activos en este momento.
               </p>
               <div class="mt-4 space-y-2">
                 <p class="text-sm text-gray-400">Posibles razones:</p>
@@ -121,6 +105,19 @@
           </div>
         </div>
       </div>
+
+      <!-- Recommendations Panel (derecho) -->
+      <RecommendationsSidebar
+        v-model:isOpen="isSecondarySidebarOpen"
+        :bestMatch="bestMatch"
+        :perfilSummary="perfilSummary"
+        :totalCount="recommendations.length"
+        :newCount="newCount"
+        :aptoCount="aptoCount"
+        :consideradoCount="consideradoCount"
+        :refreshing="refreshing"
+        @refresh="loadRecommendations(true)"
+      />
     </div>
   </AppLayout>
 </template>

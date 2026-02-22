@@ -6,7 +6,9 @@
       "Bash(npm run build:*)",
       "Bash(pip install:*)",
       "Bash(find:*)",
-      "Bash(npx vite build)"
+      "Bash(npx vite build)",
+      "Bash(ls:*)",
+      "Bash(del:*)"
     ]
   }
 }

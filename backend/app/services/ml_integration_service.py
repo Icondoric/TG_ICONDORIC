@@ -291,29 +291,56 @@ class MLIntegrationService:
 
         # Calcular score heuristico (suma ponderada)
         heuristic_score = extractor.calculate_weighted_score(features)
-        
+
         # Clasificar
         classification = extractor.classify(
-            heuristic_score, 
+            heuristic_score,
             institutional_config.get('thresholds')
         )
-        
+
         # Obtener scores individuales para explicacion
         cv_scores = features['cv_scores']
-        
+
         # Generar fortalezas (scores mas altos)
         sorted_scores = sorted(cv_scores.items(), key=lambda x: x[1], reverse=True)
         top_strengths = [
             {'feature': k, 'contribution': v}
             for k, v in sorted_scores[:3]
         ]
-        
+
         # Generar debilidades (scores mas bajos)
         bottom_scores = sorted(cv_scores.items(), key=lambda x: x[1])
         top_weaknesses = [
             {'feature': k, 'contribution': v}
             for k, v in bottom_scores[:3]
         ]
+
+        # Extraer detalle de skills matched desde metadata
+        metadata = features.get('metadata', {})
+        hard_details = metadata.get('hard_skills_details', {})
+        soft_details = metadata.get('soft_skills_details', {})
+
+        requirements = institutional_config.get('requirements', {})
+
+        match_details = {
+            'hard_skills': {
+                'matched': hard_details.get('matched_required', []),
+                'missing': hard_details.get('missing_required', []),
+                'preferred_matched': hard_details.get('matched_preferred', []),
+            },
+            'soft_skills': {
+                'matched': soft_details.get('matched_exact', []),
+                'missing': soft_details.get('missing', []),
+            },
+            'cv_skills': {
+                'hard': gemini_output.get('hard_skills', []),
+                'soft': gemini_output.get('soft_skills', []),
+            },
+            'required_skills': {
+                'hard': requirements.get('required_skills', []),
+                'soft': requirements.get('required_soft_skills', []),
+            }
+        }
 
         # Formatear respuesta compatible con lo esperado
         return {
@@ -322,7 +349,8 @@ class MLIntegrationService:
             'cv_scores': cv_scores,
             'top_strengths': top_strengths,
             'top_weaknesses': top_weaknesses,
-            'feature_contributions': cv_scores # Usar scores como proxy de contribuciones
+            'feature_contributions': cv_scores,
+            'match_details': match_details
         }
 
     def get_recommendations(

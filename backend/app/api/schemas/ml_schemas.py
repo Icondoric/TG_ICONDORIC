@@ -633,11 +633,12 @@ class RecomendacionDetalladaResponse(BaseModel):
     scores_detalle: Dict[str, float] = Field(default={})
     fortalezas: List[str] = Field(default=[])
     debilidades: List[str] = Field(default=[])
+    match_details: Optional[Dict[str, Any]] = Field(default=None, description="Detalle de skills matched/missing")
 
     # Estado
     fue_vista: bool = False
     vista_at: Optional[datetime] = None
-    created_at: datetime
+    created_at: Optional[datetime] = None
 
     class Config:
         json_schema_extra = {
