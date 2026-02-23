@@ -36,6 +36,7 @@ const form = ref({
         min_experience_years: 0,
         required_skills: [],
         preferred_skills: [],
+        required_soft_skills: [],
         required_education_level: 'Licenciatura',
         required_languages: []
     },
@@ -52,6 +53,7 @@ const profileId = computed(() => route.params.id)
 // Skills temporales y custom inputs
 const newRequiredSkill = ref('')
 const newPreferredSkill = ref('')
+const newSoftSkill = ref('')
 const newLanguage = ref('')
 const customSector = ref('')
 
@@ -85,6 +87,14 @@ const commonSkills = [
     'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP',
     'Machine Learning', 'Data Analysis', 'Project Management', 'Scrum', 'Agile',
     'Communication', 'Leadership', 'Teamwork', 'Problem Solving', 'Critical Thinking'
+]
+
+const commonSoftSkills = [
+    'Comunicacion', 'Trabajo en equipo', 'Liderazgo', 'Proactividad', 'Responsabilidad',
+    'Adaptabilidad', 'Resolucion de problemas', 'Pensamiento critico', 'Creatividad',
+    'Gestion del tiempo', 'Orientacion al detalle', 'Trabajo bajo presion',
+    'Iniciativa', 'Empatia', 'Negociacion', 'Presentaciones', 'Toma de decisiones',
+    'Planificacion', 'Organizacion', 'Orientacion a resultados'
 ]
 
 const commonLanguages = [
@@ -151,6 +161,7 @@ onMounted(async () => {
                 // Asegurar que arrays existan
                 if (!form.value.requirements.required_skills) form.value.requirements.required_skills = []
                 if (!form.value.requirements.preferred_skills) form.value.requirements.preferred_skills = []
+                if (!form.value.requirements.required_soft_skills) form.value.requirements.required_soft_skills = []
                 if (!form.value.requirements.required_languages) form.value.requirements.required_languages = []
             }
         } catch (err) {
@@ -184,6 +195,18 @@ const addPreferredSkill = () => {
 
 const removePreferredSkill = (skill) => {
     form.value.requirements.preferred_skills = form.value.requirements.preferred_skills.filter(s => s !== skill)
+}
+
+const addSoftSkill = () => {
+    const skill = newSoftSkill.value.trim()
+    if (skill && !form.value.requirements.required_soft_skills.includes(skill)) {
+        form.value.requirements.required_soft_skills.push(skill)
+        newSoftSkill.value = ''
+    }
+}
+
+const removeSoftSkill = (skill) => {
+    form.value.requirements.required_soft_skills = form.value.requirements.required_soft_skills.filter(s => s !== skill)
 }
 
 const addLanguage = () => {
@@ -556,6 +579,48 @@ const cancel = () => {
                             </div>
                         </div>
 
+                        <!-- Habilidades Blandas Requeridas -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">
+                                Habilidades Blandas Requeridas
+                            </label>
+                            <p class="text-xs text-slate-500 mb-2">
+                                Actitudes y competencias interpersonales que el candidato debe tener.
+                            </p>
+                            <div class="flex gap-2 mb-2">
+                                <input
+                                    v-model="newSoftSkill"
+                                    @keyup.enter.prevent="addSoftSkill"
+                                    type="text"
+                                    list="softSkillsList"
+                                    placeholder="Ej: Trabajo en equipo..."
+                                    class="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                                />
+                                <button
+                                    type="button"
+                                    @click="addSoftSkill"
+                                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                                >
+                                    Agregar
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    v-for="skill in form.requirements.required_soft_skills"
+                                    :key="skill"
+                                    class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm"
+                                >
+                                    {{ skill }}
+                                    <button type="button" @click="removeSoftSkill(skill)" class="ml-2 hover:text-purple-900">
+                                        &times;
+                                    </button>
+                                </span>
+                                <span v-if="form.requirements.required_soft_skills.length === 0" class="text-xs text-slate-400 italic">
+                                    Sin habilidades blandas requeridas (el score de soft skills sera 100%)
+                                </span>
+                            </div>
+                        </div>
+
                         <!-- Idiomas -->
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">
@@ -595,6 +660,9 @@ const cancel = () => {
                         <!-- Datalists -->
                         <datalist id="skillsList">
                             <option v-for="skill in commonSkills" :key="skill" :value="skill" />
+                        </datalist>
+                        <datalist id="softSkillsList">
+                            <option v-for="skill in commonSoftSkills" :key="skill" :value="skill" />
                         </datalist>
                         <datalist id="languagesList">
                             <option v-for="lang in commonLanguages" :key="lang" :value="lang" />

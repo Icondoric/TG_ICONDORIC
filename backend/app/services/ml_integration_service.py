@@ -249,6 +249,7 @@ class MLIntegrationService:
                 'min_experience_years': requirements.get('min_experience_years', 0),
                 'required_skills': requirements.get('required_skills', []),
                 'preferred_skills': requirements.get('preferred_skills', []),
+                'required_soft_skills': requirements.get('required_soft_skills', []),
                 'required_education_level': requirements.get('required_education_level', 'Licenciatura'),
                 'required_languages': requirements.get('required_languages', [])
             },
@@ -319,8 +320,14 @@ class MLIntegrationService:
         metadata = features.get('metadata', {})
         hard_details = metadata.get('hard_skills_details', {})
         soft_details = metadata.get('soft_skills_details', {})
+        lang_details = metadata.get('languages_details', {})
 
         requirements = institutional_config.get('requirements', {})
+
+        # Extraer idiomas del CV (puede estar en personal_info.languages o en languages)
+        cv_languages = (
+            gemini_output.get('personal_info', {}) or {}
+        ).get('languages') or gemini_output.get('languages', [])
 
         match_details = {
             'hard_skills': {
@@ -332,6 +339,11 @@ class MLIntegrationService:
                 'matched': soft_details.get('matched_exact', []),
                 'missing': soft_details.get('missing', []),
             },
+            'languages': {
+                'matched': lang_details.get('matched', []),
+                'missing': lang_details.get('missing', []),
+                'cv_languages': cv_languages,
+            },
             'cv_skills': {
                 'hard': gemini_output.get('hard_skills', []),
                 'soft': gemini_output.get('soft_skills', []),
@@ -339,6 +351,7 @@ class MLIntegrationService:
             'required_skills': {
                 'hard': requirements.get('required_skills', []),
                 'soft': requirements.get('required_soft_skills', []),
+                'languages': requirements.get('required_languages', []),
             }
         }
 

@@ -178,17 +178,17 @@
                 </span>
                 <span v-else class="text-gray-400">Sin fecha</span>
               </td>
-              <td class="px-6 py-4 text-right text-sm font-medium">
+              <td class="px-6 py-4 text-right text-sm font-medium space-x-3">
                 <router-link
                   :to="`/admin/ofertas/edit/${oferta.id}`"
-                  class="text-blue-600 hover:text-blue-900 mr-4"
+                  class="text-blue-600 hover:text-blue-900"
                 >
                   Editar
                 </router-link>
                 <button
                   v-if="oferta.is_active"
                   @click="deactivateOferta(oferta)"
-                  class="text-red-600 hover:text-red-900"
+                  class="text-orange-600 hover:text-orange-900"
                 >
                   Desactivar
                 </button>
@@ -198,6 +198,12 @@
                   class="text-green-600 hover:text-green-900"
                 >
                   Activar
+                </button>
+                <button
+                  @click="confirmPermanentDelete(oferta)"
+                  class="text-red-600 hover:text-red-900"
+                >
+                  Eliminar
                 </button>
               </td>
             </tr>
@@ -234,12 +240,89 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal Desactivar Oferta -->
+    <Teleport to="body">
+      <div
+        v-if="deactivateConfirm"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+        @click.self="deactivateConfirm = null"
+      >
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex-shrink-0 w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800">Desactivar Oferta</h3>
+          </div>
+          <p class="text-gray-600 mb-4">
+            ¿Deseas desactivar la oferta
+            <span class="font-semibold text-gray-800">{{ deactivateConfirm.titulo }}</span>?
+            Podras reactivarla posteriormente.
+          </p>
+          <div class="flex gap-3 justify-end">
+            <button @click="deactivateConfirm = null" class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium">
+              Cancelar
+            </button>
+            <button @click="confirmDeactivate" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium">
+              Desactivar
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Modal Eliminacion Permanente -->
+    <Teleport to="body">
+      <div
+        v-if="permanentDeleteConfirm"
+        class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
+        @click.self="cancelPermanentDelete"
+      >
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800">Eliminar Oferta Permanentemente</h3>
+          </div>
+          <p class="text-gray-600 mb-2">
+            Estas a punto de eliminar permanentemente la oferta
+            <span class="font-semibold text-gray-800">{{ permanentDeleteConfirm.titulo }}</span>.
+          </p>
+          <p class="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2 mb-4">
+            Esta accion es irreversible. La oferta sera eliminada de la base de datos.
+          </p>
+          <p v-if="permanentDeleteError" class="text-sm text-red-700 bg-red-50 border border-red-200 rounded px-3 py-2 mb-4">
+            {{ permanentDeleteError }}
+          </p>
+          <div class="flex gap-3 justify-end">
+            <button
+              @click="cancelPermanentDelete"
+              class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+            >
+              Cancelar
+            </button>
+            <button
+              @click="executePermanentDelete"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+            >
+              Eliminar permanentemente
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </AppLayout>
 </template>
 
 <script setup>
 import { ref, reactive, watch, onMounted, computed } from 'vue'
-import { listOfertas, deleteOferta, activateOferta as activateOfertaApi, getOfertasStats } from '@/features/admin/api/ofertas.api'
+import { listOfertas, deleteOferta, activateOferta as activateOfertaApi, getOfertasStats, permanentDeleteOferta } from '@/features/admin/api/ofertas.api'
 import AppLayout from '@/shared/components/AppLayout.vue'
 
 const ofertas = ref([])
@@ -254,6 +337,9 @@ const page = ref(1)
 const pageSize = ref(20)
 const loading = ref(true)
 const error = ref(null)
+const permanentDeleteConfirm = ref(null)
+const permanentDeleteError = ref(null)
+const deactivateConfirm = ref(null)
 
 const filters = reactive({
   tipo: '',
@@ -307,15 +393,43 @@ const loadStats = async () => {
   }
 }
 
-const deactivateOferta = async (oferta) => {
-  if (!confirm(`Desactivar oferta "${oferta.titulo}"?`)) return
+const deactivateOferta = (oferta) => {
+  deactivateConfirm.value = oferta
+}
 
+const confirmDeactivate = async () => {
+  if (!deactivateConfirm.value) return
   try {
-    await deleteOferta(oferta.id)
-    oferta.is_active = false
+    await deleteOferta(deactivateConfirm.value.id)
+    deactivateConfirm.value.is_active = false
+    deactivateConfirm.value = null
     loadStats()
   } catch (e) {
     error.value = e.response?.data?.detail || 'Error desactivando oferta'
+    deactivateConfirm.value = null
+  }
+}
+
+const confirmPermanentDelete = (oferta) => {
+  permanentDeleteError.value = null
+  permanentDeleteConfirm.value = oferta
+}
+
+const cancelPermanentDelete = () => {
+  permanentDeleteConfirm.value = null
+  permanentDeleteError.value = null
+}
+
+const executePermanentDelete = async () => {
+  if (!permanentDeleteConfirm.value) return
+  try {
+    await permanentDeleteOferta(permanentDeleteConfirm.value.id)
+    ofertas.value = ofertas.value.filter(o => o.id !== permanentDeleteConfirm.value.id)
+    total.value = Math.max(0, total.value - 1)
+    permanentDeleteConfirm.value = null
+    loadStats()
+  } catch (e) {
+    permanentDeleteError.value = e.response?.data?.detail || 'Error eliminando oferta'
   }
 }
 

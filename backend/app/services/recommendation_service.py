@@ -247,6 +247,7 @@ class RecommendationService:
                 'min_experience_years': requisitos.get('min_experience_years', 0),
                 'required_skills': requisitos.get('required_skills', []),
                 'preferred_skills': requisitos.get('preferred_skills', []),
+                'required_soft_skills': requisitos.get('required_soft_skills', []),
                 'required_education_level': requisitos.get('required_education_level', 'Licenciatura'),
                 'required_languages': requisitos.get('required_languages', [])
             },

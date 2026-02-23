@@ -32,6 +32,11 @@ export const deleteProfile = async (profileId) => {
     return response.data
 }
 
+export const permanentDeleteProfile = async (profileId) => {
+    const response = await api.delete(`/api/admin/institutional-profiles/${profileId}/permanent`)
+    return response.data
+}
+
 export const activateProfile = async (profileId) => {
     const response = await api.post(`/api/admin/institutional-profiles/${profileId}/activate`)
     return response.data

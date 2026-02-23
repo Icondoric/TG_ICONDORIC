@@ -4,7 +4,7 @@
     <div class="flex items-start justify-between">
       <div class="flex-1">
         <!-- Badges Row -->
-        <div class="flex items-center gap-2 mb-3">
+        <div class="flex items-center gap-2 mb-3 flex-wrap">
           <Badge
             :variant="rec.clasificacion === 'APTO' ? 'gold' : rec.clasificacion === 'CONSIDERADO' ? 'navy' : 'danger'"
           >
@@ -13,6 +13,18 @@
           <Badge v-if="!rec.fue_vista" variant="navy" size="sm">
             Nueva
           </Badge>
+          <!-- Tipo de oferta -->
+          <span
+            v-if="rec.oferta?.tipo"
+            :class="[
+              'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+              rec.oferta.tipo.toLowerCase().includes('pasant')
+                ? 'bg-purple-100 text-purple-700'
+                : 'bg-emi-navy-100 text-emi-navy-700'
+            ]"
+          >
+            {{ rec.oferta.tipo.toLowerCase().includes('pasant') ? 'Pasantía' : 'Empleo' }}
+          </span>
         </div>
 
         <!-- Title -->
@@ -61,22 +73,61 @@
       {{ rec.oferta.descripcion }}
     </p>
 
-    <!-- Strengths & Weaknesses -->
-    <div class="mt-4 flex flex-wrap gap-4">
+    <!-- Skills Match Preview -->
+    <div v-if="matchedSkills.length > 0 || missingSkills.length > 0" class="mt-4 space-y-2">
+      <!-- Skills que hicieron match -->
+      <div v-if="matchedSkills.length > 0">
+        <span class="text-xs text-gray-500">Skills compatibles:</span>
+        <div class="flex flex-wrap gap-1 mt-1">
+          <span
+            v-for="skill in matchedSkills.slice(0, 5)"
+            :key="skill"
+            class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+          >
+            <svg class="h-2.5 w-2.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            {{ skill }}
+          </span>
+          <span
+            v-if="matchedSkills.length > 5"
+            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-600"
+          >
+            +{{ matchedSkills.length - 5 }} más
+          </span>
+        </div>
+      </div>
+
+      <!-- Skills faltantes (preview) -->
+      <div v-if="missingSkills.length > 0">
+        <span class="text-xs text-gray-500">Faltan:</span>
+        <div class="flex flex-wrap gap-1 mt-1">
+          <span
+            v-for="skill in missingSkills.slice(0, 3)"
+            :key="skill"
+            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700"
+          >
+            {{ skill }}
+          </span>
+          <span v-if="missingSkills.length > 3" class="self-center text-xs text-gray-400">
+            +{{ missingSkills.length - 3 }} más
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fallback si no hay match_details -->
+    <div v-else-if="rec.fortalezas?.length > 0 || rec.debilidades?.length > 0" class="mt-4 flex flex-wrap gap-4">
       <div v-if="rec.fortalezas?.length > 0">
         <span class="text-xs text-gray-500">Fortalezas:</span>
         <div class="flex flex-wrap gap-1 mt-1">
-          <Badge v-for="f in rec.fortalezas.slice(0, 2)" :key="f" variant="gold" size="sm">
-            {{ f }}
-          </Badge>
+          <Badge v-for="f in rec.fortalezas.slice(0, 2)" :key="f" variant="gold" size="sm">{{ f }}</Badge>
         </div>
       </div>
       <div v-if="rec.debilidades?.length > 0">
         <span class="text-xs text-gray-500">Areas de mejora:</span>
         <div class="flex flex-wrap gap-1 mt-1">
-          <Badge v-for="d in rec.debilidades.slice(0, 2)" :key="d" variant="neutral" size="sm">
-            {{ d }}
-          </Badge>
+          <Badge v-for="d in rec.debilidades.slice(0, 2)" :key="d" variant="neutral" size="sm">{{ d }}</Badge>
         </div>
       </div>
     </div>
@@ -153,12 +204,13 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import Card from '@/shared/components/ui/Card.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
 import ProgressBar from '@/shared/components/ui/ProgressBar.vue'
 import MatchDetailSection from './MatchDetailSection.vue'
 
-defineProps({
+const props = defineProps({
   rec: { type: Object, required: true },
   expanded: { type: Boolean, default: false },
   formatScoreLabel: { type: Function, required: true },
@@ -166,6 +218,18 @@ defineProps({
 })
 
 defineEmits(['toggle'])
+
+// Skills que hicieron match (hard + soft combinados)
+const matchedSkills = computed(() => {
+  const hard = props.rec.match_details?.hard_skills?.matched || []
+  const soft = props.rec.match_details?.soft_skills?.matched || []
+  return [...hard, ...soft]
+})
+
+// Skills faltantes (solo hard, las más accionables)
+const missingSkills = computed(() =>
+  props.rec.match_details?.hard_skills?.missing || []
+)
 </script>
 
 <style scoped>

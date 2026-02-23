@@ -91,6 +91,7 @@ async def get_my_recommendations(
                 'scores_detalle': rec.get('scores_detalle', {}),
                 'fortalezas': rec.get('fortalezas', []),
                 'debilidades': rec.get('debilidades', []),
+                'match_details': rec.get('match_details'),
                 'fue_vista': rec.get('fue_vista', False),
                 'vista_at': rec.get('vista_at'),
                 'created_at': rec.get('created_at')

@@ -38,8 +38,9 @@ class InstitutionalWeights(BaseModel):
 class InstitutionalRequirements(BaseModel):
     """Requisitos de la institucion"""
     min_experience_years: float = Field(ge=0, default=0, description="Anos minimos de experiencia")
-    required_skills: List[str] = Field(default=[], description="Habilidades requeridas")
-    preferred_skills: List[str] = Field(default=[], description="Habilidades preferidas")
+    required_skills: List[str] = Field(default=[], description="Habilidades tecnicas requeridas")
+    preferred_skills: List[str] = Field(default=[], description="Habilidades tecnicas preferidas")
+    required_soft_skills: List[str] = Field(default=[], description="Habilidades blandas requeridas")
     required_education_level: str = Field(default="Licenciatura", description="Nivel educativo requerido")
     required_languages: List[str] = Field(default=[], description="Idiomas requeridos")
 

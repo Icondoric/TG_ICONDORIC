@@ -437,6 +437,60 @@ async def delete_institutional_profile(
         )
 
 
+@router.delete(
+    "/institutional-profiles/{profile_id}/permanent",
+    summary="Eliminar perfil institucional permanentemente",
+    description="Elimina de forma permanente un perfil institucional (solo admin)"
+)
+async def permanent_delete_institutional_profile(
+    profile_id: str,
+    admin_user: dict = Depends(verify_admin_role),
+    ml_service: MLIntegrationService = Depends(get_ml_service_dependency)
+):
+    """
+    Elimina permanentemente un perfil institucional.
+    Esta accion no se puede deshacer.
+    """
+    check_database()
+
+    try:
+        existing = supabase.table("institutional_profiles") \
+            .select("id, institution_name") \
+            .eq("id", profile_id) \
+            .execute()
+
+        if not existing.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Perfil no encontrado: {profile_id}"
+            )
+
+        institution_name = existing.data[0]['institution_name']
+
+        supabase.table("institutional_profiles") \
+            .delete() \
+            .eq("id", profile_id) \
+            .execute()
+
+        ml_service.invalidate_cache()
+        logger.info(f"Perfil eliminado permanentemente: {profile_id} - {institution_name}")
+
+        return {
+            "message": "Perfil eliminado permanentemente",
+            "profile_id": profile_id,
+            "institution_name": institution_name
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error eliminando perfil permanentemente {profile_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error eliminando perfil: {str(e)}"
+        )
+
+
 @router.post(
     "/institutional-profiles/{profile_id}/activate",
     summary="Reactivar perfil institucional",

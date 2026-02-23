@@ -60,6 +60,96 @@
               </div>
             </Card>
 
+            <!-- ── Resumen de Correspondencia (desktop) ───────────────────── -->
+            <div v-if="recommendations.length > 0" class="hidden lg:grid grid-cols-3 gap-4 mb-6">
+
+              <!-- Clasificación + tipos + convenio -->
+              <Card class="col-span-2">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <svg class="h-4 w-4 text-emi-navy-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  Correspondencia con el mercado EMI
+                </h3>
+
+                <!-- Contadores APTO / CONSIDERADO / NO APTO -->
+                <div class="grid grid-cols-3 gap-3">
+                  <div class="text-center p-3 bg-emi-gold-50 rounded-xl border border-emi-gold-200">
+                    <span class="block text-2xl font-bold text-emi-gold-600">{{ aptoCount }}</span>
+                    <span class="text-xs font-medium text-emi-gold-700">APTO</span>
+                    <div class="mt-2 w-full bg-emi-gold-200 rounded-full h-1.5">
+                      <div
+                        class="bg-emi-gold-500 h-1.5 rounded-full transition-all duration-500"
+                        :style="{ width: recommendations.length ? (aptoCount / recommendations.length * 100) + '%' : '0%' }"
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="text-center p-3 bg-emi-navy-50 rounded-xl border border-emi-navy-200">
+                    <span class="block text-2xl font-bold text-emi-navy-600">{{ consideradoCount }}</span>
+                    <span class="text-xs font-medium text-emi-navy-700">CONSIDERADO</span>
+                    <div class="mt-2 w-full bg-emi-navy-200 rounded-full h-1.5">
+                      <div
+                        class="bg-emi-navy-500 h-1.5 rounded-full transition-all duration-500"
+                        :style="{ width: recommendations.length ? (consideradoCount / recommendations.length * 100) + '%' : '0%' }"
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="text-center p-3 bg-red-50 rounded-xl border border-red-200">
+                    <span class="block text-2xl font-bold text-red-500">{{ noAptoCount }}</span>
+                    <span class="text-xs font-medium text-red-600">NO APTO</span>
+                    <div class="mt-2 w-full bg-red-200 rounded-full h-1.5">
+                      <div
+                        class="bg-red-500 h-1.5 rounded-full transition-all duration-500"
+                        :style="{ width: recommendations.length ? (noAptoCount / recommendations.length * 100) + '%' : '0%' }"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tipos + convenio EMI -->
+                <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-5 text-sm">
+                  <span class="flex items-center gap-1.5 text-gray-600">
+                    <span class="w-2.5 h-2.5 rounded-full bg-purple-400 flex-shrink-0"></span>
+                    <strong class="text-gray-900">{{ pasantiaCount }}</strong> pasantías
+                  </span>
+                  <span class="flex items-center gap-1.5 text-gray-600">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emi-navy-400 flex-shrink-0"></span>
+                    <strong class="text-gray-900">{{ laboralCount }}</strong> empleos
+                  </span>
+                  <span class="ml-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emi-navy-50 text-emi-navy-600 text-xs font-medium border border-emi-navy-200">
+                    <svg class="h-3.5 w-3.5 text-emi-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                    Convenio EMI
+                  </span>
+                </div>
+              </Card>
+
+              <!-- Skills más solicitados (faltantes) -->
+              <Card>
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                  Skills más solicitados
+                </h3>
+                <div v-if="topMissingSkills.length > 0" class="space-y-2.5">
+                  <div v-for="item in topMissingSkills" :key="item.skill">
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="text-xs font-medium text-gray-700 truncate">{{ item.skill }}</span>
+                      <span class="text-xs text-gray-400 flex-shrink-0 ml-2">{{ item.count }}/{{ recommendations.length }}</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-1.5">
+                      <div
+                        class="bg-emi-navy-400 h-1.5 rounded-full transition-all duration-500"
+                        :style="{ width: (item.count / recommendations.length * 100) + '%' }"
+                      ></div>
+                    </div>
+                  </div>
+                  <p class="pt-1 text-xs text-gray-400">Frecuencia en ofertas disponibles</p>
+                </div>
+                <p v-else class="text-sm text-gray-400 italic">Sin datos de skills faltantes</p>
+              </Card>
+            </div>
+            <!-- ─────────────────────────────────────────────────────────────── -->
+
             <!-- No Recommendations -->
             <Card v-if="recommendations.length === 0" class="text-center py-12">
               <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -90,17 +180,50 @@
               </div>
             </Card>
 
-            <!-- Recommendations List -->
-            <div v-else class="space-y-4">
-              <RecommendationCard
-                v-for="rec in recommendations"
-                :key="rec.id"
-                :rec="rec"
-                :expanded="expandedId === rec.id"
-                :formatScoreLabel="formatScoreLabel"
-                :formatDate="formatDate"
-                @toggle="toggleExpand"
-              />
+            <!-- Lista con filtros -->
+            <div v-else>
+              <!-- Tabs de filtro -->
+              <div class="flex items-center gap-2 mb-4 flex-wrap">
+                <button
+                  v-for="tab in [
+                    { key: 'todos',    label: 'Todos',      count: recommendations.length },
+                    { key: 'pasantia', label: 'Pasantías',  count: pasantiaCount },
+                    { key: 'laboral',  label: 'Empleos',    count: laboralCount }
+                  ]"
+                  :key="tab.key"
+                  @click="activeFilter = tab.key"
+                  :class="[
+                    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                    activeFilter === tab.key
+                      ? 'bg-emi-navy-500 text-white shadow-sm'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:border-emi-navy-300 hover:text-emi-navy-500'
+                  ]"
+                >
+                  {{ tab.label }}
+                  <span :class="[
+                    'text-xs px-1.5 py-0.5 rounded-full font-semibold',
+                    activeFilter === tab.key ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'
+                  ]">{{ tab.count }}</span>
+                </button>
+              </div>
+
+              <!-- Sin resultados para el filtro activo -->
+              <p v-if="filteredRecommendations.length === 0" class="text-center py-10 text-gray-400">
+                No hay {{ activeFilter === 'pasantia' ? 'pasantías' : 'empleos' }} disponibles en este momento.
+              </p>
+
+              <!-- Lista -->
+              <div v-else class="space-y-4">
+                <RecommendationCard
+                  v-for="rec in filteredRecommendations"
+                  :key="rec.id"
+                  :rec="rec"
+                  :expanded="expandedId === rec.id"
+                  :formatScoreLabel="formatScoreLabel"
+                  :formatDate="formatDate"
+                  @toggle="toggleExpand"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -123,7 +246,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import AppLayout from '@/shared/components/AppLayout.vue'
 import Card from '@/shared/components/ui/Card.vue'
 import Badge from '@/shared/components/ui/Badge.vue'
@@ -133,6 +256,7 @@ import EligibilityWarning from '../components/EligibilityWarning.vue'
 import { useRecommendations } from '../composables/useRecommendations'
 
 const isSecondarySidebarOpen = ref(true)
+const activeFilter = ref('todos')
 
 const {
   recommendations,
@@ -155,4 +279,46 @@ const {
   toggleExpand,
   loadRecommendations
 } = useRecommendations()
+
+// --- Conteos derivados
+const noAptoCount = computed(() =>
+  Math.max(0, recommendations.value.length - (aptoCount.value || 0) - (consideradoCount.value || 0))
+)
+
+const pasantiaCount = computed(() =>
+  recommendations.value.filter(r => (r.oferta?.tipo || '').toLowerCase().includes('pasant')).length
+)
+
+const laboralCount = computed(() =>
+  recommendations.value.filter(r => {
+    const t = (r.oferta?.tipo || '').toLowerCase()
+    return t.includes('laboral') || t.includes('empleo')
+  }).length
+)
+
+// Top skills faltantes agregados de todas las recomendaciones
+const topMissingSkills = computed(() => {
+  const freq = {}
+  for (const rec of recommendations.value) {
+    const missing = rec.match_details?.hard_skills?.missing || []
+    for (const skill of missing) {
+      freq[skill] = (freq[skill] || 0) + 1
+    }
+  }
+  return Object.entries(freq)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([skill, count]) => ({ skill, count }))
+})
+
+// Lista filtrada por tipo de oferta
+const filteredRecommendations = computed(() => {
+  if (activeFilter.value === 'todos') return recommendations.value
+  return recommendations.value.filter(rec => {
+    const tipo = (rec.oferta?.tipo || '').toLowerCase()
+    if (activeFilter.value === 'pasantia') return tipo.includes('pasant')
+    if (activeFilter.value === 'laboral') return tipo.includes('laboral') || tipo.includes('empleo')
+    return true
+  })
+})
 </script>

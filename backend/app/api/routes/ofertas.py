@@ -16,6 +16,7 @@ from app.api.schemas.ml_schemas import (
     OfertaLaboralListResponse
 )
 from app.services.oferta_service import get_oferta_service
+from app.db.client import supabase
 
 # Configurar logging
 logger = logging.getLogger(__name__)
@@ -273,6 +274,49 @@ async def delete_oferta(
         raise
     except Exception as e:
         logger.error(f"Error desactivando oferta: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/{oferta_id}/permanent")
+async def permanent_delete_oferta(
+    oferta_id: str,
+    admin_user: dict = Depends(verify_admin_role)
+):
+    """
+    Elimina permanentemente una oferta laboral.
+    Esta accion no se puede deshacer.
+    """
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Base de datos no configurada")
+
+    try:
+        existing = supabase.table("ofertas_laborales") \
+            .select("id, titulo") \
+            .eq("id", oferta_id) \
+            .execute()
+
+        if not existing.data:
+            raise HTTPException(status_code=404, detail="Oferta no encontrada")
+
+        titulo = existing.data[0]['titulo']
+
+        supabase.table("ofertas_laborales") \
+            .delete() \
+            .eq("id", oferta_id) \
+            .execute()
+
+        logger.info(f"Oferta eliminada permanentemente: {oferta_id} - {titulo}")
+
+        return {
+            "message": "Oferta eliminada permanentemente",
+            "oferta_id": oferta_id,
+            "titulo": titulo
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error eliminando oferta permanentemente {oferta_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

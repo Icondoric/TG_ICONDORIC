@@ -25,6 +25,11 @@ export const deleteOferta = async (ofertaId) => {
     return response.data
 }
 
+export const permanentDeleteOferta = async (ofertaId) => {
+    const response = await api.delete(`/api/admin/ofertas/${ofertaId}/permanent`)
+    return response.data
+}
+
 export const activateOferta = async (ofertaId) => {
     const response = await api.post(`/api/admin/ofertas/${ofertaId}/activate`)
     return response.data
