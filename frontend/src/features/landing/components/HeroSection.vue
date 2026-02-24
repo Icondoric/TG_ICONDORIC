@@ -13,38 +13,37 @@
         <div class="text-white space-y-8 animate-slide-up">
           <h1 class="font-display font-bold text-5xl lg:text-6xl leading-tight">
             Sistema de Evaluación de
-            <span class="text-gradient-emi bg-clip-text text-transparent bg-gradient-to-r from-emi-gold-400 to-emi-gold-600">
+            <span class="text-emi-gold-400">
               Perfiles Profesionales
             </span>
-            Aplicando IA
           </h1>
 
-          <p class="text-xl text-gray-300 leading-relaxed">
-            Plataforma inteligente que aplica <span class="text-emi-gold-400 font-semibold">Procesamiento de Lenguaje Natural</span> y <span class="text-emi-gold-400 font-semibold">Machine Learning</span> para recomendar oportunidades laborales y de pasantía según tu perfil profesional
+          <p class="text-xl text-white/80 leading-relaxed">
+            Sistema  que aplica <span class="text-emi-gold-300 font-semibold">Procesamiento de Lenguaje Natural</span> y <span class="text-emi-gold-300 font-semibold">Machine Learning</span> para recomendar oportunidades laborales y de pasantía según tu perfil profesional
           </p>
 
           <!-- Stats badges -->
           <div class="flex flex-wrap gap-4 pt-4">
             <div class="glass px-6 py-4 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
               <div class="text-3xl font-bold text-emi-gold-400">92%</div>
-              <div class="text-sm text-gray-300 mt-1">Precisión en evaluación</div>
+              <div class="text-sm text-white/70 mt-1">Precisión en evaluación</div>
             </div>
             <div class="glass px-6 py-4 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
               <div class="text-3xl font-bold text-emi-gold-400">&lt; 30s</div>
-              <div class="text-sm text-gray-300 mt-1">Procesamiento NLP</div>
+              <div class="text-sm text-white/70 mt-1">Procesamiento NLP</div>
             </div>
             <div class="glass px-6 py-4 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
               <div class="text-3xl font-bold text-emi-gold-400">100+</div>
-              <div class="text-sm text-gray-300 mt-1">Convenios activos</div>
+              <div class="text-sm text-white/70 mt-1">Convenios activos</div>
             </div>
           </div>
         </div>
 
         <!-- Right: Upload Card -->
         <div class="animate-slide-up" style="animation-delay: 0.2s;">
-          <div class="glass backdrop-blur-xl bg-white/95 rounded-3xl shadow-emi-lg p-8 border border-white/20">
+          <div class="bg-white rounded-3xl shadow-emi-lg p-8 border border-gray-200">
             <h3 class="font-display font-bold text-2xl text-emi-navy-900 mb-2">Digitaliza tu Perfil</h3>
-            <p class="text-gray-600 mb-6">Carga tu CV y recibe recomendaciones personalizadas de la EMI</p>
+            <p class="text-gray-700 mb-6">Carga tu CV y recibe recomendaciones personalizadas de la EMI</p>
 
             <!-- Dropzone -->
             <div
@@ -66,8 +65,8 @@
                   </div>
                   <div>
                     <div class="text-lg font-semibold text-gray-900 mb-1">Arrastra tu CV aquí</div>
-                    <div class="text-sm text-gray-500">o haz clic para seleccionar</div>
-                    <div class="text-xs text-gray-400 mt-2">PDF, máx. 2MB</div>
+                    <div class="text-sm text-gray-600">o haz clic para seleccionar</div>
+                    <div class="text-xs text-gray-500 mt-2">PDF, máx. 2MB</div>
                   </div>
                 </div>
 
@@ -80,7 +79,7 @@
                   </div>
                   <div>
                     <div class="text-lg font-semibold text-gray-900">Procesando con NLP...</div>
-                    <div class="text-sm text-gray-500 mt-1">{{ processingFileName }}</div>
+                    <div class="text-sm text-gray-600 mt-1">{{ processingFileName }}</div>
                   </div>
                 </div>
               </div>

@@ -1,0 +1,761 @@
+
+=== PAGE 213 ===
+
+el comportamiento del sistema frente a sus casos de uso completos; pruebas de
+rendimiento, que miden los tiempos de respuesta de los procesos críticos; y pruebas
+de usabilidad, presentadas en el punto 3.7.1, que verifican la experiencia de los cuatro
+roles de la plataforma. El conjunto de estas pruebas cubre específicamente el correcto
+desempeño del módulo de procesamiento de lenguaje natural y de machine learning,
+cuyos resultados se consolidan en el punto 3.7.2.
+3.6.1. Pruebas Unitarias
+Las pruebas unitarias verificaron el comportamiento aislado de cada endpoint y función
+del sistema, ejecutándose de forma incremental al cierre de cada sprint. Los scripts de
+prueba utilizados fueron test_fase1.py a test_fase6.py, ejecutados directamente sobre
+el servidor FastAPI en entorno local. En total se ejecutaron 76 casos de prueba
+distribuidos en los seis Sprints del sistema, todos con resultado aprobado. La tabla
+siguiente consolida los resultados por sprint.
+Tabla 59: Resumen de Pruebas Unitarias por Sprints del Sistema
+Sprints Casos Identificadores Cobertura Principal
+Sprint 1 – Gestión de Registro, login, JWT, RBAC, CRUD de
+12 PU-1.01 a PU-1.12
+Usuarios usuarios
+Sprint 2 – Digitalización Carga de CV, extracción con Gemini,
+12 PU-2.01 a PU-2.12
+de Perfiles completitud, edición manual
+Recomendaciones, filtrado por rol,
+Sprint 3 – Evaluación de
+14 PU-3.01 a PU-3.14 clasificación
+Perfiles
+APTO/CONSIDERADO/NO_APTO
+Sprint 4 – Gestión de CRUD de ofertas, filtrado, soft delete,
+12 PU-4.01 a PU-4.12
+Ofertas Laborales estadísticas
+192 - 210
+
+=== PAGE 214 ===
+
+Sprints Casos Identificadores Cobertura Principal
+Sprint 5 – Perfiles CRUD de perfiles, validación de
+13 PU-5.01 a PU-5.13
+Institucionales pesos/umbrales, invalidación de caché ML
+Sprint 6 – Informes y Analytics, agrupación temporal,
+13 PU-6.01 a PU-6.13
+Reportes recomendaciones, filtrado por rol
+TOTAL 76
+Nota: Las pruebas unitarias se ejecutaron al cierre de cada sprint. Fuente: Elaboración propia.
+La distribución de casos por sprint refleja la complejidad relativa de cada componente:
+el sprint de Evaluación de Perfiles concentra la mayor cantidad de pruebas (14) dado
+que su lógica involucra la interacción directa con el modelo de Machine Learning y la
+diferenciación de resultados por rol de usuario.
+3.6.2. Pruebas de Integración
+Se verificó la correcta comunicación entre los componentes del sistema: el servidor
+FastAPI, el módulo de procesamiento de lenguaje natural, el modelo de Machine
+Learning y la base de datos Supabase. Los casos se ejecutaron mediante los scripts
+test_fase6.py, test_feature_engineering.py y test_fase4_model.py.
+Tabla 60: Informe de Pruebas de Integración
+ID Caso de Prueba Módulos Involucrados Resultado Obtenido Estado
+Carga del modelo
+PI- MLIntegrationService ↔ Modelo en memoria con
+ridge_v1.joblib al APROBADO
+01 Sistema de archivos alpha=0.01 y 18 features
+iniciar FastAPI
+193 - 210
+
+=== PAGE 215 ===
+
+ID Caso de Prueba Módulos Involucrados Resultado Obtenido Estado
+JSON estructurado con
+Extracción y
+PI- FastAPI ↔ Gemini API hard_skills, soft_skills,
+estructuración de CV APROBADO
+02 (LLMExtractor) educación, experiencia e
+con Gemini API
+idiomas
+match_score ∈ [0,1] con
+Evaluación de perfil:
+PI- FeatureExtractor ↔ clasificación APTO /
+scoring + predicción APROBADO
+03 InstitutionalMatchModel CONSIDERADO /
+Ridge
+NO_APTO
+Persistencia de RecommendationService Upsert exitoso por
+PI-
+evaluaciones en ↔ Supabase (tabla usuario_id + oferta_id; APROBADO
+04
+Supabase recomendaciones) historial recuperable
+Top-10
+Flujo completo: subida recomendaciones
+PI- Frontend ↔ Backend ↔
+CV → perfil → filtradas por rol APROBADO
+05 ML ↔ BD
+recomendaciones generadas
+correctamente
+Cache de perfiles Consultas subsecuentes
+PI- MLIntegrationService
+institucionales con desde memoria; datos APROBADO
+06 (caché interna)
+TTL de 5 minutos renovados al expirar
+HTTP 200 con token
+Frontend ↔ /api/*
+PI- Autenticación JWT en válido; HTTP 401 sin
+(Depends: APROBADO
+07 endpoints protegidos token o con token
+get_current_user)
+expirado
+Estudiante: pasantías;
+Filtrado de
+PI- RecommendationService titulado: empleos;
+recomendaciones APROBADO
+08 ↔ OfertaService administrador: ambos
+según rol
+tipos
+194 - 210
+
+=== PAGE 216 ===
+
+ID Caso de Prueba Módulos Involucrados Resultado Obtenido Estado
+Reportes de usuarios,
+FastAPI ↔
+PI- Extracción de métricas ofertas y perfiles
+/api/analytics/* ↔ APROBADO
+09 del sistema (analytics) devueltos con filtros
+Supabase
+activos
+Nota: Los casos de integración se ejecutaron desde el frontend. Fuente: Elaboración propia.
+3.6.3. Pruebas de Rendimiento
+Se midieron los tiempos de respuesta de los procesos críticos bajo condiciones
+representativas de uso, verificando que cada operación se mantenga dentro del
+umbral aceptable definido para garantizar una experiencia fluida.
+Tabla 61: Informe de Pruebas de Rendimiento
+Proceso Descripción Tiempo Umbral Estado
+Medido Aceptable
+Extracción de CV Procesamiento PDF + 3 – 8 s < 15 s APROBADO
+con Gemini API llamada PLN +
+estructuración JSON
+Evaluación ML Vector de 18 características < 50 ms < 200 ms APROBADO
+individual + predicción Ridge
+Generación de Evaluación de hasta 100 < 500 ms < 2 s APROBADO
+recomendaciones ofertas activas + (sin caché)
+Top-10 ordenamiento por < 50 ms (con
+match_score caché)
+Carga inicial del Deserialización de < 1 s < 5 s APROBADO
+modelo ridge_v1.joblib al arrancar el
+servidor
+Recuperación desde Consulta en memoria interna < 5 ms < 100 ms APROBADO
+caché institucional con TTL de 300 s
+195 - 210
+
+=== PAGE 217 ===
+
+Proceso Descripción Tiempo Umbral Estado
+Medido Aceptable
+Respuesta de GET /api/recommendations, < 300 ms < 1 s APROBADO
+endpoints REST GET /api/profile/me, GET
+principales /api/analytics/*
+Nota: Los tiempos corresponden a mediciones en entorno de desarrollo local. El caché institucional
+reduce la latencia de evaluaciones repetidas hasta en un 90%. Fuente: Elaboración propia.
+3.6.4. Pruebas de Seguridad
+Se verificaron los mecanismos de autenticación, control de acceso basado en roles
+(RBAC) y validación de entradas. La gestión de sesiones utiliza JWT con algoritmo
+HS256, expiración de 24 horas y hashing de contraseñas con bcrypt mediante passlib.
+Tabla 62: Informe de Pruebas de Seguridad
+ID Caso de Prueba Mecanismo Resultado Obtenido Estado
+Acceso a
+endpoint HTTP 401
+PS-01 JWT (python-jose, HS256) APROBADO
+protegido sin Unauthorized
+token
+HTTP 401;
+Uso de token redirección
+Verificación del campo exp en
+PS-02 JWT expirado (> automática al inicio APROBADO
+el claim
+24 h) de sesión en el
+frontend
+Acceso a rutas
+RBAC: verify_admin_role() en
+PS-03 de administrador HTTP 403 Forbidden APROBADO
+Depends()
+con rol estudiante
+Acceso a rutas
+RBAC:
+PS-04 de operador con HTTP 403 Forbidden APROBADO
+verify_operator_access()
+rol titulado
+196 - 210
+
+=== PAGE 218 ===
+
+ID Caso de Prueba Mecanismo Resultado Obtenido Estado
+Subida de
+HTTP 400 Bad
+archivo con Validación
+Request; archivo
+PS-05 extensión no ALLOWED_CV_EXTENSION APROBADO
+rechazado antes de
+permitida (.exe, S=pdf
+procesarse
+.jpg)
+Subida de PDF Validación HTTP 413 Request
+PS-06 APROBADO
+mayor a 10 MB MAX_CV_FILE_SIZE_MB=10 Entity Too Large
+Hash irreversible
+Almacenamiento bcrypt (passlib[bcrypt], almacenado; texto
+PS-07 APROBADO
+de contraseñas CryptContext) plano nunca
+persistido
+Inyección SQL en Sin efecto en la base
+Supabase Python SDK
+PS-08 parámetros de de datos; input APROBADO
+(queries parametrizadas)
+búsqueda sanitizado por el SDK
+Secrets
+Exposición de
+Variables de entorno (.env + externalizados;
+PS-09 credenciales en APROBADO
+pydantic-settings) ausentes del
+código fuente
+repositorio de código
+Nota: Los cuatro roles del sistema (estudiante, titulado, operador, administrador) fueron verificados en
+las pruebas de autorización. Fuente: Elaboración propia.
+3.6.5. Pruebas Funcionales
+Las pruebas funcionales verifican que el sistema produce los resultados correctos ante
+los flujos de uso completos de sus actores, contrastando el comportamiento real de
+cada funcionalidad con el resultado esperado. A diferencia de las pruebas unitarias,
+que validan funciones aisladas, y de las pruebas de integración, que verifican la
+comunicación entre componentes, las pruebas funcionales evalúan el sistema desde
+la perspectiva del usuario final, siguiendo la secuencia completa de acciones que cada
+caso de uso requiere. Se ejecutaron diez casos de prueba funcionales que cubren los
+flujos principales de los cuatro roles del sistema.
+197 - 210
+
+=== PAGE 219 ===
+
+Tabla 63: Informe de Pruebas Funcionales
+Condición de Resultado Esperado y
+ID Caso de Prueba Estado
+Entrada Verificado
+Registro y Usuario ingresa Token JWT retornado; perfil
+PF-
+autenticación de email, contraseña y profesional vacío creado APROBADO
+01
+usuario rol válidos automáticamente
+Carga de CV y Perfil actualizado con hard_skills,
+PF- extracción Usuario sube PDF soft_skills, education_level,
+APROBADO
+02 automática de válido < 10 MB experience_years e idiomas
+perfil extraídos por Gemini
+Cálculo de Perfil con todas las
+is_complete = true; acceso al
+PF- completitud y dimensiones
+módulo de recomendaciones APROBADO
+03 habilitación de completadas (score
+desbloqueado
+recomendaciones ≥ 70%)
+Generación de Estudiante con perfil Lista de recomendaciones filtradas
+PF-
+recomendaciones completo; 5 ofertas por tipo='pasantia', ordenadas por APROBADO
+04
+para estudiante de pasantía activas match_score descendente
+Generación de Titulado con perfil Lista de recomendaciones filtradas
+PF-
+recomendaciones completo; 5 ofertas por tipo='empleo', ordenadas por APROBADO
+05
+para titulado de empleo activas match_score descendente
+Evaluación de Perfil profesional
+match_score ∈ [0,1] y clasificación
+PF- correspondencia procesado + perfil
+APTO/CONSIDERADO/NO_APTO APROBADO
+06 con perfil institucional activo
+retornados correctamente
+institucional configurado
+Operador crea perfil
+con pesos que
+Creación y suman 1.0, Perfil persistido; caché ML
+PF-
+configuración de umbrales válidos invalidada; perfil disponible para APROBADO
+07
+perfil institucional (apto > considerado) evaluaciones inmediatas
+y requisitos
+completos
+Gestión de oferta Administrador crea Oferta activa persistida;
+PF- laboral y oferta enriquecida con institution_name y
+APROBADO
+08 vinculación tipo='pasantia' sector; visible en módulo de
+institucional vinculada a perfil recomendaciones
+198 - 210
+
+=== PAGE 220 ===
+
+Condición de Resultado Esperado y
+ID Caso de Prueba Estado
+Entrada Verificado
+institucional
+existente
+Estudiante intenta
+PF- Control de HTTP 403 Forbidden en todos los
+acceder a rutas APROBADO
+09 acceso por rol endpoints administrativos
+/api/admin/*
+Usuario nuevo:
+Flujo completo: registro → carga de Recomendaciones personalizadas
+PF- CV → perfil → CV → generación de generadas correctamente;
+APROBADO
+10 evaluación → recomendaciones evaluaciones persistidas en
+recomendación en una sesión cv_evaluations
+continua
+Nota: Los casos de prueba funcionales se ejecutaron sobre el sistema desplegado en entorno local,
+cubriendo los flujos principales de los roles estudiante, titulado, operador y administrador. Fuente:
+Elaboración propia.
+El caso PF-10 es el más representativo del sistema, pues valida el flujo extremo a
+extremo que va desde el registro del estudiante/titulado hasta la obtención de
+recomendaciones personalizadas, involucrando en una sola secuencia al módulo de
+autenticación, al módulo de procesamiento de lenguaje natural, al modelo de machine
+learning y al módulo de recomendaciones. Su aprobación evidencia que la integración
+entre todos los componentes opera correctamente en condiciones de uso real.
+3.7. EVALUACIÓN TÉCNICA
+La evaluación técnica analiza el sistema conforme a las características de calidad
+definidas en el estándar ISO/IEC 25010, cubriendo calidad interna, usabilidad,
+funcionalidad, confiabilidad, mantenibilidad y portabilidad. Los resultados
+corresponden a la revisión de la arquitectura, el código fuente y las pruebas ejecutadas
+199 - 210
+
+=== PAGE 221 ===
+
+en la fase Post-Juego de Scrum, conforme a la Tabla de Desarrollo del Software.
+3.7.1. Usabilidad
+La usabilidad se evaluó mediante pruebas de verificación funcional de escenarios de
+uso definidos para cada rol del sistema. Dado que el sistema se encuentra en fase de
+validación y las convocatorias reales son esporádicas, las pruebas se realizaron con
+los actores institucionales identificados durante el levantamiento de información:
+estudiantes, titulados y el operador, quienes ejecutaron los flujos principales bajo
+supervisión directa. Para cada escenario se definió una secuencia de acciones y un
+criterio de aceptación verificable, tal como se detalla en la tabla siguiente.
+Tabla 64: Informe de Pruebas de Usabilidad por Escenario y Rol
+Secuencia de Criterio de Aceptación
+ID Escenario Actor Estado
+Acciones Verificado
+PU
+Carga de CV y Subir PDF → Datos estructurados visibles
+-
+visualización revisar datos en perfil; indicador de SATISFAC
+US Estudiante
+de perfil extraídos completitud actualizado; sin TORIO
+-
+extraído automáticamente pasos intermedios confusos
+01
+Consulta de Acceder a Clasificación
+PU
+recomendacio recomendaciones (APTO/CONSIDERADO/NO
+-
+nes con Estudiante → expandir _APTO) visible con badge de SATISFAC
+US
+detalle de / Titulado tarjeta → revisar color; barras de progreso por TORIO
+-
+corresponden scores por dimensión accesibles en un
+02
+cia dimensión clic
+Crear perfil
+PU Configuración
+institucional → Mensaje de error descriptivo
+- de perfil
+ingresar pesos mostrado antes del envío; SATISFAC
+US institucional Operador
+que no suman 1.0 campo en falta identificado TORIO
+- con validación
+→ intentar visualmente
+03 en tiempo real
+guardar
+200 - 210
+
+=== PAGE 222 ===
+
+Secuencia de Criterio de Aceptación
+ID Escenario Actor Estado
+Acciones Verificado
+Iniciar sesión con
+PU Estudiante Menú filtrado por rol; rutas no
+cada rol →
+- / Titulado / permitidas inaccesibles
+Navegación explorar menú SATISFAC
+US Operador / desde la interfaz; sin
+según rol lateral → acceder TORIO
+- Administra opciones huérfanas o sin
+a sus
+04 dor función
+funcionalidades
+PU Acceder a Gráficos actualizados
+Consulta del
+- reportes → dinámicamente; PDF
+dashboard Administra SATISFAC
+US cambiar rango de exportado con secciones
+analítico con dor TORIO
+- fechas → separadas y estructura
+filtro de fechas
+05 exportar a PDF legible
+Nota: Los escenarios de prueba de usabilidad se ejecutaron con representantes de los cuatro roles
+del sistema durante la fase Post-Juego de Scrum. Fuente: Elaboración propia.
+Tabla 65: Reporte de Usabilidad
+Aspecto Implementación Descripción Evaluación
+Tailwind CSS con colores Diseño responsive
+Interfaz
+institucionales (navy compatible con escritorio y SATISFACTORIO
+adaptativa
+#003366, gold #D4AF37) dispositivos móviles
+Menú y rutas filtradas
+Navegación Vue Router + Pinia
+según rol; acceso
+personalizada por (authStore) + AppSidebar SATISFACTORIO
+restringido en frontend y
+rol con variante dinámica
+backend
+GaugeChart + ProgressBar + match_score y
+Retroalimentación
+Badge (APTO / clasificación presentados
+visual de SATISFACTORIO
+CONSIDERADO / con componentes visuales
+correspondencia
+NO_APTO) explícitos
+201 - 210
+
+=== PAGE 223 ===
+
+Aspecto Implementación Descripción Evaluación
+Barra de progreso con
+Indicador de
+PerfilCompletenessResponse campos faltantes; umbral
+completitud del SATISFACTORIO
+(completeness_score ≥ 70%) requerido para
+perfil
+recomendaciones
+Proceso en un paso con
+SubirCVView → Gemini API
+Flujo de carga de indicador de carga;
+→ actualización automática SATISFACTORIO
+CV resultado visible al
+del perfil
+finalizar
+Formularios con
+CRUD de usuarios, ofertas
+Panel de validación en frontend
+laborales y perfiles SATISFACTORIO
+administración (Vue) y backend
+institucionales
+(Pydantic)
+Nota: La verificación de usabilidad fue realizada mediante revisión funcional directa de cada flujo
+principal por rol. Fuente: Elaboración propia.
+3.7.2. Funcionalidad
+Se verificó el cumplimiento de las historias de usuario del Product Backlog en los seis
+sprints del proyecto, contrastando cada funcionalidad con los componentes
+implementados en el sistema.
+La funcionalidad de los dos módulos de inteligencia del sistema, requiere verificación
+específica, dado que su desempeño correcto es condición necesaria para que el resto
+del sistema opere según lo diseñado. La tabla siguiente consolida las pruebas que
+cubren cada módulo, sus resultados verificados y sus tiempos de respuesta medidos.
+202 - 210
+
+=== PAGE 224 ===
+
+Tabla 66: Verificación del Desempeño del PLN y Machine Learning
+Pruebas que lo Rendimiento
+Módulo Resultado Verificado Estado
+cubren Medido
+Extracción correcta de
+hard_skills, soft_skills, 10 – 30 s por CV
+Módulo de PLN PI02 (integración), formación y experiencia (umbral < 50 s); 3
+(pdfplumber + PU-2.01 a PU-2.12 desde CVs en PDF de reintentos
+CORRECTO
+spaCy + Gemini (unitarias), PF-02 y texto libre; JSON automáticos ante
+API) PF-03 (funcionales) estructurado retornado fallos de Gemini
+en todos los casos de API
+prueba
+match_score ∈ [0,1]
+producido en todos los < 50 ms por
+PI01 y PI03
+casos; clasificación evaluación
+Módulo de ML (integración), PU-
+ternaria consistente con individual; < 500
+(Ridge 3.07 a PU-3.09
+los umbrales ms para top-10 CORRECTO
+Regression v1, (unitarias), PF-06 y
+configurados por recomendaciones
+18 features) PF-10 (funcionales),
+institución; R² = 0.7996 sin caché (umbral
+Tabla 30 (métricas)
+sobre conjunto de < 2 s)
+prueba
+Nota: Los resultados consolidan evidencia de pruebas unitarias, de integración y funcionales. Fuente:
+Elaboración propia.
+El módulo de procesamiento de lenguaje natural demostró extraer y estructurar
+correctamente la información relevante de currículums en PDF de texto libre, operando
+dentro del umbral de tiempo establecido y con tolerancia a fallos del servicio externo.
+El módulo de machine learning produjo puntajes de correspondencia consistentes con
+los umbrales configurados por institución en todos los casos de prueba, y sus métricas
+de regresión y clasificación, superan los criterios de éxito técnico definidos en el punto
+3.4.1.1. Ambos módulos operan de forma integrada, de manera que el perfil
+estructurado producido por el módulo de PLN alimenta directamente el vector de
+características del modelo de Machine Learning,
+203 - 210
+
+=== PAGE 225 ===
+
+Tabla 67: Matriz de Cumplimiento del Product Backlog
+Sprint ID Historia de Usuario Componentes Implementados Estado
+RegisterView + LoginView +
+Registro e Inicio de
+HU-01 POST /api/auth/register + IMPLEMENTADO
+Sesión
+POST /api/auth/login
+Sprint 1
+UsersAdminView +
+Gestión Gestión de Usuarios
+HU-02 UserDetailView + IMPLEMENTADO
+de del Sistema
+UserFormView + /api/users/*
+Usuarios
+AccountSettingsView +
+Configuración de
+HU-03 GET/PUT /api/users/me + PUT IMPLEMENTADO
+Cuenta Personal
+/api/users/me/password
+SubirCVView + POST
+Sprint 2 HU-04 Carga de CV en PDF /api/profile/upload-cv + IMPLEMENTADO
+Digitalizac pdfplumber + Gemini API
+ión MiPerfilView + EditarPerfilView
+Validación y Edición
+de Perfiles HU-05 + PUT /api/profile/me + GET IMPLEMENTADO
+de Datos Extraídos
+/api/profile/completeness
+MisRecomendacionesView +
+Listado de Pasantías RecommendationService +
+Sprint 3 HU-08 IMPLEMENTADO
+Recomendadas GET /api/recommendations
+Evaluació
+(tipo=pasantia)
+n
+Recomendaciones MisRecomendacionesView +
+de Perfiles
+HU-09 Laborales para filtro tipo='empleo' + IMPLEMENTADO
+Titulados diferenciación visual por rol
+Sprint 4
+Gestión OfertasAdminView +
+Gestión de Convenios
+de HU-07 OfertaFormView + IMPLEMENTADO
+y Ofertas Laborales
+Oferta /api/admin/ofertas/*
+Laboral
+Sprint 5 ProfilesAdminView +
+Perfiles Gestión de Perfiles ProfileFormView +
+HU-06 IMPLEMENTADO
+Institucion Institucionales /api/admin/institutional-
+ales profiles/*
+Sprint 6 Resumen de Usuarios ReportsView + GET
+HU-10 IMPLEMENTADO
+Informes y Registrados /api/analytics/users-summary
+204 - 210
+
+=== PAGE 226 ===
+
+Sprint ID Historia de Usuario Componentes Implementados Estado
+Reportes ReportsView +
+Crecimiento de
+HU-11 UserGrowthChart + GET IMPLEMENTADO
+Usuarios en el Tiempo
+/api/analytics/user-growth
+ReportsView +
+Distribución de
+HU-12 UserDistributionChart + GET IMPLEMENTADO
+Usuarios por Rol
+/api/analytics/users-summary
+Habilidades más ReportsView + SkillsBarChart +
+HU-13 IMPLEMENTADO
+Frecuentes GET /api/analytics/skills-cloud
+Filtrado de Reportes ReportsView + selector de
+HU-14 IMPLEMENTADO
+por Fechas rango + apply_date_filter()
+Exportación de ReportsView + html2pdf.js +
+HU-15 IMPLEMENTADO
+Reporte a PDF layout con break-before-page
+Nota: Las 16 historias de usuario del Product Backlog se encuentran implementadas al 100%,
+cubriendo los seis módulos del sistema. Fuente: Elaboración propia.
+3.7.3. Confiabilidad
+La confiabilidad evalúa la capacidad del sistema para mantener su nivel de desempeño
+bajo condiciones normales de operación, contemplando disponibilidad del modelo,
+persistencia de datos y tolerancia a fallos en servicios externos.
+Tabla 68: Informe de Confiabilidad del Sistema
+Aspecto Mecanismo Descripción Nivel
+Singleton MLIntegrationService; Modelo en memoria durante toda la
+Disponibilidad
+carga automática al iniciar el sesión del servidor; sin recarga por ALTO
+del modelo ML
+servidor petición
+Persistencia Upsert en tabla Sin duplicados por clave usuario_id
+de recomendaciones (Supabase + oferta_id; historial recuperable ALTO
+evaluaciones PostgreSQL) siempre
+205 - 210
+
+=== PAGE 227 ===
+
+Aspecto Mecanismo Descripción Nivel
+Aislamiento de Try/except individual en
+Un error en una oferta no interrumpe
+errores por RecommendationService._evalu ALTO
+la evaluación del resto del lote
+oferta ate_oferta()
+Validación Pydantic en todos los
+Consistencia Datos no conformes al schema
+endpoints + constraints en ALTO
+de schemas rechazados antes de persistirse
+Supabase
+Tolerancia a Hasta tres reintentos automáticos
+GEMINI_MAX_RETRIES=3
+fallos de ante fallos transitorios de la API MEDIO
+configurable en .env
+Gemini API externa
+Renovación TTL de 300 s Datos de perfiles institucionales
+de caché (PROFILE_CACHE_TTL_SECO actualizados automáticamente al ALTO
+institucional NDS=300) expirar el TTL
+Nota: El nivel MEDIO en tolerancia a Gemini API refleja la dependencia de un servicio externo fuera
+del control del sistema. Fuente: Elaboración propia.
+3.7.4. Mantenibilidad
+La mantenibilidad contempla la facilidad para modificar, extender o corregir el sistema
+sin introducir regresiones, respaldada por las decisiones arquitectónicas adoptadas
+durante el diseño y el desarrollo.
+Tabla 69: Informe de Mantenibilidad
+Aspecto Implementación Descripción
+frontend/src/features/ (auth,
+Cada feature encapsula vistas,
+Arquitectura profile, evaluation,
+componentes, stores y API; cambios
+Feature-Based recommendations, admin,
+aislados por módulo
+dashboard, account)
+Capas de servicio Separación route → service → db Lógica de negocio independiente de la
+en backend client + ml_integration_service capa HTTP; sustituible sin afectar rutas
+206 - 210
+
+=== PAGE 228 ===
+
+Aspecto Implementación Descripción
+MLIntegrationService, Instancia única gestionada
+Patrón Singleton en
+RecommendationService, centralmente; sin acoplamiento directo
+servicios
+ProfileService, OfertaService entre consumidores
+Parámetros como ML_MODEL_PATH,
+Configuración Settings (pydantic-settings) + PROFILE_CACHE_TTL_SECONDS y
+externalizada variables de entorno (.env) MAX_CV_FILE_SIZE_MB modificables
+sin tocar código
+ridge_v1.joblib (versión explícita
+Versionado del en el nombre); Soporte para múltiples versiones del
+modelo ML ML_MODEL_VERSION modelo sin incompatibilidad entre ellas
+configurable en .env
+Vite aliases: @=src,
+Alias de módulos @shared=src/shared, Rutas de importación estables ante
+en frontend @features=src/features, reorganizaciones internas del directorio
+@app=src/app
+Nota: La mantenibilidad fue evaluada mediante revisión de la estructura del código fuente y las
+decisiones de diseño documentadas en el repositorio. Fuente: Elaboración propia.
+3.7.5. Portabilidad
+La portabilidad evalúa la capacidad del sistema para ejecutarse en diferentes entornos
+sin modificaciones al código fuente, considerando tanto el despliegue del backend
+como la distribución del frontend.
+Tabla 70: Informe de Portabilidad
+Aspecto Tecnología / Mecanismo Descripción
+Compatibilidad de Vue 3 + Vite (ES2020 target) Compatible con Chrome, Firefox, Edge y
+navegadores + Tailwind CSS Safari en versiones modernas
+Independencia de
+Python 3.10+ con entorno Ejecutable en Windows, Linux y macOS sin
+sistema operativo
+virtual (venv) cambios en el código fuente
+(backend)
+207 - 210
+
+=== PAGE 229 ===
+
+Aspecto Tecnología / Mecanismo Descripción
+Supabase (PostgreSQL
+Base de datos en la Independiente del entorno local; accesible
+gestionado, acceso por URL
+nube desde cualquier entorno de despliegue
++ API key)
+Portabilidad del joblib (serialización binaria Transportable entre entornos con la misma
+modelo ML scikit-learn) versión de Python y scikit-learn
+Configuración Variables SUPABASE_URL,
+.env + pydantic-settings
+adaptable por SECRET_KEY y GEMINI_API_KEY
+(BaseSettings)
+entorno configurables por entorno (dev/prod)
+Vite build → directorio dist/
+Distribución del Desplegable en cualquier servidor web
+estático (chunks por vendor y
+frontend estático: Nginx, CDN o GitHub Pages
+sección admin)
+Nota: Las características de portabilidad garantizan que el sistema puede migrarse entre entornos de
+desarrollo, pruebas y producción sin modificar el código fuente. Fuente: Elaboración propia.
+La ejecución de los cinco tipos de prueba 76 confirma que el sistema opera
+correctamente en su conjunto. El módulo de procesamiento de lenguaje natural y el
+modelo de Machine Learning fueron verificados de forma transversal a través de
+múltiples tipos de prueba, evidenciando que extraen, estructuran y evalúan la
+información de perfiles de la comunidad EMI dentro de los parámetros de tiempo y
+precisión establecidos. Los resultados de la evaluación técnica conforme a ISO/IEC
+25010, confirman que la arquitectura y el código desarrollados cumplen con los
+estándares de calidad requeridos para la puesta en operación del sistema.
+208 - 210
+
+=== PAGE 230 ===
+
+BIBLIOGRAFÍA
+
+=== PAGE 231 ===
+
+BIBLIOGRAFÍA
+(DTDA), D. T. (2024). Bolivia Labour Market Profile 2024. Danish Trade Union
+Development Agency (DTDA).
+Alasino, A. (2024). Un enfoque de clasificación no supervisada para un sistema de
+recomendación de currículums vitae basado en la similitud semántica.
+Retrieved from Repositorio Digital Universidad Torcuato Di Tella:
+https://repositorio.utdt.edu/items/99fa0c2b-2513-4bda-a8ce-53508499ca89
+Alles, M. (2006). Dirección estratégica de recursos humanos: Gestión por
+competencias.
+Bassi, M., Busso, M., & Vargas, J. (2012). Disconnected: Skills, Education, and
+Employment in Latin America. Washington, D.C.: Inter-American Development
+Bank.
+Bertalanffy, L. v. (1968). General System Theory: Foundations, Development,
+Applications. New York, NY: George Braziller.
+Blanchard, B. S., & Fabrycky, W. J. (2011). Systems Engineering and Analysis. Upper
+Saddle River, NJ: Prentice Hall.
+Boehm, B. W. (1988). A Spiral Model of Software Development and Enhancement. In
+ACM SIGSOFT Software Engineering Notes (pp. 14–24). ACM.
+Booch, G., Rumbaugh, J., & Jacobson, I. (1999). The Unified Modeling Language User
+Guide. Reading, MA: Addison-Wesley.
+Bunge, M. (1979). Treatise on Basic Philosophy: Ontology II: A World of Systems.
+Carabalí-Sánchez, L. M. (2025). Procesamiento de lenguaje natural aplicado a la
+selección de personal. Apuntes de Ciencia & Sociedad, 145–161.
+
+=== PAGE 232 ===
+
+Chapman, P., Clinton, J., Kerber, R., Khabaza, T., Reinartz, T., Shearer, C., & Wirth,
+R. (2000). CRISP-DM 1.0: Step-by-Step Data Mining Guide. Chicago, IL: SPSS
+Inc.
+Checkland, P. (1981). Systems Thinking, Systems Practice. Chichester, UK: John
+Wiley & Sons.
+Chiavenato, I. (2011). Administración de recursos humanos: El capital humano de las
+organizaciones. México: McGraw-Hill.
+Cohn, M. (2004). User Stories Applied: For Agile Software Development. Boston, MA:
+Addison-Wesley Professional.
+Commission, E. (2017). ESCO. Retrieved from Publications Office of the European
+Union: https://esco.ec.europa.eu/en/about-esco/what-esco
+Commission, E. (s.f.). European Union. Retrieved from Create your Europass CV:
+https://europass.europa.eu/en/create-europass-cv
+Council, N. R. (2010). A Database for a Changing Economy: Review of the
+Occupational Information Network (O*NET). The National Academies Press.
+Retrieved from The National Academies Press.
+Cuevas, S. M. (2022). Aplicación de métodos NLU en la recomendación de CVs para
+la selección de personal. Universidad de Valladolid.
+Davenport, T., & Prusak, L. (2001). Conocimiento en acción: cómo las organizaciones
+gestionan lo que saben. Harvard Business School Press.
+Deber, E. (2024, agosto 21). Retrieved from eldeber:
+https://eldeber.com.bo/mundo/bolivia-lidera-el-trabajo-informal-con-un-808-
+segun-la-organizacion-internacional-de-trabajo/
+DeepMind, G. (2023, Diciembre 6). Gemini: A Family of Highly Capable Multimodal

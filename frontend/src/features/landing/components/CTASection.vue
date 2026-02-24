@@ -10,7 +10,7 @@
       <h2 class="font-display font-bold text-4xl lg:text-5xl text-white mb-6 animate-slide-up">
         ¿Listo para Descubrir tus Oportunidades?
       </h2>
-      <p class="text-xl text-gray-300 mb-10 animate-slide-up" style="animation-delay: 0.1s;">
+      <p class="text-xl text-white/80 mb-10 animate-slide-up" style="animation-delay: 0.1s;">
         Sistema desarrollado para el Vicerrectorado de Grado de la Escuela Militar de Ingeniería
       </p>
       <button
