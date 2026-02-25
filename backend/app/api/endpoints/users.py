@@ -376,6 +376,11 @@ async def get_user_profile_full(
             education_level=profile.get('education_level'),
             experience_years=float(profile.get('experience_years', 0)),
             languages=profile.get('languages', []),
+            nombre_completo=profile.get('nombre_completo'),
+            direccion=profile.get('direccion'),
+            telefono=profile.get('telefono'),
+            email_contacto=profile.get('email_contacto'),
+            nacionalidad=profile.get('nacionalidad'),
             cv_filename=profile.get('cv_filename'),
             cv_uploaded_at=profile.get('cv_uploaded_at'),
             is_complete=profile.get('is_complete', False),
@@ -384,9 +389,34 @@ async def get_user_profile_full(
             updated_at=profile['updated_at']
         )
         
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Error getting user profile: {e}")
         raise HTTPException(status_code=500, detail=f"Error getting user profile: {str(e)}")
+
+
+@router.put("/{user_id}/profile")
+async def update_user_profile(
+    user_id: str,
+    updates: dict,
+    current_user: dict = Depends(verify_operator_access)
+):
+    """
+    Editar el perfil profesional de cualquier usuario (Admin/Operador).
+    Reutiliza profile_service.update_profile_manual con todos los campos permitidos.
+    """
+    profile_service = get_profile_service()
+
+    try:
+        updated = profile_service.update_profile_manual(user_id, updates)
+        return {"message": "Perfil actualizado correctamente", "perfil": updated}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        print(f"Error updating user profile: {e}")
+        raise HTTPException(status_code=500, detail=f"Error updating profile: {str(e)}")
+
 
 @router.put("/{user_id}")
 async def update_user(

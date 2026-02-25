@@ -66,7 +66,7 @@
           </svg>
         </div>
         <div>
-          <p class="font-semibold text-gray-900">{{ profile.experience_years }} anos</p>
+          <p class="font-semibold text-gray-900">{{ profile.experience_years }} años</p>
           <p class="text-sm text-gray-500">Experiencia total</p>
         </div>
       </div>

@@ -149,72 +149,174 @@ const formatDate = (dateString, includeTime = false) => {
             </div>
 
             <!-- Content -->
-            <div v-else-if="user" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Left Column: User Info -->
-                <div class="lg:col-span-1 space-y-6">
-                    <!-- User Card -->
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <div class="flex justify-between items-start mb-4">
-                                <h2 class="text-lg font-semibold text-slate-800">Informacion de Cuenta</h2>
-                                <button
-                                @click="toggleEdit"
-                                class="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                                >
-                                {{ isEditing ? 'Cancelar' : 'Editar' }}
-                                </button>
-                        </div>
+            <div v-else-if="user" class="max-w-3xl mx-auto space-y-6">
 
-                        <div v-if="!isEditing" class="space-y-4">
-                            <div class="flex items-center gap-4">
-                                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-2xl">
-                                    {{ (user.nombre_completo || user.email).charAt(0).toUpperCase() }}
+                <!-- Hero Card: Avatar + Identity -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="h-24 bg-gradient-to-r"
+                         :class="user.rol === 'administrador' ? 'from-purple-500 to-purple-700' :
+                                 user.rol === 'operador' ? 'from-orange-400 to-orange-600' :
+                                 user.rol === 'titulado' ? 'from-indigo-500 to-indigo-700' :
+                                 'from-blue-500 to-blue-700'"
+                    ></div>
+                    <div class="px-6 pb-6 -mt-12">
+                        <div class="flex flex-col sm:flex-row sm:items-end gap-4">
+                            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold text-3xl shadow-lg border-4 border-white"
+                                 :class="user.rol === 'administrador' ? 'text-purple-600' :
+                                         user.rol === 'operador' ? 'text-orange-600' :
+                                         user.rol === 'titulado' ? 'text-indigo-600' :
+                                         'text-blue-600'"
+                            >
+                                {{ (user.nombre_completo || user.email).charAt(0).toUpperCase() }}
+                            </div>
+                            <div class="flex-1">
+                                <h2 class="text-2xl font-bold text-slate-800">{{ user.nombre_completo || 'Sin nombre' }}</h2>
+                                <p class="text-slate-500 text-sm mt-0.5">{{ user.email }}</p>
+                            </div>
+                            <span :class="[
+                                'px-3 py-1.5 rounded-full text-xs font-semibold capitalize self-start sm:self-auto',
+                                user.rol === 'administrador' ? 'bg-purple-100 text-purple-700' :
+                                user.rol === 'operador' ? 'bg-orange-100 text-orange-700' :
+                                user.rol === 'titulado' ? 'bg-indigo-100 text-indigo-700' :
+                                'bg-blue-100 text-blue-700'
+                            ]">
+                                {{ user.rol }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Rol -->
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center"
+                                 :class="user.rol === 'administrador' ? 'bg-purple-100' :
+                                         user.rol === 'operador' ? 'bg-orange-100' :
+                                         user.rol === 'titulado' ? 'bg-indigo-100' :
+                                         'bg-blue-100'"
+                            >
+                                <svg class="w-5 h-5"
+                                     :class="user.rol === 'administrador' ? 'text-purple-600' :
+                                             user.rol === 'operador' ? 'text-orange-600' :
+                                             user.rol === 'titulado' ? 'text-indigo-600' :
+                                             'text-blue-600'"
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs text-slate-400 uppercase tracking-wider font-medium">Tipo de Cuenta</span>
+                        </div>
+                        <p class="text-lg font-bold text-slate-800 capitalize">{{ user.rol }}</p>
+                    </div>
+
+                    <!-- Fecha Registro -->
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs text-slate-400 uppercase tracking-wider font-medium">Registrado</span>
+                        </div>
+                        <p class="text-lg font-bold text-slate-800">{{ formatDate(user.created_at) }}</p>
+                    </div>
+
+                    <!-- Estado Perfil -->
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center"
+                                 :class="user.tiene_perfil ? (user.perfil_completo ? 'bg-green-100' : 'bg-yellow-100') : 'bg-slate-100'"
+                            >
+                                <svg class="w-5 h-5"
+                                     :class="user.tiene_perfil ? (user.perfil_completo ? 'text-green-600' : 'text-yellow-600') : 'text-slate-400'"
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs text-slate-400 uppercase tracking-wider font-medium">Perfil</span>
+                        </div>
+                        <template v-if="user.rol !== 'administrador'">
+                            <div v-if="user.tiene_perfil">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <p class="text-lg font-bold text-slate-800">{{ Math.round(user.completeness_score * 100) }}%</p>
+                                    <span class="text-xs font-medium"
+                                          :class="user.perfil_completo ? 'text-green-600' : 'text-yellow-600'"
+                                    >{{ user.perfil_completo ? 'Completo' : 'En progreso' }}</span>
                                 </div>
-                                <div>
-                                    <h3 class="font-bold text-slate-800 text-lg">{{ user.nombre_completo || 'Sin nombre' }}</h3>
-                                    <p class="text-slate-500 text-sm">{{ user.email }}</p>
+                                <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-full rounded-full transition-all duration-500"
+                                         :class="user.perfil_completo ? 'bg-green-500' : 'bg-yellow-500'"
+                                         :style="{ width: `${user.completeness_score * 100}%` }"
+                                    ></div>
                                 </div>
                             </div>
+                            <p v-else class="text-lg font-bold text-slate-400">Sin perfil</p>
+                        </template>
+                        <p v-else class="text-lg font-bold text-slate-400">N/A</p>
+                    </div>
+                </div>
 
-                            <div class="pt-4 border-t border-slate-100 space-y-3">
-                                <div>
-                                    <span class="text-xs text-slate-400 block uppercase tracking-wider mb-1">Rol</span>
-                                    <span :class="[
-                                        'px-2.5 py-1 rounded-full text-xs font-medium capitalize',
-                                        user.rol === 'administrador' ? 'bg-purple-100 text-purple-700' :
-                                        user.rol === 'operador' ? 'bg-orange-100 text-orange-700' :
-                                        user.rol === 'titulado' ? 'bg-indigo-100 text-indigo-700' :
-                                        'bg-blue-100 text-blue-700'
-                                    ]">
-                                        {{ user.rol }}
-                                    </span>
-                                </div>
+                <!-- Informacion de Cuenta Card -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex justify-between items-center mb-5">
+                        <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Informacion de Cuenta
+                        </h2>
+                        <button
+                            @click="toggleEdit"
+                            class="px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg font-medium transition-colors"
+                        >
+                            {{ isEditing ? 'Cancelar' : 'Editar' }}
+                        </button>
+                    </div>
 
-                                <div>
-                                    <span class="text-xs text-slate-400 block uppercase tracking-wider mb-1">Registrado el</span>
-                                    <span class="text-slate-700 text-sm">{{ formatDate(user.created_at, true) }}</span>
-                                </div>
-
-                                <div v-if="user.rol !== 'administrador'">
-                                    <span class="text-xs text-slate-400 block uppercase tracking-wider mb-1">Estado Perfil</span>
-                                    <div v-if="user.tiene_perfil" class="flex items-center gap-2">
-                                        <div class="w-full max-w-[120px] bg-slate-200 rounded-full h-2 overflow-hidden">
-                                            <div
-                                                class="h-full rounded-full"
-                                                :class="user.perfil_completo ? 'bg-green-500' : 'bg-yellow-500'"
-                                                :style="{ width: `${user.completeness_score * 100}%` }"
-                                            ></div>
-                                        </div>
-                                        <span class="text-xs text-slate-600 font-medium">
-                                            {{ Math.round(user.completeness_score * 100) }}%
-                                        </span>
-                                    </div>
-                                    <span v-else class="text-sm text-slate-500 italic">No ha iniciado perfil</span>
-                                </div>
+                    <div v-if="!isEditing">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+                            <div>
+                                <span class="text-xs text-slate-400 block uppercase tracking-wider mb-1">Nombre Completo</span>
+                                <span class="text-slate-800 font-medium">{{ user.nombre_completo || 'Sin nombre' }}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 block uppercase tracking-wider mb-1">Correo Electronico</span>
+                                <span class="text-slate-800 font-medium">{{ user.email }}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 block uppercase tracking-wider mb-1">Rol Asignado</span>
+                                <span :class="[
+                                    'px-2.5 py-1 rounded-full text-xs font-medium capitalize',
+                                    user.rol === 'administrador' ? 'bg-purple-100 text-purple-700' :
+                                    user.rol === 'operador' ? 'bg-orange-100 text-orange-700' :
+                                    user.rol === 'titulado' ? 'bg-indigo-100 text-indigo-700' :
+                                    'bg-blue-100 text-blue-700'
+                                ]">
+                                    {{ user.rol }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 block uppercase tracking-wider mb-1">Fecha de Registro</span>
+                                <span class="text-slate-800 font-medium">{{ formatDate(user.created_at, true) }}</span>
+                            </div>
+                            <div v-if="user.cv_uploaded_at">
+                                <span class="text-xs text-slate-400 block uppercase tracking-wider mb-1">CV Subido</span>
+                                <span class="text-slate-800 font-medium">{{ formatDate(user.cv_uploaded_at, true) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 block uppercase tracking-wider mb-1">ID de Usuario</span>
+                                <span class="text-slate-500 font-mono text-xs">{{ user.id }}</span>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Edit Form -->
-                        <form v-else @submit.prevent="saveChanges" class="space-y-4">
+                    <!-- Edit Form -->
+                    <form v-else @submit.prevent="saveChanges" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Nombre Completo</label>
                                 <input
@@ -223,7 +325,7 @@ const formatDate = (dateString, includeTime = false) => {
                                     class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
-                                <div>
+                            <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Rol</label>
                                 <select
                                     v-model="editForm.rol"
@@ -234,154 +336,25 @@ const formatDate = (dateString, includeTime = false) => {
                                     </option>
                                 </select>
                             </div>
-
-                            <div class="pt-2 flex gap-2">
-                                <button
-                                    type="submit"
-                                    :disabled="saving"
-                                    class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium text-sm"
-                                >
-                                    {{ saving ? 'Guardando...' : 'Guardar' }}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Right Column: Profile Details -->
-                <div class="lg:col-span-2 space-y-6">
-
-                    <!-- If Profile Exists -->
-                    <template v-if="hasProfile">
-                        <!-- Stats / Skills Summary -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Hard Skills -->
-                            <div class="bg-white rounded-xl shadow-md p-6">
-                                <h3 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                                    Habilidades Tecnicas
-                                </h3>
-                                <div v-if="profile.hard_skills && profile.hard_skills.length > 0" class="flex flex-wrap gap-2">
-                                    <span
-                                        v-for="skill in profile.hard_skills"
-                                        :key="skill"
-                                        class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-md text-sm font-medium"
-                                    >
-                                        {{ skill }}
-                                    </span>
-                                </div>
-                                <p v-else class="text-slate-400 italic text-sm">No se han registrado habilidades tecnicas.</p>
-                            </div>
-
-                                <!-- Soft Skills -->
-                                <div class="bg-white rounded-xl shadow-md p-6">
-                                <h3 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                    Habilidades Blandas
-                                </h3>
-                                <div v-if="profile.soft_skills && profile.soft_skills.length > 0" class="flex flex-wrap gap-2">
-                                    <span
-                                        v-for="skill in profile.soft_skills"
-                                        :key="skill"
-                                        class="px-2.5 py-1 bg-green-50 text-green-700 rounded-md text-sm font-medium"
-                                    >
-                                        {{ skill }}
-                                    </span>
-                                </div>
-                                <p v-else class="text-slate-400 italic text-sm">No se han registrado habilidades blandas.</p>
-                            </div>
                         </div>
 
-                        <!-- Education & Experience -->
-                        <div class="bg-white rounded-xl shadow-md p-6">
-                            <h3 class="font-semibold text-slate-800 mb-6 pb-2 border-b border-slate-100">
-                                    Perfil Profesional
-                            </h3>
-
-                            <div class="space-y-6">
-                                <!-- Education Level -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Nivel Educativo</h4>
-                                        <p class="text-slate-800 font-medium text-lg">
-                                            {{ profile.education_level || 'No especificado' }}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Experiencia Laboral</h4>
-                                        <p class="text-slate-800 font-medium text-lg">
-                                            {{ profile.experience_years }} anos
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <!-- Languages -->
-                                <div>
-                                    <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Idiomas</h4>
-                                    <div v-if="profile.languages && profile.languages.length > 0" class="flex flex-wrap gap-2">
-                                        <span v-for="lang in profile.languages" :key="lang" class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">
-                                            {{ lang }}
-                                        </span>
-                                    </div>
-                                    <p v-else class="text-slate-500 italic">No especificado</p>
-                                </div>
-
-                                <!-- Detailed Lists from CV (if available) -->
-                                <div v-if="profile.gemini_extraction?.education?.length > 0">
-                                    <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-3 mt-6">Formacion Academica (CV)</h4>
-                                    <ul class="space-y-3">
-                                        <li v-for="(edu, idx) in profile.gemini_extraction.education" :key="idx" class="flex gap-3 text-sm">
-                                            <div class="min-w-[4px] bg-slate-200 rounded-full my-1"></div>
-                                            <div>
-                                                <p class="font-semibold text-slate-800">{{ edu.degree }}</p>
-                                                <p class="text-slate-600">{{ edu.institution }}</p>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div v-if="profile.gemini_extraction?.experience?.length > 0">
-                                    <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-3 mt-6">Experiencia Laboral (CV)</h4>
-                                    <ul class="space-y-4">
-                                        <li v-for="(exp, idx) in profile.gemini_extraction.experience" :key="idx" class="text-sm bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                            <p class="font-semibold text-slate-800">{{ exp.role }}</p>
-                                            <div class="flex justify-between items-center mt-1 mb-2">
-                                                <p class="text-blue-600 font-medium text-xs">{{ exp.company }}</p>
-                                                <p class="text-slate-500 text-xs">{{ exp.duration }}</p>
-                                            </div>
-                                            <p v-if="exp.description" class="text-slate-600 text-xs leading-relaxed">
-                                                {{ exp.description }}
-                                            </p>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <!-- CV File Info -->
-                                <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400">
-                                <span>Archivo CV: {{ profile.cv_filename || 'No disponible' }}</span>
-                                <span v-if="profile.cv_uploaded_at">Subido el {{ formatDate(profile.cv_uploaded_at, true) }}</span>
-                            </div>
+                        <div class="pt-2 flex gap-2 justify-end">
+                            <button
+                                type="button"
+                                @click="toggleEdit"
+                                class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium text-sm"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                :disabled="saving"
+                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium text-sm"
+                            >
+                                {{ saving ? 'Guardando...' : 'Guardar Cambios' }}
+                            </button>
                         </div>
-                    </template>
-
-                        <!-- No Profile Msg -->
-                        <div v-else-if="user.rol !== 'administrador'" class="bg-white rounded-xl shadow-md p-12 text-center border-2 border-dashed border-slate-200">
-                        <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-medium text-slate-600">Este usuario aun no ha completado su perfil</h3>
-                        <p class="text-slate-400 mt-2 max-w-sm mx-auto">
-                            El usuario debe iniciar sesion y completar su perfil o subir su CV para que aparezca informacion aqui.
-                        </p>
-                    </div>
-
-                        <!-- Admin Msg -->
-                        <div v-else class="bg-white rounded-xl shadow-md p-8 text-center bg-purple-50 border border-purple-100">
-                        <p class="text-purple-700 font-medium">Las cuentas de administrador no tienen perfil profesional asociado.</p>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -200,7 +200,7 @@ onMounted(() => {
                     "Mcal. Antonio José de Sucre"<br>
                     <strong class="text-emi-gold-600">Prestigio, Disciplina y Oportunidades</strong>
                 </div>
-                <p class="text-xs text-gray-400">© 2026 DNTIC - Escuela Militar de Ingeniería</p>
+                <p class="text-xs text-gray-400">© 2026 - Escuela Militar de Ingeniería</p>
             </div>
         </div>
     </div>

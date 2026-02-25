@@ -182,6 +182,32 @@ class ProfileService:
             'updated_at': datetime.utcnow().isoformat()
         }
 
+        # Pre-cargar info personal desde Gemini si está disponible
+        def _clean(val):
+            """Filtra strings vacíos, el literal 'null', y None."""
+            if not val or str(val).strip().lower() in ('null', 'none', ''):
+                return None
+            return str(val).strip()
+
+        name_val = _clean(personal_info.get('name')) or _clean(
+            personal_info.get('detected_names', [None])[0]
+            if isinstance(personal_info.get('detected_names'), list) else None
+        )
+        if name_val:
+            update_data['nombre_completo'] = name_val
+        if _clean(personal_info.get('phone')):
+            update_data['telefono'] = _clean(personal_info.get('phone'))
+        if _clean(personal_info.get('email')):
+            update_data['email_contacto'] = _clean(personal_info.get('email'))
+        loc = _clean(personal_info.get('location')) or _clean(personal_info.get('address'))
+        if loc:
+            update_data['direccion'] = loc
+        if _clean(personal_info.get('nationality')):
+            update_data['nacionalidad'] = _clean(personal_info.get('nationality'))
+
+        logger.info(f"Personal info extraída del CV: nombre={update_data.get('nombre_completo')}, "
+                    f"email={update_data.get('email_contacto')}, tel={update_data.get('telefono')}")
+
         # Calcular completitud
         completeness = self.calculate_completeness(update_data)
         update_data['completeness_score'] = completeness['score']
@@ -227,8 +253,13 @@ class ProfileService:
             raise ValueError("Perfil no encontrado")
 
         # Campos permitidos para edicion manual
-        allowed_fields = ['hard_skills', 'soft_skills', 'education_level',
-                         'experience_years', 'languages']
+        allowed_fields = [
+            'hard_skills', 'soft_skills', 'education_level',
+            'experience_years', 'languages',
+            # Información personal
+            'nombre_completo', 'direccion', 'telefono',
+            'email_contacto', 'nacionalidad'
+        ]
 
         update_data = {'updated_at': datetime.utcnow().isoformat()}
 

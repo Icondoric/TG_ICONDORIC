@@ -113,15 +113,21 @@ def _build_prompt(text: str) -> str:
     {text[:4000]}
 
     Instrucciones:
-    1. Extrae **Habilidades Técnicas** (Hard Skills) y **Habilidades Blandas** (Soft Skills).
-    2. Extrae el **Historial Académico** (Education) con título, institución y año.
-    3. Extrae la **Experiencia Laboral** (Experience) con cargo, empresa, duración y una breve descripción.
-    4. Extrae los **Idiomas**.
-    5. Redacta un **Breve Resumen Profesional** (máximo 3 líneas).
+    1. Extrae los **Datos Personales**: nombre completo, teléfono, email, ubicación/dirección y nacionalidad si están mencionados.
+    2. Extrae **Habilidades Técnicas** (Hard Skills) y **Habilidades Blandas** (Soft Skills).
+    3. Extrae el **Historial Académico** (Education) con título, institución y año.
+    4. Extrae la **Experiencia Laboral** (Experience) con cargo, empresa, duración y una breve descripción.
+    5. Extrae los **Idiomas**.
+    6. Redacta un **Breve Resumen Profesional** (máximo 3 líneas).
 
     Retorna SOLAMENTE un JSON válido con el siguiente formato:
     {{
         "personal_info": {{
+            "name": "Nombre Completo del candidato o null si no está",
+            "phone": "Número de teléfono o null si no está",
+            "email": "email@ejemplo.com o null si no está",
+            "location": "Ciudad, País o null si no está",
+            "nationality": "Nacionalidad o null si no está",
             "summary": "Resumen del perfil...",
             "languages": ["Inglés (B2)", "Español (Nativo)"]
         }},
@@ -144,6 +150,7 @@ def _build_prompt(text: str) -> str:
         ]
     }}
     """
+
 
 
 def _parse_gemini_response(response_text: str) -> Dict[str, Any]:

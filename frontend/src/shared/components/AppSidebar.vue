@@ -151,6 +151,28 @@ const getChildClasses = (child) => {
 
         <!-- Menu Items -->
         <div class="flex-1 overflow-y-auto py-4">
+            <!-- Bienvenida usuario -->
+            <div
+                v-if="uiStore.isSidebarOpen && authStore.user"
+                class="mx-3 mb-3 pl-3 border-l-2 border-emi-gold-500"
+            >
+                <p class="text-xs font-medium mb-0.5"
+                   :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+                >
+                    Bienvenido
+                </p>
+                <p class="text-sm font-semibold leading-tight truncate"
+                   :class="isDark ? 'text-white' : 'text-emi-navy-700'"
+                >
+                    {{ authStore.user.nombre_completo }}
+                </p>
+                <p class="text-xs font-medium leading-tight truncate mt-0.5"
+                   :class="isDark ? 'text-emi-gold-400' : 'text-emi-gold-600'"
+                >
+                    {{ authStore.user.rol?.charAt(0).toUpperCase() + authStore.user.rol?.slice(1) }}
+                </p>
+            </div>
+
             <nav class="space-y-1 px-2">
                 <template v-for="item in menuItems" :key="item.label">
                     <!-- Simple item (no children) -->
@@ -226,19 +248,95 @@ const getChildClasses = (child) => {
             </nav>
         </div>
 
-        <!-- Footer / Logout -->
-        <div class="p-4" :class="isDark ? 'border-t border-emi-navy-700 bg-emi-navy-800' : 'border-t border-gray-200'">
-            <button
-                @click="handleLogout"
-                class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors duration-150 shadow-sm"
-                :class="!uiStore.isSidebarOpen ? 'justify-center' : ''"
-                :title="!uiStore.isSidebarOpen ? 'Cerrar Sesión' : ''"
-            >
-                <svg class="h-5 w-5" :class="uiStore.isSidebarOpen ? 'mr-2' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span v-if="uiStore.isSidebarOpen">Cerrar Sesión</span>
-            </button>
+        <!-- Footer: Mi Cuenta + Logout -->
+        <div :class="isDark ? 'border-t border-emi-navy-700 bg-emi-navy-800' : 'border-t border-gray-200'">
+            <!-- Mi Cuenta Section -->
+            <div class="px-2 pt-3 pb-2">
+                <div
+                    class="relative"
+                    @mouseenter="onNavItemEnter({ label: 'Mi Cuenta', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', children: [{ label: 'Ver Mi Cuenta', path: '/ver-mi-cuenta' }, { label: 'Configurar Mi Cuenta', path: '/configurar-cuenta' }] }, $event)"
+                    @mouseleave="onNavItemLeave"
+                >
+                    <button
+                        @click="toggleSubmenu('Mi Cuenta')"
+                        :class="[
+                            'group flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors duration-150 w-full',
+                            isActive('/ver-mi-cuenta') || isActive('/configurar-cuenta')
+                                ? isDark ? 'bg-emi-navy-700 text-white' : 'bg-emi-navy-500 text-white'
+                                : isDark ? 'text-gray-300 hover:bg-emi-navy-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-emi-navy-500',
+                            !uiStore.isSidebarOpen ? 'justify-center' : ''
+                        ]"
+                    >
+                        <svg
+                            :class="[
+                                'h-6 w-6 flex-shrink-0 transition-transform duration-150 group-hover:scale-110',
+                                isActive('/ver-mi-cuenta') || isActive('/configurar-cuenta')
+                                    ? isDark ? 'text-white' : 'text-current'
+                                    : isDark ? 'text-gray-400 group-hover:text-white' : 'text-gray-500 group-hover:text-emi-navy-500',
+                                uiStore.isSidebarOpen ? 'mr-3' : ''
+                            ]"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span v-if="uiStore.isSidebarOpen" class="flex-1 text-left leading-tight">Mi Cuenta</span>
+                        <svg
+                            v-if="uiStore.isSidebarOpen"
+                            class="h-4 w-4 ml-auto transition-transform duration-200"
+                            :class="expandedItem === 'Mi Cuenta' ? 'rotate-180' : ''"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <!-- Submenu children (sidebar expandido) -->
+                    <transition name="submenu">
+                        <div
+                            v-if="uiStore.isSidebarOpen && expandedItem === 'Mi Cuenta'"
+                            class="mt-1 space-y-1 overflow-hidden"
+                        >
+                            <router-link
+                                to="/ver-mi-cuenta"
+                                :class="getChildClasses({ path: '/ver-mi-cuenta' })"
+                            >
+                                <span class="w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0"
+                                    :class="isActive('/ver-mi-cuenta')
+                                        ? isDark ? 'bg-white' : 'bg-emi-gold-500'
+                                        : isDark ? 'bg-gray-500' : 'bg-gray-400'"
+                                ></span>
+                                Ver Mi Cuenta
+                            </router-link>
+                            <router-link
+                                to="/configurar-cuenta"
+                                :class="getChildClasses({ path: '/configurar-cuenta' })"
+                            >
+                                <span class="w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0"
+                                    :class="isActive('/configurar-cuenta')
+                                        ? isDark ? 'bg-white' : 'bg-emi-gold-500'
+                                        : isDark ? 'bg-gray-500' : 'bg-gray-400'"
+                                ></span>
+                                Configurar Mi Cuenta
+                            </router-link>
+                        </div>
+                    </transition>
+                </div>
+            </div>
+
+            <!-- Logout -->
+            <div class="px-4 pb-4 pt-2">
+                <button
+                    @click="handleLogout"
+                    class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors duration-150 shadow-sm"
+                    :class="!uiStore.isSidebarOpen ? 'justify-center' : ''"
+                    :title="!uiStore.isSidebarOpen ? 'Cerrar Sesión' : ''"
+                >
+                    <svg class="h-5 w-5" :class="uiStore.isSidebarOpen ? 'mr-2' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span v-if="uiStore.isSidebarOpen">Cerrar Sesión</span>
+                </button>
+            </div>
         </div>
     </aside>
 
@@ -337,6 +435,28 @@ const getChildClasses = (child) => {
 
             <!-- Mobile Menu -->
             <div class="py-4 overflow-y-auto" style="max-height: calc(100vh - 128px)">
+                <!-- Bienvenida usuario mobile -->
+                <div
+                    v-if="authStore.user"
+                    class="mx-3 mb-3 pl-3 border-l-2 border-emi-gold-500"
+                >
+                    <p class="text-xs font-medium mb-0.5"
+                       :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+                    >
+                        Bienvenido
+                    </p>
+                    <p class="text-sm font-semibold leading-tight truncate"
+                       :class="isDark ? 'text-white' : 'text-emi-navy-700'"
+                    >
+                        {{ authStore.user.nombre_completo }}
+                    </p>
+                    <p class="text-xs font-medium leading-tight truncate mt-0.5"
+                       :class="isDark ? 'text-emi-gold-400' : 'text-emi-gold-600'"
+                    >
+                        {{ authStore.user.rol?.charAt(0).toUpperCase() + authStore.user.rol?.slice(1) }}
+                    </p>
+                </div>
+
                 <nav class="space-y-1 px-2">
                     <template v-for="item in menuItems" :key="item.label">
                         <!-- Simple item -->
@@ -405,17 +525,77 @@ const getChildClasses = (child) => {
                 </nav>
             </div>
 
-            <!-- Mobile Logout -->
-            <div class="absolute bottom-0 left-0 right-0 p-4" :class="isDark ? 'border-t border-emi-navy-700' : 'border-t border-gray-200'">
-                <button
-                    @click="handleLogout"
-                    class="w-full flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm"
-                >
-                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    Cerrar Sesión
-                </button>
+            <!-- Mobile Footer: Mi Cuenta + Logout -->
+            <div class="absolute bottom-0 left-0 right-0" :class="isDark ? 'border-t border-emi-navy-700' : 'border-t border-gray-200'">
+                <!-- Mi Cuenta Section (mobile) -->
+                <div class="px-2 pt-3 pb-2">
+                    <div>
+                        <button
+                            @click="toggleSubmenu('Mi Cuenta')"
+                            :class="[
+                                'w-full group flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors',
+                                isActive('/ver-mi-cuenta') || isActive('/configurar-cuenta')
+                                    ? isDark ? 'bg-emi-navy-700 text-white' : 'bg-emi-navy-500 text-white'
+                                    : isDark ? 'text-gray-300 hover:bg-emi-navy-700' : 'text-gray-700 hover:bg-gray-100'
+                            ]"
+                        >
+                            <svg class="h-6 w-6 mr-3 flex-shrink-0 transition-transform duration-150 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span class="flex-1 text-left">Mi Cuenta</span>
+                            <svg
+                                class="h-4 w-4 ml-auto transition-transform duration-200"
+                                :class="expandedItem === 'Mi Cuenta' ? 'rotate-180' : ''"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <transition name="submenu">
+                            <div v-if="expandedItem === 'Mi Cuenta'" class="mt-1 space-y-1 overflow-hidden">
+                                <router-link
+                                    to="/ver-mi-cuenta"
+                                    @click="uiStore.closeMobileSidebar"
+                                    :class="getChildClasses({ path: '/ver-mi-cuenta' })"
+                                >
+                                    <span class="w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0"
+                                        :class="isActive('/ver-mi-cuenta')
+                                            ? isDark ? 'bg-white' : 'bg-emi-gold-500'
+                                            : isDark ? 'bg-gray-500' : 'bg-gray-400'"
+                                    ></span>
+                                    Ver Mi Cuenta
+                                </router-link>
+                                <router-link
+                                    to="/configurar-cuenta"
+                                    @click="uiStore.closeMobileSidebar"
+                                    :class="getChildClasses({ path: '/configurar-cuenta' })"
+                                >
+                                    <span class="w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0"
+                                        :class="isActive('/configurar-cuenta')
+                                            ? isDark ? 'bg-white' : 'bg-emi-gold-500'
+                                            : isDark ? 'bg-gray-500' : 'bg-gray-400'"
+                                    ></span>
+                                    Configurar Mi Cuenta
+                                </router-link>
+                            </div>
+                        </transition>
+                    </div>
+                </div>
+
+                <!-- Logout -->
+                <div class="px-4 pb-4 pt-2">
+                    <button
+                        @click="handleLogout"
+                        class="w-full flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm"
+                    >
+                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Cerrar Sesión
+                    </button>
+                </div>
             </div>
         </aside>
     </div>

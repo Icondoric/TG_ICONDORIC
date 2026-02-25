@@ -181,43 +181,50 @@ class RecommendationService:
         """
         Evalua una oferta contra el perfil del usuario.
 
+        Prioridad de configuracion (migration v3):
+        1. Config propia de la oferta (weights / thresholds / requirements)
+        2. Config del perfil institucional asociado
+        3. Config generica por defecto
+
         Args:
             gemini_output: Perfil en formato Gemini
-            oferta: Datos de la oferta
+            oferta: Datos de la oferta (puede incluir weights/thresholds/requirements propios)
 
         Returns:
             Dict con resultado de evaluacion o None
         """
         ml_service = get_ml_service()
 
-        # Si la oferta tiene perfil institucional, usarlo
+        # Cargar perfil institucional base (o generico si no hay)
         if oferta.get('institutional_profile_id'):
             profile = ml_service.load_institutional_profile(
                 oferta['institutional_profile_id']
             )
+            if not profile:
+                profile = self._create_generic_profile(oferta)
+        else:
+            profile = self._create_generic_profile(oferta)
 
-            if profile:
-                # Merge requisitos especificos de la oferta
-                if oferta.get('requisitos_especificos'):
-                    profile['requirements'] = {
-                        **profile['requirements'],
-                        **oferta['requisitos_especificos']
-                    }
+        # Override con config propia de la oferta (migration v3):
+        # Nivel educativo mínimo, pesos y umbrales ahora vienen de la oferta
+        if oferta.get('weights'):
+            profile['weights'] = oferta['weights']
+        if oferta.get('thresholds'):
+            profile['thresholds'] = oferta['thresholds']
+        if oferta.get('requirements'):
+            profile['requirements'] = {
+                **profile['requirements'],
+                **oferta['requirements']
+            }
 
-                result = ml_service.evaluate_cv(gemini_output, profile)
+        # Merge requisitos_especificos adicionales
+        if oferta.get('requisitos_especificos'):
+            profile['requirements'] = {
+                **profile['requirements'],
+                **oferta['requisitos_especificos']
+            }
 
-                return {
-                    'match_score': result['match_score'],
-                    'clasificacion': result['classification'],
-                    'scores_detalle': result['cv_scores'],
-                    'fortalezas': self._extract_fortalezas(result),
-                    'debilidades': self._extract_debilidades(result),
-                    'match_details': result.get('match_details')
-                }
-
-        # Si no tiene perfil institucional, crear uno generico
-        generic_profile = self._create_generic_profile(oferta)
-        result = ml_service.evaluate_cv(gemini_output, generic_profile)
+        result = ml_service.evaluate_cv(gemini_output, profile)
 
         return {
             'match_score': result['match_score'],

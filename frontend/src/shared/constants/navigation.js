@@ -20,21 +20,16 @@ export function getMenuItems(role) {
             return [
                 {
                     label: 'Gestión de Usuarios', icon: icons.users, children: [
-                        { label: 'Ver Usuarios', path: '/admin/users' },
+                        { label: 'Lista de Usuarios', path: '/admin/users' },
                         { label: 'Nuevo Usuario', path: '/admin/users/new' },
                     ]
                 },
                 {
                     label: 'Digitalización de Perfiles', icon: icons.profile, children: [
                         { label: 'Subir CV', path: '/digitalizacion/subir-cv' },
-                        { label: 'Mi Perfil', path: '/digitalizacion/mi-perfil' },
+                        { label: 'Mi Perfil Digitalizado', path: '/digitalizacion/mi-perfil' },
                         { label: 'Editar Perfil', path: '/digitalizacion/editar' },
-                    ]
-                },
-                {
-                    label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
-                        { label: 'Dashboard', path: '/admin' },
-                        { label: 'Recomendaciones', path: '/mis-recomendaciones' },
+                        { label: 'Buscar Perfiles', path: '/digitalizacion/buscar-perfiles' },
                     ]
                 },
                 {
@@ -47,6 +42,13 @@ export function getMenuItems(role) {
                     label: 'Perfiles Institucionales', icon: icons.instituciones, children: [
                         { label: 'Ver Perfiles', path: '/admin/profiles' },
                         { label: 'Nuevo Perfil', path: '/admin/profiles/new' },
+                    ]
+                },
+                {
+                    label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
+                        { label: 'Correspondencia entre Perfiles', path: '/correspondencia-perfiles' },
+                        { label: 'Historial de Postulaciones', path: '/historial-postulaciones' },
+                        { label: 'Evaluación de Candidatos', path: '/admin/ranking-candidatos' },
                     ]
                 },
                 {
@@ -65,6 +67,11 @@ export function getMenuItems(role) {
                     label: 'Gestión de Usuarios', icon: icons.users, children: [
                         { label: 'Ver Usuarios', path: '/admin/users' },
                         { label: 'Nuevo Usuario', path: '/admin/users/new' },
+                    ]
+                },
+                {
+                    label: 'Digitalización de Perfiles', icon: icons.profile, children: [
+                        { label: 'Buscar Perfiles', path: '/digitalizacion/buscar-perfiles' },
                     ]
                 },
                 {
@@ -94,20 +101,16 @@ export function getMenuItems(role) {
         default:
             return [
                 {
-                    label: 'Mi Cuenta', icon: icons.settings, children: [
-                        { label: 'Configuración', path: '/configuracion-cuenta' },
-                    ]
-                },
-                {
                     label: 'Digitalización de Perfiles', icon: icons.profile, children: [
                         { label: 'Subir CV', path: '/digitalizacion/subir-cv' },
-                        { label: 'Mi Perfil', path: '/digitalizacion/mi-perfil' },
+                        { label: 'Mi Perfil Digitalizado', path: '/digitalizacion/mi-perfil' },
                         { label: 'Editar Perfil', path: '/digitalizacion/editar' },
                     ]
                 },
                 {
                     label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
-                        { label: 'Recomendaciones', path: '/mis-recomendaciones' },
+                        { label: 'Correspondencia entre Perfiles', path: '/correspondencia-perfiles' },
+                        { label: 'Historial de Postulaciones', path: '/historial-postulaciones' },
                     ]
                 },
             ]

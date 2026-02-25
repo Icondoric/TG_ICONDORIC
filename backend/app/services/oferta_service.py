@@ -54,7 +54,13 @@ class OfertaService:
                 'tipo': data['tipo'],
                 'modalidad': data.get('modalidad'),
                 'ubicacion': data.get('ubicacion'),
+                'area': data.get('area'),
+                'contact_phone': data.get('contact_phone'),
+                'contact_email': data.get('contact_email'),
                 'requisitos_especificos': data.get('requisitos_especificos', {}),
+                'weights': data.get('weights'),
+                'thresholds': data.get('thresholds'),
+                'requirements': data.get('requirements'),
                 'is_active': True,
                 'fecha_inicio': data.get('fecha_inicio'),
                 'fecha_cierre': data.get('fecha_cierre'),
@@ -101,7 +107,9 @@ class OfertaService:
             # Campos permitidos para actualizar
             allowed_fields = [
                 'institutional_profile_id', 'titulo', 'descripcion',
-                'tipo', 'modalidad', 'ubicacion', 'requisitos_especificos',
+                'tipo', 'modalidad', 'ubicacion', 'area',
+                'contact_phone', 'contact_email',
+                'requisitos_especificos', 'weights', 'thresholds', 'requirements',
                 'is_active', 'fecha_inicio', 'fecha_cierre', 'cupos_disponibles'
             ]
 
@@ -369,6 +377,65 @@ class OfertaService:
         except Exception as e:
             logger.error(f"Error obteniendo estadisticas: {e}")
             return {}
+
+    def get_contact_suggestions(self, institution_id: str) -> Dict:
+        """
+        Retorna el ultimo telefono, correo y area usados en ofertas de la institucion.
+
+        Busca primero en las ofertas mas recientes de la institucion, y como
+        fallback usa los datos del perfil institucional directamente.
+
+        Args:
+            institution_id: ID del perfil institucional
+
+        Returns:
+            Dict con contact_phone, contact_email, area (pueden ser None)
+        """
+        if not supabase:
+            raise ValueError("Base de datos no configurada")
+
+        suggestions = {'contact_phone': None, 'contact_email': None, 'area': None}
+
+        try:
+            # Buscar en ofertas recientes de la institucion
+            response = supabase.table("ofertas_laborales") \
+                .select("contact_phone, contact_email, area") \
+                .eq("institutional_profile_id", institution_id) \
+                .order("updated_at", desc=True) \
+                .limit(10) \
+                .execute()
+
+            if response.data:
+                for oferta in response.data:
+                    if not suggestions['contact_phone'] and oferta.get('contact_phone'):
+                        suggestions['contact_phone'] = oferta['contact_phone']
+                    if not suggestions['contact_email'] and oferta.get('contact_email'):
+                        suggestions['contact_email'] = oferta['contact_email']
+                    if not suggestions['area'] and oferta.get('area'):
+                        suggestions['area'] = oferta['area']
+                    if all(suggestions.values()):
+                        break
+
+            # Fallback: datos del perfil institucional
+            if not all(suggestions.values()):
+                profile_response = supabase.table("institutional_profiles") \
+                    .select("contact_phone, contact_email, area") \
+                    .eq("id", institution_id) \
+                    .execute()
+
+                if profile_response.data:
+                    p = profile_response.data[0]
+                    if not suggestions['contact_phone']:
+                        suggestions['contact_phone'] = p.get('contact_phone')
+                    if not suggestions['contact_email']:
+                        suggestions['contact_email'] = p.get('contact_email')
+                    if not suggestions['area']:
+                        suggestions['area'] = p.get('area')
+
+        except Exception as e:
+            logger.error(f"Error obteniendo sugerencias de contacto: {e}")
+
+        return suggestions
 
     def _enrich_oferta(self, oferta: Dict) -> Dict:
         """

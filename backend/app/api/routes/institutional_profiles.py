@@ -59,6 +59,9 @@ async def list_active_institutional_profiles(
                 institution_name=p['institution_name'],
                 sector=p['sector'],
                 description=p.get('description'),
+                area=p.get('area'),
+                contact_phone=p.get('contact_phone'),
+                contact_email=p.get('contact_email'),
                 weights=p.get('weights', {}),
                 requirements=p.get('requirements', {}),
                 thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),
@@ -117,6 +120,9 @@ async def list_institutional_profiles(
                 institution_name=p['institution_name'],
                 sector=p['sector'],
                 description=p.get('description'),
+                area=p.get('area'),
+                contact_phone=p.get('contact_phone'),
+                contact_email=p.get('contact_email'),
                 weights=p.get('weights', {}),
                 requirements=p.get('requirements', {}),
                 thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),
@@ -175,6 +181,9 @@ async def get_institutional_profile(
             institution_name=p['institution_name'],
             sector=p['sector'],
             description=p.get('description'),
+            ubicacion=p.get('ubicacion'),
+            contact_phone=p.get('contact_phone'),
+            contact_email=p.get('contact_email'),
             weights=p.get('weights', {}),
             requirements=p.get('requirements', {}),
             thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),
@@ -230,6 +239,9 @@ async def create_institutional_profile(
             'institution_name': profile.institution_name,
             'sector': profile.sector,
             'description': profile.description,
+            'ubicacion': profile.ubicacion,
+            'contact_phone': profile.contact_phone,
+            'contact_email': profile.contact_email,
             'weights': profile.weights.model_dump(),
             'requirements': profile.requirements.model_dump(),
             'thresholds': profile.thresholds.model_dump() if profile.thresholds else {
@@ -262,6 +274,9 @@ async def create_institutional_profile(
             institution_name=p['institution_name'],
             sector=p['sector'],
             description=p.get('description'),
+            ubicacion=p.get('ubicacion'),
+            contact_phone=p.get('contact_phone'),
+            contact_email=p.get('contact_email'),
             weights=p.get('weights', {}),
             requirements=p.get('requirements', {}),
             thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),
@@ -334,6 +349,12 @@ async def update_institutional_profile(
             update_data['sector'] = profile.sector
         if profile.description is not None:
             update_data['description'] = profile.description
+        if profile.ubicacion is not None:
+            update_data['ubicacion'] = profile.ubicacion
+        if profile.contact_phone is not None:
+            update_data['contact_phone'] = profile.contact_phone
+        if profile.contact_email is not None:
+            update_data['contact_email'] = profile.contact_email
         if profile.weights is not None:
             update_data['weights'] = profile.weights.model_dump()
         if profile.requirements is not None:
@@ -360,6 +381,9 @@ async def update_institutional_profile(
             institution_name=p['institution_name'],
             sector=p['sector'],
             description=p.get('description'),
+            ubicacion=p.get('ubicacion'),
+            contact_phone=p.get('contact_phone'),
+            contact_email=p.get('contact_email'),
             weights=p.get('weights', {}),
             requirements=p.get('requirements', {}),
             thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),

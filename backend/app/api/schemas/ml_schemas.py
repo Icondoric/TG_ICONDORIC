@@ -74,6 +74,9 @@ class InstitutionalProfileCreate(BaseModel):
     institution_name: str = Field(min_length=2, max_length=200, description="Nombre de la institucion")
     sector: str = Field(min_length=2, max_length=100, description="Sector de la institucion")
     description: Optional[str] = Field(default=None, max_length=1000, description="Descripcion")
+    ubicacion: Optional[str] = Field(default=None, max_length=200, description="Ubicacion geografica")
+    contact_phone: Optional[str] = Field(default=None, max_length=50, description="Telefono de contacto")
+    contact_email: Optional[str] = Field(default=None, max_length=200, description="Correo de contacto")
     weights: InstitutionalWeights
     requirements: InstitutionalRequirements
     thresholds: Optional[InstitutionalThresholds] = None
@@ -111,6 +114,9 @@ class InstitutionalProfileUpdate(BaseModel):
     institution_name: Optional[str] = Field(default=None, min_length=2, max_length=200)
     sector: Optional[str] = Field(default=None, min_length=2, max_length=100)
     description: Optional[str] = Field(default=None, max_length=1000)
+    ubicacion: Optional[str] = Field(default=None, max_length=200)
+    contact_phone: Optional[str] = Field(default=None, max_length=50)
+    contact_email: Optional[str] = Field(default=None, max_length=200)
     weights: Optional[InstitutionalWeights] = None
     requirements: Optional[InstitutionalRequirements] = None
     thresholds: Optional[InstitutionalThresholds] = None
@@ -123,6 +129,9 @@ class InstitutionalProfileResponse(BaseModel):
     institution_name: str
     sector: str
     description: Optional[str] = None
+    ubicacion: Optional[str] = None
+    contact_phone: Optional[str] = None
+    contact_email: Optional[str] = None
     weights: Dict[str, float]
     requirements: Dict[str, Any]
     thresholds: Dict[str, float]
@@ -379,6 +388,13 @@ class PerfilProfesionalResponse(BaseModel):
     experience_years: float = 0
     languages: List[str] = Field(default=[])
 
+    # Información personal (pre-cargada desde CV, editable)
+    nombre_completo: Optional[str] = None
+    direccion: Optional[str] = None
+    telefono: Optional[str] = None
+    email_contacto: Optional[str] = None
+    nacionalidad: Optional[str] = None
+
     # Metadatos del CV
     cv_filename: Optional[str] = None
     cv_uploaded_at: Optional[datetime] = None
@@ -425,6 +441,13 @@ class PerfilProfesionalUpdate(BaseModel):
     education_level: Optional[str] = None
     experience_years: Optional[float] = Field(default=None, ge=0)
     languages: Optional[List[str]] = None
+
+    # Información personal
+    nombre_completo: Optional[str] = Field(default=None, max_length=200)
+    direccion: Optional[str] = Field(default=None, max_length=300)
+    telefono: Optional[str] = Field(default=None, max_length=50)
+    email_contacto: Optional[str] = Field(default=None, max_length=200)
+    nacionalidad: Optional[str] = Field(default=None, max_length=100)
 
     @field_validator('education_level')
     @classmethod
@@ -496,10 +519,16 @@ class OfertaLaboralCreate(BaseModel):
     tipo: str = Field(description="Tipo: 'pasantia' o 'empleo'")
     modalidad: Optional[str] = Field(default=None, description="Modalidad: 'presencial', 'remoto', 'hibrido'")
     ubicacion: Optional[str] = Field(default=None, max_length=200, description="Ubicacion geografica")
+    area: Optional[str] = Field(default=None, max_length=200, description="Area o departamento de la oferta")
+    contact_phone: Optional[str] = Field(default=None, max_length=50, description="Telefono de contacto de la oferta")
+    contact_email: Optional[str] = Field(default=None, max_length=200, description="Correo de contacto de la oferta")
     requisitos_especificos: Optional[Dict[str, Any]] = Field(default={}, description="Requisitos adicionales")
     fecha_inicio: Optional[str] = Field(default=None, description="Fecha inicio (YYYY-MM-DD)")
     fecha_cierre: Optional[str] = Field(default=None, description="Fecha cierre (YYYY-MM-DD)")
     cupos_disponibles: int = Field(default=1, ge=1, description="Numero de cupos")
+    weights: Optional[InstitutionalWeights] = Field(default=None, description="Pesos propios (None = heredar de institucion)")
+    thresholds: Optional[InstitutionalThresholds] = Field(default=None, description="Umbrales propios (None = heredar de institucion)")
+    requirements: Optional[InstitutionalRequirements] = Field(default=None, description="Requisitos propios (None = heredar de institucion)")
 
     @field_validator('tipo')
     @classmethod
@@ -539,11 +568,17 @@ class OfertaLaboralUpdate(BaseModel):
     tipo: Optional[str] = None
     modalidad: Optional[str] = None
     ubicacion: Optional[str] = Field(default=None, max_length=200)
+    area: Optional[str] = Field(default=None, max_length=200)
+    contact_phone: Optional[str] = Field(default=None, max_length=50)
+    contact_email: Optional[str] = Field(default=None, max_length=200)
     requisitos_especificos: Optional[Dict[str, Any]] = None
     fecha_inicio: Optional[str] = None
     fecha_cierre: Optional[str] = None
     cupos_disponibles: Optional[int] = Field(default=None, ge=1)
     is_active: Optional[bool] = None
+    weights: Optional[InstitutionalWeights] = None
+    thresholds: Optional[InstitutionalThresholds] = None
+    requirements: Optional[InstitutionalRequirements] = None
 
     @field_validator('tipo')
     @classmethod
@@ -572,7 +607,15 @@ class OfertaLaboralResponse(BaseModel):
     tipo: str
     modalidad: Optional[str] = None
     ubicacion: Optional[str] = None
+    area: Optional[str] = None
+    contact_phone: Optional[str] = None
+    contact_email: Optional[str] = None
     requisitos_especificos: Optional[Dict[str, Any]] = Field(default={})
+
+    # Config propia de la oferta (None = heredar de institucion)
+    weights: Optional[Dict[str, float]] = None
+    thresholds: Optional[Dict[str, float]] = None
+    requirements: Optional[Dict[str, Any]] = None
 
     is_active: bool
     fecha_inicio: Optional[str] = None

@@ -1,0 +1,251 @@
+@startuml Diagrama_Actividades_Evaluacion_de_Perfiles
+
+' ============================================================
+'  DIAGRAMA DE ACTIVIDADES
+'  Módulo: Evaluación de Perfiles (Sprint 5)
+'  Sistema: TG ICONDORIC - EMI
+'  Cubre los 3 sub-módulos:
+'    1. Correspondencia entre Perfiles (Postulación)
+'    2. Historial de Postulaciones
+'    3. Evaluación de Candidatos (Admin)
+' ============================================================
+
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Inter
+skinparam defaultFontSize 11
+
+skinparam activity {
+    BackgroundColor #E8EAF6
+    BorderColor #3949AB
+    DiamondBackgroundColor #FFF9C4
+    DiamondBorderColor #F9A825
+}
+
+skinparam partition {
+    BackgroundColor #F5F5F5
+    BorderColor #9E9E9E
+}
+
+title **Diagrama de Actividades — Módulo Evaluación de Perfiles**\n//Sistema TG ICONDORIC - EMI//
+
+|#E8EAF6| Candidato (Estudiante/Titulado) |
+|#E3F2FD| Frontend (Vue.js) |
+|#E8F5E9| Backend (FastAPI) |
+|#FFF3E0| Motor ML (TF-IDF + Coseno) |
+|#FCE4EC| Base de Datos (Supabase) |
+
+' ════════════════════════════════════════════════════════════
+'  FLUJO 1: CORRESPONDENCIA ENTRE PERFILES (POSTULACIÓN)
+' ════════════════════════════════════════════════════════════
+
+|Candidato (Estudiante/Titulado)|
+start
+:Acceder al módulo\n"Correspondencia entre Perfiles";
+
+|Frontend (Vue.js)|
+:Cargar PostulacionesView;
+
+|Backend (FastAPI)|
+:POST /api/recommendations/check-eligibility;
+:Verificar elegibilidad\n(CV cargado, perfil completo);
+
+|Frontend (Vue.js)|
+if (¿Usuario elegible?) then (sí)
+    |Backend (FastAPI)|
+    :GET /api/postulaciones/ofertas;
+    :Filtrar ofertas por rol\n(Estudiante→Pasantías,\nTitulado→Empleos);
+
+    |Base de Datos (Supabase)|
+    :SELECT ofertas\nWHERE is_active = true\nAND tipo = filtro_rol;
+
+    |Backend (FastAPI)|
+    :GET /api/postulaciones;
+    :Obtener postulaciones previas;
+
+    |Base de Datos (Supabase)|
+    :SELECT postulaciones\nWHERE user_id = usuario;
+
+    |Frontend (Vue.js)|
+    :Mostrar lista de ofertas\ncon filtros (Todas/Pasantías/Empleos);
+    :Marcar ofertas ya postuladas\ncon badge y score;
+
+    |Candidato (Estudiante/Titulado)|
+    :Explorar ofertas disponibles;
+    :Expandir detalles de oferta\n(requisitos, institución, fechas);
+
+    if (¿Ya se postuló a esta oferta?) then (sí)
+        |Frontend (Vue.js)|
+        :Mostrar resultado previo\n(badge APTO/CONSIDERADO/NO_APTO\ny porcentaje de match);
+    else (no)
+        |Candidato (Estudiante/Titulado)|
+        :Presionar botón "Postularme";
+
+        |Frontend (Vue.js)|
+        :Mostrar estado "Analizando...";
+
+        |Backend (FastAPI)|
+        :POST /api/postulaciones/{oferta_id};
+
+        :Obtener CV procesado del usuario;
+        |Base de Datos (Supabase)|
+        :SELECT gemini_extraction\nFROM users\nWHERE id = user_id;
+
+        |Backend (FastAPI)|
+        :Cargar configuración de\nperfil institucional;
+
+        |Base de Datos (Supabase)|
+        :SELECT * FROM institutional_profiles\nWHERE id = oferta.institutional_profile_id;
+
+        |Backend (FastAPI)|
+        if (¿Tiene perfil institucional?) then (sí)
+            :Usar config del perfil\n(weights, thresholds, requirements);
+        else (no)
+            :Crear perfil genérico\ncon requisitos de la oferta;
+        endif
+
+        |Motor ML (TF-IDF + Coseno)|
+        :Extraer features del CV;
+        :Vectorizar habilidades\n(TF-IDF Vectorizer);
+        :Calcular similitud coseno\npor cada dimensión;
+        note right
+          **5 Dimensiones evaluadas:**
+          1. Hard Skills Score
+          2. Soft Skills Score
+          3. Education Score
+          4. Experience Score
+          5. Languages Score
+        end note
+        :Calcular match_score global\n(suma ponderada);
+        :Identificar fortalezas\ny debilidades;
+        :Generar match_details\n(skills matched/missing);
+
+        |Backend (FastAPI)|
+        if (match_score ≥ 0.70) then
+            :Clasificar como **APTO**;
+        elseif (match_score ≥ 0.40) then
+            :Clasificar como **CONSIDERADO**;
+        else
+            :Clasificar como **NO_APTO**;
+        endif
+
+        |Base de Datos (Supabase)|
+        :UPSERT INTO postulaciones\n(user_id, oferta_id, match_score,\nclasificacion, scores_detalle,\nfortalezas, debilidades,\nmatch_details);
+
+        |Frontend (Vue.js)|
+        :Mostrar resultado:\n• Badge de clasificación\n• Porcentaje de match\n• Desglose de scores\n• Fortalezas/Debilidades;
+
+        |Candidato (Estudiante/Titulado)|
+        :Revisar análisis\nde compatibilidad;
+    endif
+else (no)
+    |Frontend (Vue.js)|
+    :Mostrar aviso de elegibilidad\n(EligibilityWarning)\ncon razón y campos faltantes;
+
+    |Candidato (Estudiante/Titulado)|
+    :Completar perfil / subir CV;
+endif
+
+' ════════════════════════════════════════════════════════════
+'  FLUJO 2: HISTORIAL DE POSTULACIONES
+' ════════════════════════════════════════════════════════════
+
+|Candidato (Estudiante/Titulado)|
+:Acceder a\n"Historial de Postulaciones";
+
+|Frontend (Vue.js)|
+:Cargar HistorialPostulacionesView;
+
+|Backend (FastAPI)|
+:Verificar elegibilidad;
+:GET /api/postulaciones;
+:Obtener todas las postulaciones;
+
+|Base de Datos (Supabase)|
+:SELECT postulaciones + ofertas\nJOIN ofertas ON oferta_id\nORDER BY created_at DESC;
+
+|Frontend (Vue.js)|
+:Calcular estadísticas:\n• Total APTO\n• Total CONSIDERADO\n• Total NO_APTO;
+:Mostrar grid de resumen\ncon barras de progreso;
+:Listar postulaciones como\ntarjetas expandibles;
+
+|Candidato (Estudiante/Titulado)|
+:Expandir postulación para\nver detalle completo;
+
+|Frontend (Vue.js)|
+:Mostrar panel expandido:\n• Info de la oferta\n• Institución y contacto\n• Desglose de scores\n• Match details\n  (skills matched/missing);
+
+' ════════════════════════════════════════════════════════════
+'  FLUJO 3: EVALUACIÓN DE CANDIDATOS (ADMIN)
+' ════════════════════════════════════════════════════════════
+
+|#E1F5FE| Administrador |
+:Acceder a\n"Evaluación de Candidatos";
+
+|Frontend (Vue.js)|
+:Cargar RankingCandidatosView\n(layout dual-panel);
+
+|Backend (FastAPI)|
+:GET /api/admin/ranking/ofertas;
+:Listar ofertas con estadísticas\nde postulaciones;
+
+|Base de Datos (Supabase)|
+:SELECT ofertas +\nCOUNT postulaciones\nGROUP BY clasificacion;
+
+|Frontend (Vue.js)|
+:Panel izquierdo:\nMostrar lista de ofertas\ncon mini-barras de stats\n(APTO/CONSIDERADO/NO_APTO);
+:Aplicar filtros:\n• Búsqueda por texto\n• Tipo (Todas/Pasantías/Empleos)\n• Estado (Todas/Activas/Cerradas)\n• Top N (3/5/10);
+
+|Administrador|
+:Seleccionar una oferta\nde la lista;
+
+|Backend (FastAPI)|
+:GET /api/admin/ranking/{oferta_id}\n?top_n=N;
+:Consultar Top N postulaciones\nordenadas por match_score DESC;
+
+|Base de Datos (Supabase)|
+:SELECT postulaciones + users\nWHERE oferta_id = seleccionada\nORDER BY match_score DESC\nLIMIT top_n;
+
+|Backend (FastAPI)|
+:Enriquecer datos de candidatos:\n• Nombre, email, teléfono\n• Hard/soft skills\n• Education level\n• Experience years\n• Languages;
+
+|Frontend (Vue.js)|
+:Panel derecho:\nMostrar encabezado de oferta\ncon banner de color;
+:Sección convocatoria:\n• Descripción\n• Cupos, modalidad, ubicación\n• Requisitos (skills, educación)\n• Fechas y contacto;
+:Sección ranking:\nCards de candidatos con:\n• Badge de posición (#1, #2, #3)\n• Nombre y clasificación\n• Score % y barra de progreso\n• Tags de fortalezas/debilidades;
+
+|Administrador|
+:Expandir candidato para\nver justificación detallada;
+
+|Frontend (Vue.js)|
+:Mostrar justificación:\n• Resumen del perfil\n• Hard/soft skills declaradas\n• Score por dimensión (ProgressBar)\n• Match details (skills matched/missing);
+
+|Administrador|
+if (¿Generar informe PDF?) then (sí)
+    :Presionar "Generar Informe";
+
+    |Backend (FastAPI)|
+    :GET /api/admin/ranking/{oferta_id}/informe;
+    :Construir documento PDF\ncon ReportLab;
+    note right
+      **Contenido del PDF:**
+      • Portada institucional EMI
+      • Resumen ejecutivo
+      • Datos de la convocatoria
+      • Ranking de candidatos
+      • Justificación por dimensión
+      • Firma del evaluador
+    end note
+
+    |Frontend (Vue.js)|
+    :Descargar PDF automáticamente;
+
+    |Administrador|
+    :Revisar informe PDF;
+else (no)
+    |Administrador|
+    :Navegar a perfil completo\ndel candidato (opcional);
+endif
+
+stop
+
+@enduml

@@ -106,7 +106,7 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
             <!-- Header -->
             <header class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-slate-800">Gestion de Usuarios</h1>
+                    <h1 class="text-3xl font-bold text-slate-800">Lista de Usuarios</h1>
                     <p class="mt-1 text-slate-600">
                         Administra las cuentas de estudiantes, titulados y administradores.
                     </p>

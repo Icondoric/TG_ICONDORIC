@@ -10,6 +10,7 @@ const OffersReportView = () => import('@/features/admin/views/OffersReportView.v
 const ProfilesReportView = () => import('@/features/admin/views/ProfilesReportView.vue')
 const OfertasAdminView = () => import('@/features/admin/views/OfertasAdminView.vue')
 const OfertaFormView = () => import('@/features/admin/views/OfertaFormView.vue')
+const RankingCandidatosView = () => import('@/features/admin/views/RankingCandidatosView.vue')
 
 const adminMeta = { requiresAuth: true, requiresAdmin: true, hideNavbar: true }
 const adminOnlyMeta = { requiresAuth: true, requiresAdminOnly: true, hideNavbar: true }
@@ -97,6 +98,12 @@ export default [
         path: '/admin/ofertas/edit/:id',
         name: 'admin-ofertas-edit',
         component: OfertaFormView,
+        meta: adminMeta
+    },
+    {
+        path: '/admin/ranking-candidatos',
+        name: 'admin-ranking-candidatos',
+        component: RankingCandidatosView,
         meta: adminMeta
     }
 ]

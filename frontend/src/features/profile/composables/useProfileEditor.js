@@ -12,7 +12,13 @@ export function useProfileEditor() {
         completeness_score: 0,
         cv_filename: null,
         cv_uploaded_at: null,
-        gemini_extraction: {}
+        gemini_extraction: {},
+        // Información personal
+        nombre_completo: null,
+        direccion: null,
+        telefono: null,
+        email_contacto: null,
+        nacionalidad: null
     })
     const completeness = ref(null)
     const loading = ref(true)
@@ -33,7 +39,13 @@ export function useProfileEditor() {
         soft_skills: [],
         languages: [],
         education_level: '',
-        experience_years: 0
+        experience_years: 0,
+        // Información personal
+        nombre_completo: '',
+        direccion: '',
+        telefono: '',
+        email_contacto: '',
+        nacionalidad: ''
     })
     const saving = ref(false)
     const newHardSkill = ref('')
@@ -183,6 +195,14 @@ export function useProfileEditor() {
                 editModal.value.title = 'Editar Experiencia'
                 editForm.value.experience_years = profile.value.experience_years || 0
                 break
+            case 'personal_info':
+                editModal.value.title = 'Información Personal'
+                editForm.value.nombre_completo = profile.value.nombre_completo || ''
+                editForm.value.telefono = profile.value.telefono || ''
+                editForm.value.email_contacto = profile.value.email_contacto || ''
+                editForm.value.direccion = profile.value.direccion || ''
+                editForm.value.nacionalidad = profile.value.nacionalidad || ''
+                break
         }
     }
 
@@ -224,6 +244,13 @@ export function useProfileEditor() {
                     break
                 case 'experience':
                     updates.experience_years = editForm.value.experience_years
+                    break
+                case 'personal_info':
+                    updates.nombre_completo = editForm.value.nombre_completo || null
+                    updates.telefono = editForm.value.telefono || null
+                    updates.email_contacto = editForm.value.email_contacto || null
+                    updates.direccion = editForm.value.direccion || null
+                    updates.nacionalidad = editForm.value.nacionalidad || null
                     break
             }
 

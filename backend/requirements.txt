@@ -28,3 +28,6 @@ seaborn
 
 # ML / Modelo Ridge (Fase 4)
 joblib
+
+# Generación de informes PDF
+reportlab>=4.0.0

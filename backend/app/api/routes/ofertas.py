@@ -25,6 +25,56 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/admin/ofertas", tags=["Admin - Ofertas"])
 
 
+def _oferta_to_response(o: dict) -> OfertaLaboralResponse:
+    """Convierte un dict de oferta al schema de respuesta."""
+    return OfertaLaboralResponse(
+        id=o['id'],
+        institutional_profile_id=o.get('institutional_profile_id'),
+        institution_name=o.get('institution_name'),
+        sector=o.get('sector'),
+        titulo=o['titulo'],
+        descripcion=o.get('descripcion'),
+        tipo=o['tipo'],
+        modalidad=o.get('modalidad'),
+        ubicacion=o.get('ubicacion'),
+        area=o.get('area'),
+        contact_phone=o.get('contact_phone'),
+        contact_email=o.get('contact_email'),
+        requisitos_especificos=o.get('requisitos_especificos', {}),
+        weights=o.get('weights'),
+        thresholds=o.get('thresholds'),
+        requirements=o.get('requirements'),
+        is_active=o['is_active'],
+        fecha_inicio=o.get('fecha_inicio'),
+        fecha_cierre=o.get('fecha_cierre'),
+        cupos_disponibles=o.get('cupos_disponibles', 1),
+        created_by=o.get('created_by'),
+        created_at=o['created_at'],
+        updated_at=o['updated_at']
+    )
+
+
+@router.get("/contact-suggestions")
+async def get_contact_suggestions(
+    institution_id: str = Query(..., description="ID del perfil institucional"),
+    admin_user: dict = Depends(verify_operator_access)
+):
+    """
+    Retorna sugerencias de contacto para una institucion.
+
+    Busca el ultimo telefono, correo y area usados en las ofertas de esa
+    institucion para pre-rellenar el formulario de nueva oferta.
+    """
+    oferta_service = get_oferta_service()
+
+    try:
+        suggestions = oferta_service.get_contact_suggestions(institution_id)
+        return suggestions
+    except Exception as e:
+        logger.error(f"Error obteniendo sugerencias de contacto: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("", response_model=OfertaLaboralListResponse)
 async def list_ofertas(
     tipo: Optional[str] = Query(None, description="Filtrar por tipo: 'pasantia' o 'empleo'"),
@@ -52,28 +102,7 @@ async def list_ofertas(
             page_size=page_size
         )
 
-        ofertas_response = [
-            OfertaLaboralResponse(
-                id=o['id'],
-                institutional_profile_id=o.get('institutional_profile_id'),
-                institution_name=o.get('institution_name'),
-                sector=o.get('sector'),
-                titulo=o['titulo'],
-                descripcion=o.get('descripcion'),
-                tipo=o['tipo'],
-                modalidad=o.get('modalidad'),
-                ubicacion=o.get('ubicacion'),
-                requisitos_especificos=o.get('requisitos_especificos', {}),
-                is_active=o['is_active'],
-                fecha_inicio=o.get('fecha_inicio'),
-                fecha_cierre=o.get('fecha_cierre'),
-                cupos_disponibles=o.get('cupos_disponibles', 1),
-                created_by=o.get('created_by'),
-                created_at=o['created_at'],
-                updated_at=o['updated_at']
-            )
-            for o in result['ofertas']
-        ]
+        ofertas_response = [_oferta_to_response(o) for o in result['ofertas']]
 
         return OfertaLaboralListResponse(
             ofertas=ofertas_response,
@@ -108,25 +137,7 @@ async def get_oferta(
                 detail="Oferta no encontrada"
             )
 
-        return OfertaLaboralResponse(
-            id=oferta['id'],
-            institutional_profile_id=oferta.get('institutional_profile_id'),
-            institution_name=oferta.get('institution_name'),
-            sector=oferta.get('sector'),
-            titulo=oferta['titulo'],
-            descripcion=oferta.get('descripcion'),
-            tipo=oferta['tipo'],
-            modalidad=oferta.get('modalidad'),
-            ubicacion=oferta.get('ubicacion'),
-            requisitos_especificos=oferta.get('requisitos_especificos', {}),
-            is_active=oferta['is_active'],
-            fecha_inicio=oferta.get('fecha_inicio'),
-            fecha_cierre=oferta.get('fecha_cierre'),
-            cupos_disponibles=oferta.get('cupos_disponibles', 1),
-            created_by=oferta.get('created_by'),
-            created_at=oferta['created_at'],
-            updated_at=oferta['updated_at']
-        )
+        return _oferta_to_response(oferta)
 
     except HTTPException:
         raise
@@ -165,25 +176,7 @@ async def create_oferta(
             created_by=admin_user['user_id']
         )
 
-        return OfertaLaboralResponse(
-            id=oferta['id'],
-            institutional_profile_id=oferta.get('institutional_profile_id'),
-            institution_name=oferta.get('institution_name'),
-            sector=oferta.get('sector'),
-            titulo=oferta['titulo'],
-            descripcion=oferta.get('descripcion'),
-            tipo=oferta['tipo'],
-            modalidad=oferta.get('modalidad'),
-            ubicacion=oferta.get('ubicacion'),
-            requisitos_especificos=oferta.get('requisitos_especificos', {}),
-            is_active=oferta['is_active'],
-            fecha_inicio=oferta.get('fecha_inicio'),
-            fecha_cierre=oferta.get('fecha_cierre'),
-            cupos_disponibles=oferta.get('cupos_disponibles', 1),
-            created_by=oferta.get('created_by'),
-            created_at=oferta['created_at'],
-            updated_at=oferta['updated_at']
-        )
+        return _oferta_to_response(oferta)
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -216,25 +209,7 @@ async def update_oferta(
 
         oferta = oferta_service.update_oferta(oferta_id, update_dict)
 
-        return OfertaLaboralResponse(
-            id=oferta['id'],
-            institutional_profile_id=oferta.get('institutional_profile_id'),
-            institution_name=oferta.get('institution_name'),
-            sector=oferta.get('sector'),
-            titulo=oferta['titulo'],
-            descripcion=oferta.get('descripcion'),
-            tipo=oferta['tipo'],
-            modalidad=oferta.get('modalidad'),
-            ubicacion=oferta.get('ubicacion'),
-            requisitos_especificos=oferta.get('requisitos_especificos', {}),
-            is_active=oferta['is_active'],
-            fecha_inicio=oferta.get('fecha_inicio'),
-            fecha_cierre=oferta.get('fecha_cierre'),
-            cupos_disponibles=oferta.get('cupos_disponibles', 1),
-            created_by=oferta.get('created_by'),
-            created_at=oferta['created_at'],
-            updated_at=oferta['updated_at']
-        )
+        return _oferta_to_response(oferta)
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -335,25 +310,7 @@ async def activate_oferta(
     try:
         oferta = oferta_service.activate_oferta(oferta_id)
 
-        return OfertaLaboralResponse(
-            id=oferta['id'],
-            institutional_profile_id=oferta.get('institutional_profile_id'),
-            institution_name=oferta.get('institution_name'),
-            sector=oferta.get('sector'),
-            titulo=oferta['titulo'],
-            descripcion=oferta.get('descripcion'),
-            tipo=oferta['tipo'],
-            modalidad=oferta.get('modalidad'),
-            ubicacion=oferta.get('ubicacion'),
-            requisitos_especificos=oferta.get('requisitos_especificos', {}),
-            is_active=oferta['is_active'],
-            fecha_inicio=oferta.get('fecha_inicio'),
-            fecha_cierre=oferta.get('fecha_cierre'),
-            cupos_disponibles=oferta.get('cupos_disponibles', 1),
-            created_by=oferta.get('created_by'),
-            created_at=oferta['created_at'],
-            updated_at=oferta['updated_at']
-        )
+        return _oferta_to_response(oferta)
 
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

@@ -1,54 +1,60 @@
 <template>
   <AppLayout>
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-emi-navy-500">Configuración de Cuenta</h1>
-        <p class="mt-2 text-gray-600">
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">Configurar Mi Cuenta</h1>
+        <p class="mt-1 text-slate-600">
           Administra tu información personal y configuración de seguridad
         </p>
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="flex justify-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emi-navy-500"></div>
+      <div v-if="loading" class="bg-white rounded-xl shadow-md p-12 text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="mt-4 text-slate-500">Cargando datos...</p>
       </div>
 
       <!-- Error State -->
-      <Card v-else-if="error" class="border-red-200 bg-red-50">
+      <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-xl p-4">
         <p class="text-red-700">{{ error }}</p>
-        <button @click="loadAccountInfo" class="mt-2 text-red-600 hover:text-red-800 underline">
+        <button @click="loadAccountInfo" class="mt-2 text-red-600 hover:text-red-800 underline text-sm">
           Reintentar
         </button>
-      </Card>
+      </div>
 
       <!-- Content -->
       <div v-else class="space-y-6">
-        <!-- Account Information Card -->
-
 
         <!-- Personal Information Card -->
-        <Card title="Información Personal">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-5">
+            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Información Personal
+          </h2>
           <form @submit.prevent="updatePersonalInfo" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
-              <input
-                v-model="personalForm.nombre_completo"
-                type="text"
-                placeholder="Ingresa tu nombre completo"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-              <input
-                v-model="personalForm.email"
-                type="email"
-                placeholder="tu@email.com"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
-              />
-              <p class="mt-1 text-xs text-gray-500">Este email se usará para iniciar sesión</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Nombre Completo</label>
+                <input
+                  v-model="personalForm.nombre_completo"
+                  type="text"
+                  placeholder="Ingresa tu nombre completo"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                <input
+                  v-model="personalForm.email"
+                  type="email"
+                  placeholder="tu@email.com"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <p class="mt-1 text-xs text-slate-500">Este email se usará para iniciar sesión</p>
+              </div>
             </div>
 
             <!-- Success/Error Messages -->
@@ -68,46 +74,53 @@
               <button
                 type="submit"
                 :disabled="savingPersonal || !hasPersonalChanges"
-                class="btn-emi-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
               >
                 {{ savingPersonal ? 'Guardando...' : 'Guardar Cambios' }}
               </button>
             </div>
           </form>
-        </Card>
+        </div>
 
         <!-- Password Change Card -->
-        <Card title="Cambiar Contraseña">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-5">
+            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Cambiar Contraseña
+          </h2>
           <form @submit.prevent="updatePassword" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Contraseña Actual</label>
               <input
                 v-model="passwordForm.current_password"
                 type="password"
                 placeholder="••••••••"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
-              <input
-                v-model="passwordForm.new_password"
-                type="password"
-                placeholder="••••••••"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
-              />
-              <p class="mt-1 text-xs text-gray-500">Mínimo 6 caracteres</p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
-              <input
-                v-model="passwordForm.confirm_password"
-                type="password"
-                placeholder="••••••••"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
-              />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Nueva Contraseña</label>
+                <input
+                  v-model="passwordForm.new_password"
+                  type="password"
+                  placeholder="••••••••"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <p class="mt-1 text-xs text-slate-500">Mínimo 6 caracteres</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Confirmar Nueva Contraseña</label>
+                <input
+                  v-model="passwordForm.confirm_password"
+                  type="password"
+                  placeholder="••••••••"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
             </div>
 
             <!-- Password Validation Messages -->
@@ -132,32 +145,32 @@
               <button
                 type="submit"
                 :disabled="savingPassword || !isPasswordFormValid"
-                class="btn-emi-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
               >
                 {{ savingPassword ? 'Actualizando...' : 'Cambiar Contraseña' }}
               </button>
             </div>
           </form>
-        </Card>
+        </div>
 
         <!-- Security Notice -->
-        <Card class="border-emi-gold-200 bg-emi-gold-50">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-5">
           <div class="flex items-start gap-3">
-            <div class="p-2 bg-emi-gold-100 rounded-full">
-              <svg class="w-5 h-5 text-emi-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
             <div>
-              <h3 class="font-semibold text-emi-gold-800">Seguridad de tu Cuenta</h3>
-              <ul class="mt-2 text-sm text-emi-gold-700 space-y-1">
+              <h3 class="font-semibold text-amber-800">Seguridad de tu Cuenta</h3>
+              <ul class="mt-2 text-sm text-amber-700 space-y-1">
                 <li>• Usa una contraseña segura y única</li>
                 <li>• No compartas tus credenciales con nadie</li>
                 <li>• Si cambias tu email, úsalo para iniciar sesión la próxima vez</li>
               </ul>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   </AppLayout>
@@ -168,8 +181,6 @@ import { ref, computed, onMounted } from 'vue'
 import { getAccountInfo, updateAccount, changePassword } from '@/features/account/api/account.api'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import AppLayout from '@/shared/components/AppLayout.vue'
-import Card from '@/shared/components/ui/Card.vue'
-import Badge from '@/shared/components/ui/Badge.vue'
 
 const authStore = useAuthStore()
 

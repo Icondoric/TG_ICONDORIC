@@ -107,6 +107,12 @@
               </div>
             </Card>
 
+            <!-- Información Personal -->
+            <PersonalInfoCard
+              :profile="profile"
+              @edit="openEditModal('personal_info')"
+            />
+
             <!-- Digitalization Summary -->
             <DigitalizationSummary
               :profile="profile"
@@ -182,6 +188,24 @@
         @refresh="loadProfile"
       />
     </div>
+
+    <!-- Edit Modal -->
+    <EditProfileModal
+      :editModal="editModal"
+      :editForm="editForm"
+      :saving="saving"
+      :newHardSkill="newHardSkill"
+      :newSoftSkill="newSoftSkill"
+      :newLanguage="newLanguage"
+      @close="closeEditModal"
+      @save="saveChanges"
+      @addSkill="addSkill"
+      @removeSkill="removeSkill"
+      @updateField="(field, val) => editForm[field] = val"
+      @update:newHardSkill="newHardSkill = $event"
+      @update:newSoftSkill="newSoftSkill = $event"
+      @update:newLanguage="newLanguage = $event"
+    />
   </AppLayout>
 </template>
 
@@ -196,6 +220,8 @@ import ProfileSidebar from '../components/ProfileSidebar.vue'
 import CompetenciasCard from '../components/CompetenciasCard.vue'
 import EducationExperienceGrid from '../components/EducationExperienceGrid.vue'
 import DigitalizationSummary from '../components/DigitalizationSummary.vue'
+import PersonalInfoCard from '../components/PersonalInfoCard.vue'
+import EditProfileModal from '../components/EditProfileModal.vue'
 import { useProfileEditor } from '../composables/useProfileEditor'
 
 const isSecondarySidebarOpen = ref(true)
@@ -205,11 +231,22 @@ const {
   completeness,
   loading,
   error,
+  editModal,
+  editForm,
+  saving,
+  newHardSkill,
+  newSoftSkill,
+  newLanguage,
   geminiEducation,
   geminiExperience,
   geminiPersonalInfo,
   hasGeminiData,
   formatDate,
-  loadProfile
+  loadProfile,
+  openEditModal,
+  closeEditModal,
+  addSkill,
+  removeSkill,
+  saveChanges
 } = useProfileEditor()
 </script>

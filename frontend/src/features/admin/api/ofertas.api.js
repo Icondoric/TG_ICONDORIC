@@ -39,3 +39,10 @@ export const getOfertasStats = async () => {
     const response = await api.get('/api/admin/ofertas/stats/summary')
     return response.data
 }
+
+export const getContactSuggestions = async (institutionId) => {
+    const response = await api.get('/api/admin/ofertas/contact-suggestions', {
+        params: { institution_id: institutionId }
+    })
+    return response.data
+}

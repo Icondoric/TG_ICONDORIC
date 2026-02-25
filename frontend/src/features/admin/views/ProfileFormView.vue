@@ -1,10 +1,10 @@
 <script setup>
 /**
- * ProfileFormView - Fase 7
+ * ProfileFormView
  * Vista para crear/editar perfiles institucionales
  */
 
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAdminProfilesStore } from '@/features/admin/store/adminProfiles.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
@@ -15,16 +15,19 @@ const router = useRouter()
 const adminProfilesStore = useAdminProfilesStore()
 const authStore = useAuthStore()
 
-// Estado local
 const isLoading = ref(false)
 const isSaving = ref(false)
 const error = ref(null)
 
-// Formulario
 const form = ref({
     institution_name: '',
     sector: '',
     description: '',
+    ubicacion: '',
+    contact_phone: '',
+    contact_email: '',
+    // Pesos con valores por defecto — no se muestran en el formulario,
+    // cada oferta define los suyos propios
     weights: {
         hard_skills: 0.30,
         soft_skills: 0.20,
@@ -46,90 +49,27 @@ const form = ref({
     }
 })
 
-// Para edicion
 const isEditMode = computed(() => !!route.params.id)
 const profileId = computed(() => route.params.id)
 
-// Skills temporales y custom inputs
-const newRequiredSkill = ref('')
-const newPreferredSkill = ref('')
-const newSoftSkill = ref('')
-const newLanguage = ref('')
 const customSector = ref('')
 
-// Opciones
-const educationLevels = [
-    'Bachillerato',
-    'Tecnico',
-    'Licenciatura',
-    'Maestria',
-    'Doctorado'
-]
-
 const sectorOptions = [
-    'Tecnologia',
-    'Finanzas',
-    'Salud',
-    'Educacion',
-    'Construccion',
-    'Comercio',
-    'Servicios',
-    'Industria',
-    'Gobierno',
-    'ONG',
-    'Otro'
+    'Tecnologia', 'Finanzas', 'Salud', 'Educacion',
+    'Construccion', 'Comercio', 'Servicios', 'Industria',
+    'Gobierno', 'ONG', 'Otro'
 ]
-
-// Listas comunes para autocompletado
-const commonSkills = [
-    'Python', 'Java', 'JavaScript', 'TypeScript', 'C++', 'C#', 'SQL', 'NoSQL',
-    'React', 'Vue.js', 'Angular', 'Node.js', 'Django', 'FastAPI', 'Spring Boot',
-    'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP',
-    'Machine Learning', 'Data Analysis', 'Project Management', 'Scrum', 'Agile',
-    'Communication', 'Leadership', 'Teamwork', 'Problem Solving', 'Critical Thinking'
-]
-
-const commonSoftSkills = [
-    'Comunicacion', 'Trabajo en equipo', 'Liderazgo', 'Proactividad', 'Responsabilidad',
-    'Adaptabilidad', 'Resolucion de problemas', 'Pensamiento critico', 'Creatividad',
-    'Gestion del tiempo', 'Orientacion al detalle', 'Trabajo bajo presion',
-    'Iniciativa', 'Empatia', 'Negociacion', 'Presentaciones', 'Toma de decisiones',
-    'Planificacion', 'Organizacion', 'Orientacion a resultados'
-]
-
-const commonLanguages = [
-    'Espanol (Nativo)', 'Espanol (Avanzado)',
-    'Ingles (A1)', 'Ingles (A2)', 'Ingles (B1)', 'Ingles (B2)', 'Ingles (C1)', 'Ingles (C2)',
-    'Frances (B1)', 'Frances (B2)',
-    'Portugues (B1)', 'Portugues (B2)',
-    'Aymara (Basico)', 'Quechua (Basico)'
-]
-
-// Computed
-const weightsSum = computed(() => {
-    const weights = form.value.weights
-    return Object.values(weights).reduce((a, b) => a + b, 0)
-})
-
-const isWeightsValid = computed(() => {
-    return Math.abs(weightsSum.value - 1.0) < 0.01
-})
-
-const isThresholdsValid = computed(() => {
-    return form.value.thresholds.apto > form.value.thresholds.considerado
-})
 
 const canSave = computed(() => {
-    const isSectorValid = form.value.sector === 'Otro' ? customSector.value.trim().length > 0 : !!form.value.sector
+    const isSectorValid = form.value.sector === 'Otro'
+        ? customSector.value.trim().length > 0
+        : !!form.value.sector
 
     return form.value.institution_name.trim() &&
            isSectorValid &&
-           isWeightsValid.value &&
-           isThresholdsValid.value &&
            !isSaving.value
 })
 
-// Cargar datos si es edicion
 onMounted(async () => {
     if (!authStore.isAdminOrOperator) {
         router.push('/dashboard')
@@ -141,11 +81,11 @@ onMounted(async () => {
         try {
             await adminProfilesStore.loadProfile(profileId.value)
             if (adminProfilesStore.currentProfile) {
-                // Poblar formulario
-                form.value.institution_name = adminProfilesStore.currentProfile.institution_name
+                const p = adminProfilesStore.currentProfile
 
-                // Manejo de Sector Personalizado
-                const loadedSector = adminProfilesStore.currentProfile.sector
+                form.value.institution_name = p.institution_name
+
+                const loadedSector = p.sector
                 if (sectorOptions.includes(loadedSector)) {
                     form.value.sector = loadedSector
                 } else {
@@ -153,86 +93,26 @@ onMounted(async () => {
                     customSector.value = loadedSector
                 }
 
-                form.value.description = adminProfilesStore.currentProfile.description || ''
-                form.value.weights = { ...adminProfilesStore.currentProfile.weights }
-                form.value.requirements = { ...adminProfilesStore.currentProfile.requirements }
-                form.value.thresholds = { ...adminProfilesStore.currentProfile.thresholds }
+                form.value.description = p.description || ''
+                form.value.ubicacion = p.ubicacion || ''
+                form.value.contact_phone = p.contact_phone || ''
+                form.value.contact_email = p.contact_email || ''
+                form.value.weights = { ...p.weights }
+                form.value.requirements = { ...p.requirements }
+                form.value.thresholds = { ...p.thresholds }
 
-                // Asegurar que arrays existan
                 if (!form.value.requirements.required_skills) form.value.requirements.required_skills = []
                 if (!form.value.requirements.preferred_skills) form.value.requirements.preferred_skills = []
                 if (!form.value.requirements.required_soft_skills) form.value.requirements.required_soft_skills = []
                 if (!form.value.requirements.required_languages) form.value.requirements.required_languages = []
             }
         } catch (err) {
-            error.value = 'Error cargando perfil'
+            error.value = 'Error cargando el perfil'
         } finally {
             isLoading.value = false
         }
     }
 })
-
-// Methods
-const addRequiredSkill = () => {
-    const skill = newRequiredSkill.value.trim()
-    if (skill && !form.value.requirements.required_skills.includes(skill)) {
-        form.value.requirements.required_skills.push(skill)
-        newRequiredSkill.value = ''
-    }
-}
-
-const removeRequiredSkill = (skill) => {
-    form.value.requirements.required_skills = form.value.requirements.required_skills.filter(s => s !== skill)
-}
-
-const addPreferredSkill = () => {
-    const skill = newPreferredSkill.value.trim()
-    if (skill && !form.value.requirements.preferred_skills.includes(skill)) {
-        form.value.requirements.preferred_skills.push(skill)
-        newPreferredSkill.value = ''
-    }
-}
-
-const removePreferredSkill = (skill) => {
-    form.value.requirements.preferred_skills = form.value.requirements.preferred_skills.filter(s => s !== skill)
-}
-
-const addSoftSkill = () => {
-    const skill = newSoftSkill.value.trim()
-    if (skill && !form.value.requirements.required_soft_skills.includes(skill)) {
-        form.value.requirements.required_soft_skills.push(skill)
-        newSoftSkill.value = ''
-    }
-}
-
-const removeSoftSkill = (skill) => {
-    form.value.requirements.required_soft_skills = form.value.requirements.required_soft_skills.filter(s => s !== skill)
-}
-
-const addLanguage = () => {
-    const lang = newLanguage.value.trim()
-    if (lang && !form.value.requirements.required_languages.includes(lang)) {
-        form.value.requirements.required_languages.push(lang)
-        newLanguage.value = ''
-    }
-}
-
-const removeLanguage = (lang) => {
-    form.value.requirements.required_languages = form.value.requirements.required_languages.filter(l => l !== lang)
-}
-
-const normalizeWeights = () => {
-    const sum = weightsSum.value
-    if (sum > 0) {
-        const weights = form.value.weights
-        for (const key in weights) {
-            weights[key] = Math.round((weights[key] / sum) * 100) / 100
-        }
-        // Ajustar ultimo para que sume exactamente 1
-        const newSum = Object.values(weights).reduce((a, b) => a + b, 0)
-        weights.languages = Math.round((weights.languages + (1 - newSum)) * 100) / 100
-    }
-}
 
 const save = async () => {
     if (!canSave.value) return
@@ -241,13 +121,17 @@ const save = async () => {
     error.value = null
 
     try {
-        // Determinar sector final
-        const finalSector = form.value.sector === 'Otro' ? customSector.value.trim() : form.value.sector
+        const finalSector = form.value.sector === 'Otro'
+            ? customSector.value.trim()
+            : form.value.sector
 
         const data = {
             institution_name: form.value.institution_name.trim(),
             sector: finalSector,
             description: form.value.description.trim() || null,
+            ubicacion: form.value.ubicacion.trim() || null,
+            contact_phone: form.value.contact_phone.trim() || null,
+            contact_email: form.value.contact_email.trim() || null,
             weights: form.value.weights,
             requirements: form.value.requirements,
             thresholds: form.value.thresholds
@@ -261,26 +145,21 @@ const save = async () => {
 
         router.push('/admin/profiles')
     } catch (err) {
-        error.value = err.response?.data?.detail || 'Error guardando perfil'
+        error.value = err.response?.data?.detail || 'Error guardando el perfil'
     } finally {
         isSaving.value = false
     }
 }
 
-const cancel = () => {
-    router.push('/admin/profiles')
-}
+const cancel = () => router.push('/admin/profiles')
 </script>
 
 <template>
     <AppLayout>
         <div class="max-w-4xl mx-auto py-8 px-4">
-            <!-- Header -->
+            <!-- Encabezado -->
             <header class="mb-8">
-                <button
-                    @click="cancel"
-                    class="flex items-center text-slate-600 hover:text-slate-800 mb-4"
-                >
+                <button @click="cancel" class="flex items-center text-slate-600 hover:text-slate-800 mb-4">
                     <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
@@ -290,11 +169,11 @@ const cancel = () => {
                     {{ isEditMode ? 'Editar Perfil' : 'Nuevo Perfil' }}
                 </h1>
                 <p class="mt-2 text-slate-600">
-                    {{ isEditMode ? 'Modifica los datos del perfil institucional' : 'Crea un nuevo perfil institucional para el sistema de matching' }}
+                    {{ isEditMode ? 'Modifica los datos del perfil institucional' : 'Crea un nuevo perfil institucional' }}
                 </p>
             </header>
 
-            <!-- Loading -->
+            <!-- Cargando -->
             <div v-if="isLoading" class="bg-white rounded-xl shadow-md p-8 text-center">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
                 <p class="mt-4 text-slate-500">Cargando perfil...</p>
@@ -302,16 +181,15 @@ const cancel = () => {
 
             <!-- Formulario -->
             <form v-else @submit.prevent="save" class="space-y-6">
+
                 <!-- Error -->
                 <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4">
                     <p class="text-red-700">{{ error }}</p>
                 </div>
 
-                <!-- Informacion Basica -->
+                <!-- ─── Informacion Basica ─── -->
                 <div class="bg-white rounded-xl shadow-md p-6">
-                    <h2 class="text-lg font-semibold text-slate-800 mb-4">
-                        Informacion Basica
-                    </h2>
+                    <h2 class="text-lg font-semibold text-slate-800 mb-4">Informacion Basica</h2>
 
                     <div class="space-y-4">
                         <div>
@@ -328,9 +206,7 @@ const cancel = () => {
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Sector *
-                            </label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Sector *</label>
                             <select
                                 v-model="form.sector"
                                 required
@@ -341,8 +217,6 @@ const cancel = () => {
                                     {{ sector }}
                                 </option>
                             </select>
-
-                            <!-- Input para sector personalizado -->
                             <div v-if="form.sector === 'Otro'" class="mt-3">
                                 <label class="block text-sm font-medium text-slate-700 mb-1">
                                     Especificar Sector *
@@ -358,9 +232,7 @@ const cancel = () => {
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Descripcion
-                            </label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Descripcion</label>
                             <textarea
                                 v-model="form.description"
                                 rows="3"
@@ -368,315 +240,51 @@ const cancel = () => {
                                 placeholder="Descripcion breve de la institucion..."
                             ></textarea>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Pesos -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-semibold text-slate-800">
-                            Pesos de Evaluacion
-                        </h2>
-                        <button
-                            type="button"
-                            @click="normalizeWeights"
-                            class="text-sm text-blue-600 hover:text-blue-800"
-                        >
-                            Normalizar a 100%
-                        </button>
-                    </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Ubicacion</label>
+                            <input
+                                v-model="form.ubicacion"
+                                type="text"
+                                class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Ej: La Paz, Bolivia"
+                            />
+                            <p class="text-xs text-slate-400 mt-1">
+                                Se usara para autocompletar la ubicacion al crear ofertas de esta institucion.
+                            </p>
+                        </div>
 
-                    <p class="text-sm text-slate-500 mb-4">
-                        Define la importancia de cada dimension en la evaluacion (deben sumar 100%)
-                    </p>
-
-                    <!-- Validacion -->
-                    <div
-                        :class="[
-                            'mb-4 p-3 rounded-lg text-sm',
-                            isWeightsValid ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                        ]"
-                    >
-                        Total: {{ (weightsSum * 100).toFixed(0) }}%
-                        {{ isWeightsValid ? '(Valido)' : '(Debe sumar 100%)' }}
-                    </div>
-
-                    <div class="space-y-4">
-                        <div v-for="(value, key) in form.weights" :key="key">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-sm font-medium text-slate-700 capitalize">
-                                    {{ key.replace('_', ' ') }}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">
+                                    Telefono de Contacto
                                 </label>
-                                <span class="text-sm text-slate-500">{{ (value * 100).toFixed(0) }}%</span>
+                                <input
+                                    v-model="form.contact_phone"
+                                    type="tel"
+                                    class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Ej: +591 2 1234567"
+                                />
                             </div>
-                            <input
-                                v-model.number="form.weights[key]"
-                                type="range"
-                                min="0"
-                                max="1"
-                                step="0.05"
-                                class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-                            />
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">
+                                    Correo de Contacto
+                                </label>
+                                <input
+                                    v-model="form.contact_email"
+                                    type="email"
+                                    class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Ej: rrhh@empresa.com"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Umbrales -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h2 class="text-lg font-semibold text-slate-800 mb-4">
-                        Umbrales de Clasificacion
-                    </h2>
-
-                    <!-- Validacion -->
-                    <div
-                        v-if="!isThresholdsValid"
-                        class="mb-4 p-3 rounded-lg text-sm bg-red-50 text-red-700"
-                    >
-                        El umbral de APTO debe ser mayor que el de CONSIDERADO
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Umbral APTO (%)
-                            </label>
-                            <input
-                                v-model.number="form.thresholds.apto"
-                                type="number"
-                                min="0"
-                                max="1"
-                                step="0.05"
-                                class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                            <p class="text-xs text-slate-400 mt-1">
-                                Score minimo para ser APTO: {{ (form.thresholds.apto * 100).toFixed(0) }}%
-                            </p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Umbral CONSIDERADO (%)
-                            </label>
-                            <input
-                                v-model.number="form.thresholds.considerado"
-                                type="number"
-                                min="0"
-                                max="1"
-                                step="0.05"
-                                class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                            <p class="text-xs text-slate-400 mt-1">
-                                Score minimo para ser CONSIDERADO: {{ (form.thresholds.considerado * 100).toFixed(0) }}%
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Requisitos -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h2 class="text-lg font-semibold text-slate-800 mb-4">
-                        Requisitos
-                    </h2>
-
-                    <div class="space-y-6">
-                        <!-- Experiencia Minima -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Experiencia Minima (anos)
-                            </label>
-                            <input
-                                v-model.number="form.requirements.min_experience_years"
-                                type="number"
-                                min="0"
-                                step="0.5"
-                                class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <!-- Nivel Educativo -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Nivel Educativo Minimo
-                            </label>
-                            <select
-                                v-model="form.requirements.required_education_level"
-                                class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                                <option v-for="level in educationLevels" :key="level" :value="level">
-                                    {{ level }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <!-- Skills Requeridas -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Habilidades Requeridas
-                            </label>
-                            <div class="flex gap-2 mb-2">
-                                <input
-                                    v-model="newRequiredSkill"
-                                    @keyup.enter.prevent="addRequiredSkill"
-                                    type="text"
-                                    list="skillsList"
-                                    placeholder="Agregar habilidad..."
-                                    class="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                                <button
-                                    type="button"
-                                    @click="addRequiredSkill"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                                >
-                                    Agregar
-                                </button>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <span
-                                    v-for="skill in form.requirements.required_skills"
-                                    :key="skill"
-                                    class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
-                                >
-                                    {{ skill }}
-                                    <button type="button" @click="removeRequiredSkill(skill)" class="ml-2 hover:text-blue-900">
-                                        &times;
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Skills Preferidas -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Habilidades Preferidas
-                            </label>
-                            <div class="flex gap-2 mb-2">
-                                <input
-                                    v-model="newPreferredSkill"
-                                    @keyup.enter.prevent="addPreferredSkill"
-                                    type="text"
-                                    list="skillsList"
-                                    placeholder="Agregar habilidad..."
-                                    class="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                                <button
-                                    type="button"
-                                    @click="addPreferredSkill"
-                                    class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300"
-                                >
-                                    Agregar
-                                </button>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <span
-                                    v-for="skill in form.requirements.preferred_skills"
-                                    :key="skill"
-                                    class="inline-flex items-center px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm"
-                                >
-                                    {{ skill }}
-                                    <button type="button" @click="removePreferredSkill(skill)" class="ml-2 hover:text-slate-900">
-                                        &times;
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Habilidades Blandas Requeridas -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Habilidades Blandas Requeridas
-                            </label>
-                            <p class="text-xs text-slate-500 mb-2">
-                                Actitudes y competencias interpersonales que el candidato debe tener.
-                            </p>
-                            <div class="flex gap-2 mb-2">
-                                <input
-                                    v-model="newSoftSkill"
-                                    @keyup.enter.prevent="addSoftSkill"
-                                    type="text"
-                                    list="softSkillsList"
-                                    placeholder="Ej: Trabajo en equipo..."
-                                    class="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                />
-                                <button
-                                    type="button"
-                                    @click="addSoftSkill"
-                                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-                                >
-                                    Agregar
-                                </button>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <span
-                                    v-for="skill in form.requirements.required_soft_skills"
-                                    :key="skill"
-                                    class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm"
-                                >
-                                    {{ skill }}
-                                    <button type="button" @click="removeSoftSkill(skill)" class="ml-2 hover:text-purple-900">
-                                        &times;
-                                    </button>
-                                </span>
-                                <span v-if="form.requirements.required_soft_skills.length === 0" class="text-xs text-slate-400 italic">
-                                    Sin habilidades blandas requeridas (el score de soft skills sera 100%)
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Idiomas -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Idiomas Requeridos
-                            </label>
-                            <div class="flex gap-2 mb-2">
-                                <input
-                                    v-model="newLanguage"
-                                    @keyup.enter.prevent="addLanguage"
-                                    type="text"
-                                    list="languagesList"
-                                    placeholder="Ej: Ingles (B2)..."
-                                    class="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                                <button
-                                    type="button"
-                                    @click="addLanguage"
-                                    class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300"
-                                >
-                                    Agregar
-                                </button>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <span
-                                    v-for="lang in form.requirements.required_languages"
-                                    :key="lang"
-                                    class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
-                                >
-                                    {{ lang }}
-                                    <button type="button" @click="removeLanguage(lang)" class="ml-2 hover:text-green-900">
-                                        &times;
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Datalists -->
-                        <datalist id="skillsList">
-                            <option v-for="skill in commonSkills" :key="skill" :value="skill" />
-                        </datalist>
-                        <datalist id="softSkillsList">
-                            <option v-for="skill in commonSoftSkills" :key="skill" :value="skill" />
-                        </datalist>
-                        <datalist id="languagesList">
-                            <option v-for="lang in commonLanguages" :key="lang" :value="lang" />
-                        </datalist>
-                    </div>
-                </div>
-
-                <!-- Botones de Accion -->
+                <!-- Botones -->
                 <div class="flex justify-end gap-4">
-                    <button
-                        type="button"
-                        @click="cancel"
-                        class="px-6 py-3 text-slate-600 hover:text-slate-800 font-medium"
-                    >
+                    <button type="button" @click="cancel"
+                        class="px-6 py-3 text-slate-600 hover:text-slate-800 font-medium">
                         Cancelar
                     </button>
                     <button
@@ -706,28 +314,3 @@ const cancel = () => {
     </AppLayout>
 </template>
 
-<style scoped>
-/* Custom range slider styling */
-input[type="range"] {
-    -webkit-appearance: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    height: 16px;
-    width: 16px;
-    border-radius: 50%;
-    background: #3b82f6;
-    cursor: pointer;
-    margin-top: -6px;
-}
-
-input[type="range"]::-moz-range-thumb {
-    height: 16px;
-    width: 16px;
-    border-radius: 50%;
-    background: #3b82f6;
-    cursor: pointer;
-    border: none;
-}
-</style>

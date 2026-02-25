@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.endpoints import cv, auth, users, analytics
-from app.api.routes import ml_predictions, institutional_profiles, profile, ofertas, recommendations
+from app.api.routes import ml_predictions, institutional_profiles, profile, ofertas, recommendations, postulaciones, admin_ranking
 from app.services.ml_integration_service import get_ml_service
 
 # Configurar logging
@@ -89,6 +89,14 @@ app.include_router(
 app.include_router(
     recommendations.router,
     tags=["Recommendations"]
+)
+app.include_router(
+    postulaciones.router,
+    tags=["Postulaciones"]
+)
+app.include_router(
+    admin_ranking.router,
+    tags=["Admin - Ranking Candidatos"]
 )
 app.include_router(
     users.router,

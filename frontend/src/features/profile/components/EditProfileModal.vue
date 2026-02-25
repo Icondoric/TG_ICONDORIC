@@ -118,7 +118,7 @@
       <!-- Experience Edit -->
       <div v-if="editModal.type === 'experience'" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Anos de Experiencia</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Años de Experiencia</label>
           <input
             :value="editForm.experience_years"
             @input="$emit('updateField', 'experience_years', Number($event.target.value))"
@@ -127,6 +127,63 @@
             max="50"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
           />
+        </div>
+      </div>
+
+      <!-- Personal Info Edit -->
+      <div v-if="editModal.type === 'personal_info'" class="space-y-4">
+        <p class="text-sm text-gray-500">Estos datos se pre-cargan desde tu CV. Puedes corregirlos o completarlos manualmente.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+            <input
+              :value="editForm.nombre_completo"
+              @input="$emit('updateField', 'nombre_completo', $event.target.value)"
+              type="text"
+              placeholder="Ej. Juan Pérez García"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+            <input
+              :value="editForm.telefono"
+              @input="$emit('updateField', 'telefono', $event.target.value)"
+              type="tel"
+              placeholder="Ej. +591 71234567"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email de contacto</label>
+            <input
+              :value="editForm.email_contacto"
+              @input="$emit('updateField', 'email_contacto', $event.target.value)"
+              type="email"
+              placeholder="Ej. juan@example.com"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nacionalidad</label>
+            <input
+              :value="editForm.nacionalidad"
+              @input="$emit('updateField', 'nacionalidad', $event.target.value)"
+              type="text"
+              placeholder="Ej. Boliviana"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección / Ubicación</label>
+            <input
+              :value="editForm.direccion"
+              @input="$emit('updateField', 'direccion', $event.target.value)"
+              type="text"
+              placeholder="Ej. La Paz, Bolivia"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-transparent"
+            />
+          </div>
         </div>
       </div>
 
@@ -140,7 +197,7 @@
         <button
           @click="$emit('save')"
           :disabled="saving"
-          class="btn-emi-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 bg-emi-navy-500 text-white rounded-lg hover:bg-emi-navy-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {{ saving ? 'Guardando...' : 'Guardar Cambios' }}
         </button>
