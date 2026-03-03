@@ -19,6 +19,10 @@
       </div>
 
       <!-- Stats Cards -->
+      <div class="mb-3">
+        <h2 class="text-sm font-semibold text-slate-600 uppercase tracking-wider">Resumen de convocatorias</h2>
+        <p class="text-xs text-slate-400 mt-0.5">Estado actual de todas las ofertas registradas en el sistema</p>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="card-emi p-4">
           <div class="flex items-center">
@@ -188,33 +192,29 @@
                 </span>
                 <span v-else class="text-slate-400">Sin fecha</span>
               </td>
-              <td class="px-6 py-4 text-right text-sm font-medium space-x-2">
-                <router-link
-                  :to="`/admin/ofertas/edit/${oferta.id}`"
-                  class="px-3 py-1.5 bg-emi-navy-100 text-emi-navy-700 rounded-lg hover:bg-emi-navy-200 transition-colors inline-block"
-                >
-                  Editar
-                </router-link>
-                <button
-                  v-if="oferta.is_active"
-                  @click="deactivateOferta(oferta)"
-                  class="px-3 py-1.5 bg-warning-100 text-warning-700 rounded-lg hover:bg-warning-200 transition-colors"
-                >
-                  Desactivar
-                </button>
-                <button
-                  v-else
-                  @click="activateOferta(oferta)"
-                  class="px-3 py-1.5 bg-success-100 text-success-700 rounded-lg hover:bg-success-200 transition-colors"
-                >
-                  Activar
-                </button>
-                <button
-                  @click="confirmPermanentDelete(oferta)"
-                  class="px-3 py-1.5 bg-danger-100 text-danger-700 rounded-lg hover:bg-danger-200 transition-colors"
-                >
-                  Eliminar
-                </button>
+              <td class="px-6 py-4">
+                <div class="flex flex-col gap-2 items-end">
+                  <router-link
+                    :to="`/admin/ofertas/edit/${oferta.id}`"
+                    class="px-3 py-1.5 bg-emi-navy-100 text-emi-navy-700 rounded-lg hover:bg-emi-navy-200 transition-colors text-sm font-medium"
+                  >
+                    Editar
+                  </router-link>
+                  <button
+                    v-if="oferta.is_active"
+                    @click="deactivateOferta(oferta)"
+                    class="px-3 py-1.5 bg-warning-100 text-warning-700 rounded-lg hover:bg-warning-200 transition-colors text-sm font-medium"
+                  >
+                    Desactivar
+                  </button>
+                  <button
+                    v-else
+                    @click="activateOferta(oferta)"
+                    class="px-3 py-1.5 bg-success-100 text-success-700 rounded-lg hover:bg-success-200 transition-colors text-sm font-medium"
+                  >
+                    Activar
+                  </button>
+                </div>
               </td>
             </tr>
 
@@ -284,55 +284,12 @@
       </div>
     </Teleport>
 
-    <!-- Modal Eliminacion Permanente -->
-    <Teleport to="body">
-      <div
-        v-if="permanentDeleteConfirm"
-        class="fixed inset-0 bg-slate-900 bg-opacity-60 flex items-center justify-center z-50 p-4"
-        @click.self="cancelPermanentDelete"
-      >
-        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex-shrink-0 w-10 h-10 bg-danger-100 rounded-full flex items-center justify-center">
-              <svg class="w-5 h-5 text-danger-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-slate-800">Eliminar Oferta Permanentemente</h3>
-          </div>
-          <p class="text-slate-600 mb-2">
-            Estas a punto de eliminar permanentemente la oferta
-            <span class="font-semibold text-slate-800">{{ permanentDeleteConfirm.titulo }}</span>.
-          </p>
-          <p class="text-sm text-danger-600 bg-danger-50 rounded-lg px-3 py-2 mb-4">
-            Esta accion es irreversible. La oferta sera eliminada de la base de datos.
-          </p>
-          <p v-if="permanentDeleteError" class="text-sm text-danger-700 bg-danger-50 border border-danger-200 rounded px-3 py-2 mb-4">
-            {{ permanentDeleteError }}
-          </p>
-          <div class="flex gap-3 justify-end">
-            <button
-              @click="cancelPermanentDelete"
-              class="px-4 py-2 text-slate-600 hover:bg-slate-50 transition-colors rounded-lg font-medium"
-            >
-              Cancelar
-            </button>
-            <button
-              @click="executePermanentDelete"
-              class="px-4 py-2 bg-danger-600 text-white rounded-lg hover:bg-danger-700 transition-colors font-medium"
-            >
-              Eliminar permanentemente
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
   </AppLayout>
 </template>
 
 <script setup>
 import { ref, reactive, watch, onMounted, computed } from 'vue'
-import { listOfertas, deleteOferta, activateOferta as activateOfertaApi, getOfertasStats, permanentDeleteOferta } from '@/features/admin/api/ofertas.api'
+import { listOfertas, deleteOferta, activateOferta as activateOfertaApi, getOfertasStats } from '@/features/admin/api/ofertas.api'
 import AppLayout from '@/shared/components/AppLayout.vue'
 import { formatApiError } from '@/shared/utils/apiError'
 
@@ -348,8 +305,6 @@ const page = ref(1)
 const pageSize = ref(20)
 const loading = ref(true)
 const error = ref(null)
-const permanentDeleteConfirm = ref(null)
-const permanentDeleteError = ref(null)
 const deactivateConfirm = ref(null)
 
 const filters = reactive({
@@ -433,29 +388,6 @@ const confirmDeactivate = async () => {
   } catch (e) {
     error.value = formatApiError(e, 'Error desactivando oferta')
     deactivateConfirm.value = null
-  }
-}
-
-const confirmPermanentDelete = (oferta) => {
-  permanentDeleteError.value = null
-  permanentDeleteConfirm.value = oferta
-}
-
-const cancelPermanentDelete = () => {
-  permanentDeleteConfirm.value = null
-  permanentDeleteError.value = null
-}
-
-const executePermanentDelete = async () => {
-  if (!permanentDeleteConfirm.value) return
-  try {
-    await permanentDeleteOferta(permanentDeleteConfirm.value.id)
-    ofertas.value = ofertas.value.filter(o => o.id !== permanentDeleteConfirm.value.id)
-    total.value = Math.max(0, total.value - 1)
-    permanentDeleteConfirm.value = null
-    loadStats()
-  } catch (e) {
-    permanentDeleteError.value = formatApiError(e, 'Error eliminando oferta')
   }
 }
 

@@ -7,7 +7,7 @@
         <div>
           <h1 class="text-3xl font-bold text-emi-navy-500">Evaluación de Candidatos</h1>
           <p class="mt-1 text-gray-600">
-            Selecciona una convocatoria para ver los postulantes y su evaluación automática.
+            Selecciona una convocatoria para ver los postulantes y su evaluación.
           </p>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
@@ -35,53 +35,66 @@
       </div>
 
       <!-- ═══ FILTROS ═══ -->
-      <div class="card-emi mb-6">
-        <div class="flex flex-wrap items-center gap-3">
+      <div class="mb-3">
+        <h2 class="text-sm font-semibold text-slate-600 uppercase tracking-wider">Filtros de Búsqueda</h2>
+        <p class="text-xs text-slate-400 mt-0.5">Encuentra convocatorias específicas por texto, tipo o estado</p>
+      </div>
+      <div class="card-emi mb-6 p-4">
+        <div class="flex flex-wrap items-end gap-5">
 
           <!-- Buscador -->
-          <div class="relative flex-1 min-w-[200px]">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emi-navy-400"
-              fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            <input
-              v-model="filters.search"
-              @input="debouncedLoad"
-              type="text"
-              placeholder="Buscar por título o institución..."
-              class="w-full pl-9 pr-3 py-2 text-sm border border-emi-navy-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emi-navy-300"
-            />
+          <div class="flex-1 min-w-[200px]">
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Palabra Clave</label>
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emi-navy-400"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input
+                v-model="filters.search"
+                @input="debouncedLoad"
+                type="text"
+                placeholder="Buscar por título o institución..."
+                class="w-full pl-9 pr-3 py-2 text-sm border border-emi-navy-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emi-navy-300"
+              />
+            </div>
           </div>
 
           <!-- Tipo -->
-          <div class="flex gap-1.5">
-            <button
-              v-for="t in tipoOptions"
-              :key="t.value"
-              @click="filters.tipo = t.value; loadOfertas()"
-              :class="[
-                'px-3 py-2 text-xs rounded-lg font-medium transition-colors',
-                filters.tipo === t.value
-                  ? 'bg-emi-navy-500 text-white'
-                  : 'bg-white text-gray-500 border border-emi-navy-200 hover:border-emi-navy-400'
-              ]"
-            >{{ t.label }}</button>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Tipo de Oferta</label>
+            <div class="flex gap-1 bg-slate-50 p-1 rounded-lg border border-slate-200">
+              <button
+                v-for="t in tipoOptions"
+                :key="t.value"
+                @click="filters.tipo = t.value; loadOfertas()"
+                :class="[
+                  'px-3 py-1.5 text-xs rounded-md font-medium transition-all',
+                  filters.tipo === t.value
+                    ? 'bg-white text-emi-navy-600 shadow-sm ring-1 ring-slate-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                ]"
+              >{{ t.label }}</button>
+            </div>
           </div>
 
           <!-- Estado -->
-          <div class="flex gap-1.5">
-            <button
-              v-for="e in estadoOptions"
-              :key="e.value"
-              @click="setEstado(e.value)"
-              :class="[
-                'px-3 py-2 text-xs rounded-lg font-medium transition-colors',
-                estadoKey === e.value
-                  ? 'bg-emi-navy-500 text-white'
-                  : 'bg-white text-gray-500 border border-emi-navy-200 hover:border-emi-navy-400'
-              ]"
-            >{{ e.label }}</button>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Estado</label>
+            <div class="flex gap-1 bg-slate-50 p-1 rounded-lg border border-slate-200">
+              <button
+                v-for="e in estadoOptions"
+                :key="e.value"
+                @click="setEstado(e.value)"
+                :class="[
+                  'px-3 py-1.5 text-xs rounded-md font-medium transition-all',
+                  estadoKey === e.value
+                    ? 'bg-white text-emi-navy-600 shadow-sm ring-1 ring-slate-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                ]"
+              >{{ e.label }}</button>
+            </div>
           </div>
 
         </div>
