@@ -28,10 +28,6 @@ const ROLES = [
 ]
 
 onMounted(async () => {
-    if (!authStore.isAdminOrOperator) {
-        router.push('/dashboard')
-        return
-    }
     await loadUsers()
 })
 
@@ -106,14 +102,14 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
             <!-- Header -->
             <header class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-slate-800">Lista de Usuarios</h1>
+                    <h1 class="text-3xl font-bold text-emi-navy-500">Lista de Usuarios</h1>
                     <p class="mt-1 text-slate-600">
                         Administra las cuentas de estudiantes, titulados y administradores.
                     </p>
                 </div>
                 <button
                     @click="generateReport"
-                    class="flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                    class="btn-emi-primary flex items-center shadow-sm"
                 >
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -123,7 +119,7 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
             </header>
 
             <!-- Filters -->
-            <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+            <div class="card-emi p-4 mb-6">
                 <div class="flex flex-col md:flex-row gap-4">
                     <!-- Search -->
                     <div class="flex-1">
@@ -148,7 +144,7 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
                         <select
                             v-model="roleFilter"
                             @change="onFilterChange"
-                            class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-emi-navy-500 transition-colors"
                         >
                             <option value="">Todos los roles</option>
                             <option v-for="role in ROLES" :key="role.value" :value="role.value">
@@ -160,18 +156,18 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
             </div>
 
             <!-- Loading -->
-            <div v-if="usersStore.loading" class="bg-white rounded-xl shadow-md p-12 text-center">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div v-if="usersStore.loading" class="card-emi p-12 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emi-gold mx-auto"></div>
                 <p class="mt-4 text-slate-500">Cargando usuarios...</p>
             </div>
 
             <!-- Error -->
-            <div v-else-if="usersStore.error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p class="text-red-700">{{ usersStore.error }}</p>
+            <div v-else-if="usersStore.error" class="bg-danger-50 border border-danger-200 rounded-lg p-4 mb-6">
+                <p class="text-danger-700">{{ usersStore.error }}</p>
             </div>
 
             <!-- Users Table -->
-            <div v-else id="users-report-content" class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div v-else id="users-report-content" class="card-emi overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -197,23 +193,17 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span :class="[
-                                        'px-2.5 py-1 rounded-full text-xs font-medium capitalize',
-                                        user.rol === 'administrador' ? 'bg-purple-100 text-purple-700' :
-                                        user.rol === 'operador' ? 'bg-orange-100 text-orange-700' :
-                                        user.rol === 'titulado' ? 'bg-indigo-100 text-indigo-700' :
-                                        'bg-blue-100 text-blue-700'
-                                    ]">
+                                    <span class="badge-rol badge-rol-default" :data-rol="user.rol">
                                         {{ user.rol }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <template v-if="user.rol !== 'administrador'">
                                         <div v-if="user.tiene_perfil" class="flex items-center gap-2">
-                                             <div class="w-16 bg-slate-200 rounded-full h-2 overflow-hidden">
+                                            <div class="w-16 bg-slate-200 rounded-full h-2 overflow-hidden">
                                                 <div
                                                     class="h-full rounded-full"
-                                                    :class="user.perfil_completo ? 'bg-green-500' : 'bg-yellow-500'"
+                                                    :class="user.perfil_completo ? 'bg-success-500' : 'bg-warning-500'"
                                                     :style="{ width: `${user.completeness_score * 100}%` }"
                                                 ></div>
                                             </div>
@@ -233,7 +223,7 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
                                 <td class="px-6 py-4 text-right">
                                     <button
                                         @click="viewUser(user.id)"
-                                        class="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                        class="px-3 py-1.5 bg-emi-navy-100 text-emi-navy-700 rounded-lg hover:bg-emi-navy-200 font-medium text-sm transition-colors"
                                     >
                                         Ver Detalle
                                     </button>

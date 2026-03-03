@@ -9,11 +9,73 @@ const icons = {
     settings: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
 }
 
+// Mapa completo: módulo ID → definición de menú con submoduleId en cada child.
+// Usado para construir dinámicamente el menú de roles personalizados.
+const MODULE_MENU_ITEMS = {
+    gestion_usuarios: {
+        label: 'Gestión de Usuarios', icon: icons.users, children: [
+            { label: 'Lista de Usuarios', path: '/admin/users', submoduleId: 'lista_usuarios' },
+            { label: 'Nuevo Usuario', path: '/admin/users/new', submoduleId: 'nuevo_usuario' },
+        ]
+    },
+    digitalizacion_perfiles: {
+        label: 'Digitalización de Perfiles', icon: icons.profile, children: [
+            { label: 'Subir CV', path: '/digitalizacion/subir-cv', submoduleId: 'subir_cv' },
+            { label: 'Mi Perfil Digitalizado', path: '/digitalizacion/mi-perfil', submoduleId: 'mi_perfil' },
+            { label: 'Editar Perfil', path: '/digitalizacion/editar', submoduleId: 'editar_perfil' },
+            { label: 'Buscar Perfiles', path: '/digitalizacion/buscar-perfiles', submoduleId: 'buscar_perfiles' },
+        ]
+    },
+    oferta_laboral: {
+        label: 'Gestión de Oferta Laboral', icon: icons.ofertas, children: [
+            { label: 'Lista de Ofertas Laborales', path: '/admin/ofertas', submoduleId: 'ver_ofertas' },
+            { label: 'Nueva Oferta', path: '/admin/ofertas/new', submoduleId: 'nueva_oferta' },
+        ]
+    },
+    perfiles_institucionales: {
+        label: 'Perfiles Institucionales', icon: icons.instituciones, children: [
+            { label: 'Lista de Perfiles Institucionales', path: '/admin/profiles', submoduleId: 'ver_perfiles' },
+            { label: 'Nuevo Perfil', path: '/admin/profiles/new', submoduleId: 'nuevo_perfil' },
+        ]
+    },
+    evaluacion_perfiles: {
+        label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
+            { label: 'Mejor Correspondencia', path: '/mis-recomendaciones', submoduleId: 'correspondencia' },
+            { label: 'Correspondencia entre Perfiles', path: '/correspondencia-perfiles', submoduleId: 'correspondencia' },
+            { label: 'Historial de Postulaciones', path: '/historial-postulaciones', submoduleId: 'historial' },
+            { label: 'Evaluación de Candidatos', path: '/admin/ranking-candidatos', submoduleId: 'ranking_candidatos' },
+        ]
+    },
+    informes_reportes: {
+        label: 'Informes y Reportes', icon: icons.reports, children: [
+            { label: 'Resumen General', path: '/admin/reports', submoduleId: 'resumen_general' },
+            { label: 'Reporte de Usuarios', path: '/admin/reports/users', submoduleId: 'reporte_usuarios' },
+            { label: 'Reporte de Ofertas', path: '/admin/reports/offers', submoduleId: 'reporte_ofertas' },
+            { label: 'Reporte de Perfiles', path: '/admin/reports/profiles', submoduleId: 'reporte_perfiles' },
+        ]
+    },
+}
+
+const FIXED_ROLES = ['admin', 'administrador', 'operador', 'estudiante', 'titulado']
+
 /**
  * Returns sidebar menu items based on user role.
- * Items can have a `path` (direct link) or `children` (submenu).
+ * @param {string} role
+ * @param {Object|null} allowedModules - { moduleId: [submoduleId, ...] } para roles personalizados
  */
-export function getMenuItems(role) {
+export function getMenuItems(role, allowedModules = null) {
+    // Rol personalizado: construir menú dinámico filtrando módulos Y sub-módulos permitidos
+    if (allowedModules !== null && !FIXED_ROLES.includes(role)) {
+        return Object.entries(allowedModules)
+            .filter(([id]) => MODULE_MENU_ITEMS[id])
+            .map(([id, allowedSubs]) => {
+                const item = MODULE_MENU_ITEMS[id]
+                const children = item.children.filter(c => allowedSubs.includes(c.submoduleId))
+                return { ...item, children }
+            })
+            .filter(item => item.children.length > 0)
+    }
+
     switch (role) {
         case 'admin':
         case 'administrador':
@@ -34,18 +96,19 @@ export function getMenuItems(role) {
                 },
                 {
                     label: 'Gestión de Oferta Laboral', icon: icons.ofertas, children: [
-                        { label: 'Ver Ofertas', path: '/admin/ofertas' },
+                        { label: 'Lista de Ofertas Laborales', path: '/admin/ofertas' },
                         { label: 'Nueva Oferta', path: '/admin/ofertas/new' },
                     ]
                 },
                 {
                     label: 'Perfiles Institucionales', icon: icons.instituciones, children: [
-                        { label: 'Ver Perfiles', path: '/admin/profiles' },
+                        { label: 'Lista de Perfiles Institucionales', path: '/admin/profiles' },
                         { label: 'Nuevo Perfil', path: '/admin/profiles/new' },
                     ]
                 },
                 {
                     label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
+                        { label: 'Mejor Correspondencia', path: '/mis-recomendaciones' },
                         { label: 'Correspondencia entre Perfiles', path: '/correspondencia-perfiles' },
                         { label: 'Historial de Postulaciones', path: '/historial-postulaciones' },
                         { label: 'Evaluación de Candidatos', path: '/admin/ranking-candidatos' },
@@ -57,6 +120,11 @@ export function getMenuItems(role) {
                         { label: 'Reporte de Usuarios', path: '/admin/reports/users' },
                         { label: 'Reporte de Ofertas', path: '/admin/reports/offers' },
                         { label: 'Reporte de Perfiles', path: '/admin/reports/profiles' },
+                    ]
+                },
+                {
+                    label: 'Gestión de Sistema', icon: icons.settings, children: [
+                        { label: 'Roles', path: '/admin/system/roles' },
                     ]
                 },
             ]
@@ -76,13 +144,13 @@ export function getMenuItems(role) {
                 },
                 {
                     label: 'Gestión de Oferta Laboral', icon: icons.ofertas, children: [
-                        { label: 'Ver Ofertas', path: '/admin/ofertas' },
+                        { label: 'Lista de Ofertas Laborales', path: '/admin/ofertas' },
                         { label: 'Nueva Oferta', path: '/admin/ofertas/new' },
                     ]
                 },
                 {
                     label: 'Perfiles Institucionales', icon: icons.instituciones, children: [
-                        { label: 'Ver Perfiles', path: '/admin/profiles' },
+                        { label: 'Lista de Perfiles Institucionales', path: '/admin/profiles' },
                         { label: 'Nuevo Perfil', path: '/admin/profiles/new' },
                     ]
                 },
@@ -109,6 +177,7 @@ export function getMenuItems(role) {
                 },
                 {
                     label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
+                        { label: 'Mejor Correspondencia', path: '/mis-recomendaciones' },
                         { label: 'Correspondencia entre Perfiles', path: '/correspondencia-perfiles' },
                         { label: 'Historial de Postulaciones', path: '/historial-postulaciones' },
                     ]

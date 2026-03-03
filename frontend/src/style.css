@@ -60,4 +60,29 @@
     .badge-danger {
         @apply bg-danger-light text-danger-dark;
     }
+
+    /* Badges de Roles de Usuario (Dinámicos por atributo data-rol) */
+    .badge-rol {
+        @apply px-2.5 py-1 rounded-full text-xs font-medium capitalize;
+    }
+
+    .badge-rol-default {
+        @apply bg-slate-100 text-slate-700;
+    }
+
+    .badge-rol[data-rol="administrador"] {
+        @apply bg-info-100 text-info-700;
+    }
+
+    .badge-rol[data-rol="operador"] {
+        @apply bg-warning-100 text-warning-700;
+    }
+
+    .badge-rol[data-rol="titulado"] {
+        @apply bg-emi-navy-100 text-emi-navy-700;
+    }
+
+    .badge-rol[data-rol="estudiante"] {
+        @apply bg-emi-gold-500 text-emi-navy-50;
+    }
 }

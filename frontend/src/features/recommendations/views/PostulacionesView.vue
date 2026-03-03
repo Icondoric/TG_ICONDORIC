@@ -339,6 +339,7 @@ import ProgressBar from '@/shared/components/ui/ProgressBar.vue'
 import EligibilityWarning from '../components/EligibilityWarning.vue'
 import MatchDetailSection from '../components/MatchDetailSection.vue'
 import { getOfertasDisponibles, postularAOferta, getMyPostulaciones } from '../api/postulaciones.api'
+import { formatApiError } from '@/shared/utils/apiError'
 import { checkRecommendationEligibility } from '../api/recommendations.api'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 
@@ -439,7 +440,7 @@ const postular = async (ofertaId) => {
 
   } catch (e) {
     errorPostulando.value = ofertaId
-    errorMensaje.value = e.response?.data?.detail || 'Error al procesar la postulación'
+    errorMensaje.value = formatApiError(e, 'Error al procesar la postulación')
   } finally {
     postulando.value = null
   }

@@ -8,7 +8,7 @@ import { getMenuItems, getSidebarVariant } from '@/shared/constants/navigation'
 const uiStore = useUiStore()
 const authStore = useAuthStore()
 
-const menuItems = computed(() => getMenuItems(authStore.user?.rol))
+const menuItems = computed(() => getMenuItems(authStore.user?.rol, authStore.allowedModules))
 const variant = computed(() => getSidebarVariant(authStore.user?.rol))
 </script>
 

@@ -43,11 +43,8 @@ api.interceptors.response.use(
                 if (_router) {
                     _router.push('/login')
                 }
-            } else if (error.response.status === 403) {
-                if (_router) {
-                    _router.push('/dashboard')
-                }
             }
+            // 403 lo maneja cada vista individualmente — no redirigir automáticamente
         }
         return Promise.reject(error)
     }

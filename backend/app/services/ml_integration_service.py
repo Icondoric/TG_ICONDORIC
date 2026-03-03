@@ -228,32 +228,17 @@ class MLIntegrationService:
             raise
 
     def _format_profile_for_ml(self, profile: Dict) -> Dict:
-        """Formatea un perfil de BD para uso en ML"""
-        weights = profile.get('weights', {})
-        requirements = profile.get('requirements', {})
-        thresholds = profile.get('thresholds', {'apto': 0.70, 'considerado': 0.50})
+        """
+        Formatea un perfil institucional de BD.
 
+        Solo retorna datos de identidad. Los pesos, requisitos y umbrales
+        de evaluacion se definen en cada oferta_laboral, no aqui.
+        """
         return {
             'id': profile['id'],
             'institution_name': profile['institution_name'],
             'sector': profile['sector'],
             'description': profile.get('description', ''),
-            'weights': {
-                'hard_skills': weights.get('hard_skills', 0.30),
-                'soft_skills': weights.get('soft_skills', 0.20),
-                'experience': weights.get('experience', 0.25),
-                'education': weights.get('education', 0.15),
-                'languages': weights.get('languages', 0.10)
-            },
-            'requirements': {
-                'min_experience_years': requirements.get('min_experience_years', 0),
-                'required_skills': requirements.get('required_skills', []),
-                'preferred_skills': requirements.get('preferred_skills', []),
-                'required_soft_skills': requirements.get('required_soft_skills', []),
-                'required_education_level': requirements.get('required_education_level', 'Licenciatura'),
-                'required_languages': requirements.get('required_languages', [])
-            },
-            'thresholds': thresholds
         }
 
     def _is_cache_valid(self) -> bool:
@@ -321,6 +306,8 @@ class MLIntegrationService:
         hard_details = metadata.get('hard_skills_details', {})
         soft_details = metadata.get('soft_skills_details', {})
         lang_details = metadata.get('languages_details', {})
+        edu_details = metadata.get('education_details', {})
+        exp_details = metadata.get('experience_details', {})
 
         requirements = institutional_config.get('requirements', {})
 
@@ -343,6 +330,16 @@ class MLIntegrationService:
                 'matched': lang_details.get('matched', []),
                 'missing': lang_details.get('missing', []),
                 'cv_languages': cv_languages,
+            },
+            'education': {
+                'cv_level': edu_details.get('cv_level', 'Sin especificar'),
+                'required_level': requirements.get('required_education_level', 'Licenciatura'),
+                'meets_requirement': edu_details.get('meets_requirement', False),
+            },
+            'experience': {
+                'cv_years': round(exp_details.get('total_years', 0), 1),
+                'required_years': requirements.get('min_experience_years', 0),
+                'meets_minimum': exp_details.get('meets_minimum', False),
             },
             'cv_skills': {
                 'hard': gemini_output.get('hard_skills', []),

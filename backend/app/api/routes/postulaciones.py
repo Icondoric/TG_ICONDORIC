@@ -4,10 +4,12 @@ Endpoints para que estudiantes y titulados postulen a ofertas laborales.
 """
 
 import logging
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.dependencies import get_current_user
+from app.db.client import supabase
 from app.services.postulacion_service import get_postulacion_service
 
 logger = logging.getLogger(__name__)
@@ -65,6 +67,79 @@ async def postular_a_oferta(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"Error postulando a oferta {oferta_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{oferta_id}/desde-recomendacion")
+async def postular_desde_recomendacion(
+    oferta_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Registra una postulación copiando los datos de la recomendación existente.
+    No re-evalúa el CV — usa el match ya calculado por el sistema.
+    """
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Base de datos no disponible")
+
+    user_id = current_user['user_id']
+
+    # Buscar recomendación existente para este usuario+oferta
+    rec = supabase.table("recomendaciones") \
+        .select("*") \
+        .eq("usuario_id", user_id) \
+        .eq("oferta_id", oferta_id) \
+        .limit(1) \
+        .execute()
+
+    if not rec.data:
+        raise HTTPException(status_code=404, detail="No existe una recomendación para esta oferta")
+
+    r = rec.data[0]
+
+    data = {
+        'usuario_id': user_id,
+        'oferta_id':  oferta_id,
+        'match_score':    r.get('match_score'),
+        'clasificacion':  r.get('clasificacion'),
+        'scores_detalle': r.get('scores_detalle'),
+        'fortalezas':     r.get('fortalezas'),
+        'debilidades':    r.get('debilidades'),
+        'match_details':  r.get('match_details'),
+        'estado':         'pendiente',
+        'updated_at':     datetime.utcnow().isoformat(),
+    }
+
+    try:
+        saved = supabase.table("postulaciones") \
+            .upsert(data, on_conflict="usuario_id,oferta_id") \
+            .execute()
+
+        row = saved.data[0] if saved.data else {}
+
+        # Obtener datos de la oferta para devolver al frontend
+        oferta_row = supabase.table("ofertas_laborales") \
+            .select("*, institutional_profiles(institution_name, sector)") \
+            .eq("id", oferta_id) \
+            .limit(1) \
+            .execute()
+
+        oferta = {}
+        if oferta_row.data:
+            oferta = oferta_row.data[0]
+            inst = oferta.pop("institutional_profiles", None) or {}
+            oferta["institution_name"] = inst.get("institution_name")
+            oferta["sector"] = inst.get("sector")
+
+        return {
+            **data,
+            'id':         row.get('id'),
+            'created_at': row.get('created_at'),
+            'oferta':     oferta,
+        }
+
+    except Exception as e:
+        logger.error(f"Error guardando postulacion desde recomendacion {oferta_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

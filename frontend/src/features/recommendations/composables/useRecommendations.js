@@ -1,6 +1,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import { getMyRecommendations, checkRecommendationEligibility, markRecommendationViewed } from '@/features/recommendations/api/recommendations.api'
+import { formatApiError } from '@/shared/utils/apiError'
 
 export function useRecommendations() {
     const authStore = useAuthStore()
@@ -106,7 +107,7 @@ export function useRecommendations() {
             recommendations.value = result.recomendaciones || []
             perfilSummary.value = result.perfil_summary
         } catch (e) {
-            error.value = e.response?.data?.detail || 'Error cargando recomendaciones'
+            error.value = formatApiError(e, 'Error cargando recomendaciones')
         } finally {
             loading.value = false
             refreshing.value = false

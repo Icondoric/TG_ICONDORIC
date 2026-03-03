@@ -44,6 +44,11 @@ class InstitutionalRequirements(BaseModel):
     required_education_level: str = Field(default="Licenciatura", description="Nivel educativo requerido")
     required_languages: List[str] = Field(default=[], description="Idiomas requeridos")
 
+    # Campos de elegibilidad (pre-filtro binario, no afectan el modelo ML)
+    carreras_aceptadas: List[str] = Field(default=[], description="Carreras EMI aceptadas (vacio = todas)")
+    semestre_minimo: Optional[int] = Field(default=None, ge=1, le=10, description="Semestre minimo requerido")
+    semestre_maximo: Optional[int] = Field(default=None, ge=1, le=10, description="Semestre maximo requerido")
+
     @field_validator('required_education_level')
     @classmethod
     def validate_education_level(cls, v):
@@ -77,36 +82,6 @@ class InstitutionalProfileCreate(BaseModel):
     ubicacion: Optional[str] = Field(default=None, max_length=200, description="Ubicacion geografica")
     contact_phone: Optional[str] = Field(default=None, max_length=50, description="Telefono de contacto")
     contact_email: Optional[str] = Field(default=None, max_length=200, description="Correo de contacto")
-    weights: InstitutionalWeights
-    requirements: InstitutionalRequirements
-    thresholds: Optional[InstitutionalThresholds] = None
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "institution_name": "TechBolivia Startup",
-                "sector": "Tecnologia",
-                "description": "Empresa de desarrollo de software",
-                "weights": {
-                    "hard_skills": 0.40,
-                    "soft_skills": 0.15,
-                    "experience": 0.25,
-                    "education": 0.10,
-                    "languages": 0.10
-                },
-                "requirements": {
-                    "min_experience_years": 1.0,
-                    "required_skills": ["Python", "SQL"],
-                    "preferred_skills": ["Docker", "AWS"],
-                    "required_education_level": "Licenciatura",
-                    "required_languages": ["Ingles"]
-                },
-                "thresholds": {
-                    "apto": 0.70,
-                    "considerado": 0.50
-                }
-            }
-        }
 
 
 class InstitutionalProfileUpdate(BaseModel):
@@ -117,9 +92,6 @@ class InstitutionalProfileUpdate(BaseModel):
     ubicacion: Optional[str] = Field(default=None, max_length=200)
     contact_phone: Optional[str] = Field(default=None, max_length=50)
     contact_email: Optional[str] = Field(default=None, max_length=200)
-    weights: Optional[InstitutionalWeights] = None
-    requirements: Optional[InstitutionalRequirements] = None
-    thresholds: Optional[InstitutionalThresholds] = None
     is_active: Optional[bool] = None
 
 
@@ -132,9 +104,6 @@ class InstitutionalProfileResponse(BaseModel):
     ubicacion: Optional[str] = None
     contact_phone: Optional[str] = None
     contact_email: Optional[str] = None
-    weights: Dict[str, float]
-    requirements: Dict[str, Any]
-    thresholds: Dict[str, float]
     is_active: bool
     created_at: datetime
     updated_at: datetime
@@ -395,6 +364,10 @@ class PerfilProfesionalResponse(BaseModel):
     email_contacto: Optional[str] = None
     nacionalidad: Optional[str] = None
 
+    # Información académica (elegibilidad)
+    carrera: Optional[str] = None
+    semestre_actual: Optional[int] = None
+
     # Metadatos del CV
     cv_filename: Optional[str] = None
     cv_uploaded_at: Optional[datetime] = None
@@ -449,6 +422,10 @@ class PerfilProfesionalUpdate(BaseModel):
     email_contacto: Optional[str] = Field(default=None, max_length=200)
     nacionalidad: Optional[str] = Field(default=None, max_length=100)
 
+    # Información académica (elegibilidad)
+    carrera: Optional[str] = Field(default=None, description="Carrera EMI que estudia o estudió")
+    semestre_actual: Optional[int] = Field(default=None, ge=1, le=10, description="Semestre actual (solo estudiantes)")
+
     @field_validator('education_level')
     @classmethod
     def validate_education_level(cls, v):
@@ -460,6 +437,26 @@ class PerfilProfesionalUpdate(BaseModel):
         ]
         if v not in valid_levels:
             raise ValueError(f"Nivel educativo invalido. Opciones: {valid_levels}")
+        return v
+
+    @field_validator('carrera')
+    @classmethod
+    def validate_carrera(cls, v):
+        if v is None:
+            return v
+        valid_carreras = [
+            'Ingenieria Civil',
+            'Ingenieria de Sistemas',
+            'Ingenieria Geografica',
+            'Ingenieria Mecatronica',
+            'Ingenieria en Sistemas Electronicos',
+            'Ingenieria Financiera',
+            'Ingenieria Industrial',
+            'Derecho',
+            'Ingenieria Comercial',
+        ]
+        if v not in valid_carreras:
+            raise ValueError(f"Carrera invalida. Opciones: {valid_carreras}")
         return v
 
 

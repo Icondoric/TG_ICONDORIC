@@ -145,6 +145,7 @@ import { ref, computed, onMounted } from 'vue'
 import { getAccountInfo } from '@/features/account/api/account.api'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import AppLayout from '@/shared/components/AppLayout.vue'
+import { formatApiError } from '@/shared/utils/apiError'
 
 const authStore = useAuthStore()
 
@@ -217,7 +218,7 @@ const loadAccountInfo = async () => {
     accountInfo.value = data
   } catch (err) {
     console.error('Error loading account info:', err)
-    error.value = err.response?.data?.detail || 'Error al cargar información de la cuenta'
+    error.value = formatApiError(err, 'Error al cargar información de la cuenta')
   } finally {
     loading.value = false
   }

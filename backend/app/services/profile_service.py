@@ -258,14 +258,20 @@ class ProfileService:
             'experience_years', 'languages',
             # Información personal
             'nombre_completo', 'direccion', 'telefono',
-            'email_contacto', 'nacionalidad'
+            'email_contacto', 'nacionalidad',
+            # Información académica (elegibilidad)
+            'carrera', 'semestre_actual',
         ]
+
+        # Campos que admiten None explícito (para poder limpiarlos)
+        nullable_fields = {'carrera', 'semestre_actual'}
 
         update_data = {'updated_at': datetime.utcnow().isoformat()}
 
         for field in allowed_fields:
-            if field in updates and updates[field] is not None:
-                update_data[field] = updates[field]
+            if field in updates:
+                if updates[field] is not None or field in nullable_fields:
+                    update_data[field] = updates[field]
 
         # Recalcular completitud con los nuevos datos
         merged_profile = {**profile, **update_data}

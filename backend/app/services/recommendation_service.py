@@ -140,12 +140,19 @@ class RecommendationService:
                     completeness
                 )
 
+        # Datos de elegibilidad del candidato (carrera y semestre)
+        candidate_info = {
+            'carrera': profile.get('carrera'),
+            'semestre_actual': profile.get('semestre_actual'),
+            'user_role': user_role,
+        }
+
         # Evaluar cada oferta
         recommendations = []
 
         for oferta in ofertas:
             try:
-                result = self._evaluate_oferta(gemini_output, oferta)
+                result = self._evaluate_oferta(gemini_output, oferta, candidate_info)
 
                 if result:
                     recommendations.append({
@@ -176,7 +183,8 @@ class RecommendationService:
     def _evaluate_oferta(
         self,
         gemini_output: Dict,
-        oferta: Dict
+        oferta: Dict,
+        candidate_info: Optional[Dict] = None
     ) -> Optional[Dict]:
         """
         Evalua una oferta contra el perfil del usuario.
@@ -186,43 +194,39 @@ class RecommendationService:
         2. Config del perfil institucional asociado
         3. Config generica por defecto
 
+        Antes de invocar el modelo ML se aplica un pre-filtro de elegibilidad
+        basado en carrera y semestre del candidato.
+
         Args:
             gemini_output: Perfil en formato Gemini
             oferta: Datos de la oferta (puede incluir weights/thresholds/requirements propios)
+            candidate_info: {'carrera', 'semestre_actual', 'user_role'} para pre-filtro
 
         Returns:
             Dict con resultado de evaluacion o None
         """
         ml_service = get_ml_service()
 
-        # Cargar perfil institucional base (o generico si no hay)
-        if oferta.get('institutional_profile_id'):
-            profile = ml_service.load_institutional_profile(
-                oferta['institutional_profile_id']
-            )
-            if not profile:
-                profile = self._create_generic_profile(oferta)
-        else:
-            profile = self._create_generic_profile(oferta)
+        # La configuracion de evaluacion (pesos, requisitos, umbrales) viene
+        # UNICAMENTE de la oferta. El perfil institucional solo aporta datos
+        # de identidad (institution_name, sector) que ya vienen en el JOIN
+        # realizado por oferta_service. No se cargan ni usan pesos del perfil
+        # institucional para evitar que una config de nivel institucional
+        # sobreescriba la de la oferta.
+        profile = self._create_profile_from_oferta(oferta)
 
-        # Override con config propia de la oferta (migration v3):
-        # Nivel educativo mínimo, pesos y umbrales ahora vienen de la oferta
-        if oferta.get('weights'):
-            profile['weights'] = oferta['weights']
-        if oferta.get('thresholds'):
-            profile['thresholds'] = oferta['thresholds']
-        if oferta.get('requirements'):
-            profile['requirements'] = {
-                **profile['requirements'],
-                **oferta['requirements']
-            }
-
-        # Merge requisitos_especificos adicionales
-        if oferta.get('requisitos_especificos'):
-            profile['requirements'] = {
-                **profile['requirements'],
-                **oferta['requisitos_especificos']
-            }
+        # PRE-FILTRO DE ELEGIBILIDAD (binario, antes del modelo ML)
+        if candidate_info:
+            eligibility = self._check_eligibility(candidate_info, profile['requirements'])
+            if not eligibility['eligible']:
+                return {
+                    'match_score': 0.0,
+                    'clasificacion': 'NO_APTO',
+                    'scores_detalle': {},
+                    'fortalezas': [],
+                    'debilidades': [eligibility['reason']],
+                    'match_details': {'eligibility_reason': eligibility['reason']}
+                }
 
         result = ml_service.evaluate_cv(gemini_output, profile)
 
@@ -235,30 +239,104 @@ class RecommendationService:
             'match_details': result.get('match_details')
         }
 
-    def _create_generic_profile(self, oferta: Dict) -> Dict:
-        """Crea un perfil institucional generico para ofertas sin perfil asociado."""
-        requisitos = oferta.get('requisitos_especificos', {})
+    def _check_eligibility(self, candidate_info: Dict, requirements: Dict) -> Dict:
+        """
+        Aplica el pre-filtro de elegibilidad basado en carrera y semestre.
+
+        Reglas:
+        1. Si la oferta tiene carreras_aceptadas y la carrera del candidato
+           no está en la lista → NO elegible.
+        2. Si el candidato es estudiante y la oferta tiene semestre_minimo
+           y su semestre es menor → NO elegible.
+        3. Si la oferta tiene semestre_maximo y el semestre del candidato
+           es mayor → NO elegible.
+        4. Si el candidato es titulado, los filtros de semestre se omiten.
+
+        Args:
+            candidate_info: {'carrera', 'semestre_actual', 'user_role'}
+            requirements: Dict de requisitos resueltos de la oferta
+
+        Returns:
+            {'eligible': bool, 'reason': str | None}
+        """
+        carrera = candidate_info.get('carrera')
+        semestre_actual = candidate_info.get('semestre_actual')
+        user_role = candidate_info.get('user_role', '')
+
+        carreras_aceptadas = requirements.get('carreras_aceptadas', [])
+        semestre_minimo = requirements.get('semestre_minimo')
+        semestre_maximo = requirements.get('semestre_maximo')
+
+        # Filtro por carrera (aplica a todos: estudiantes y titulados)
+        if carreras_aceptadas and carrera:
+            if carrera not in carreras_aceptadas:
+                return {
+                    'eligible': False,
+                    'reason': f'Carrera no requerida. Esta oferta es para: {", ".join(carreras_aceptadas)}'
+                }
+
+        # Filtros de semestre (solo para estudiantes)
+        if user_role == 'estudiante' and semestre_actual is not None:
+            if semestre_minimo is not None and semestre_actual < semestre_minimo:
+                return {
+                    'eligible': False,
+                    'reason': f'Semestre insuficiente. Esta oferta requiere a partir del {semestre_minimo}° semestre'
+                }
+            if semestre_maximo is not None and semestre_actual > semestre_maximo:
+                return {
+                    'eligible': False,
+                    'reason': f'Semestre fuera del rango requerido. Esta oferta es para hasta el {semestre_maximo}° semestre'
+                }
+
+        return {'eligible': True, 'reason': None}
+
+    def _create_profile_from_oferta(self, oferta: Dict) -> Dict:
+        """
+        Construye la configuracion de evaluacion EXCLUSIVAMENTE desde la oferta.
+
+        Los pesos, requisitos y umbrales nunca se heredan del perfil institucional.
+        Si la oferta no los define, se usan defaults genericos.
+
+        El perfil institucional solo aporta identidad (institution_name, sector),
+        que ya viene en el dict de la oferta via JOIN en oferta_service.
+        """
+        # requirements: structured admin form (alta prioridad) sobre legacy field
+        requisitos = oferta.get('requisitos_especificos') or {}
+        requirements = oferta.get('requirements') or {}
+        req = {**requisitos, **requirements}
+
+        # weights: los definidos en la oferta o defaults genericos
+        w = oferta.get('weights') or {}
+
+        # thresholds: los definidos en la oferta o defaults genericos
+        t = oferta.get('thresholds') or {}
 
         return {
-            'id': 'generic',
+            'id': oferta.get('id', 'generic'),
             'institution_name': oferta.get('institution_name', 'Empresa'),
             'sector': oferta.get('sector', 'General'),
             'weights': {
-                'hard_skills': 0.30,
-                'soft_skills': 0.20,
-                'experience': 0.25,
-                'education': 0.15,
-                'languages': 0.10
+                'hard_skills': w.get('hard_skills', 0.30),
+                'soft_skills': w.get('soft_skills', 0.20),
+                'experience': w.get('experience', 0.25),
+                'education': w.get('education', 0.15),
+                'languages': w.get('languages', 0.10),
             },
             'requirements': {
-                'min_experience_years': requisitos.get('min_experience_years', 0),
-                'required_skills': requisitos.get('required_skills', []),
-                'preferred_skills': requisitos.get('preferred_skills', []),
-                'required_soft_skills': requisitos.get('required_soft_skills', []),
-                'required_education_level': requisitos.get('required_education_level', 'Licenciatura'),
-                'required_languages': requisitos.get('required_languages', [])
+                'min_experience_years': req.get('min_experience_years', 0),
+                'required_skills': req.get('required_skills', []),
+                'preferred_skills': req.get('preferred_skills', []),
+                'required_soft_skills': req.get('required_soft_skills', []),
+                'required_education_level': req.get('required_education_level', 'Licenciatura'),
+                'required_languages': req.get('required_languages', []),
+                'carreras_aceptadas': req.get('carreras_aceptadas', []),
+                'semestre_minimo': req.get('semestre_minimo'),
+                'semestre_maximo': req.get('semestre_maximo'),
             },
-            'thresholds': {'apto': 0.70, 'considerado': 0.50}
+            'thresholds': {
+                'apto': t.get('apto', 0.70),
+                'considerado': t.get('considerado', 0.50),
+            },
         }
 
     def _extract_fortalezas(self, result: Dict) -> List[str]:

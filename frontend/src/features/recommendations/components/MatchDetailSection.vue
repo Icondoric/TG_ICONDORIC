@@ -1,5 +1,25 @@
 <template>
   <div class="space-y-6">
+
+    <!-- Elegibilidad: rechazo por pre-filtro -->
+    <div
+      v-if="props.matchDetails?.eligibility_reason"
+      class="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3"
+    >
+      <svg class="w-5 h-5 text-red-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728" />
+      </svg>
+      <div>
+        <p class="text-sm font-semibold text-red-800">No cumples los requisitos de elegibilidad</p>
+        <p class="text-sm text-red-700 mt-0.5">{{ props.matchDetails.eligibility_reason }}</p>
+        <p class="text-xs text-red-500 mt-1">Este candidato no fue evaluado por el modelo de aptitudes.</p>
+      </div>
+    </div>
+
+    <!-- Detalle de aptitudes (se oculta cuando hay rechazo por elegibilidad) -->
+    <template v-if="!props.matchDetails?.eligibility_reason">
+
     <!-- Hard Skills -->
     <div>
       <div class="flex items-center justify-between mb-3">
@@ -207,6 +227,54 @@
       </p>
     </div>
 
+    <!-- Nivel Educativo -->
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <h5 class="font-semibold text-gray-900">Nivel Educativo</h5>
+      </div>
+      <div v-if="props.matchDetails?.education" class="flex items-center gap-3">
+        <span :class="[
+          'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium',
+          props.matchDetails.education.meets_requirement ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        ]">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path v-if="props.matchDetails.education.meets_requirement"
+              stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          {{ props.matchDetails.education.cv_level || 'Sin especificar' }}
+        </span>
+        <span class="text-xs text-gray-400">
+          Requerido: <strong>{{ props.matchDetails.education.required_level }}</strong>
+        </span>
+      </div>
+      <p v-else class="text-sm text-gray-400 italic">Sin información de nivel educativo</p>
+    </div>
+
+    <!-- Experiencia Laboral -->
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <h5 class="font-semibold text-gray-900">Experiencia Laboral</h5>
+      </div>
+      <div v-if="props.matchDetails?.experience" class="flex items-center gap-3">
+        <span :class="[
+          'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium',
+          props.matchDetails.experience.meets_minimum ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        ]">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path v-if="props.matchDetails.experience.meets_minimum"
+              stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          {{ props.matchDetails.experience.cv_years }} año(s)
+        </span>
+        <span class="text-xs text-gray-400">
+          Requerido: <strong>{{ props.matchDetails.experience.required_years }} año(s) mínimo</strong>
+        </span>
+      </div>
+      <p v-else class="text-sm text-gray-400 italic">Sin información de experiencia requerida</p>
+    </div>
+
     <!-- Extra CV skills (not required but the user has) -->
     <div v-if="extraHardSkills.length > 0">
       <h5 class="font-semibold text-gray-900 mb-2">Tus fortalezas adicionales</h5>
@@ -223,6 +291,7 @@
 
     <!-- Contextual message -->
     <div
+      v-if="contextMessage"
       :class="[
         'p-3 rounded-lg text-sm',
         contextMessageStyle
@@ -230,6 +299,10 @@
     >
       {{ contextMessage }}
     </div>
+
+    </template>
+    <!-- fin detalle aptitudes -->
+
   </div>
 </template>
 
@@ -371,6 +444,9 @@ const extraHardSkills = computed(() => {
 
 // Contextual message based on classification
 const contextMessage = computed(() => {
+  if (props.matchDetails?.eligibility_reason) {
+    return null // Ya se muestra el banner de elegibilidad arriba
+  }
   switch (props.clasificacion) {
     case 'APTO':
       return 'Tienes un perfil fuerte para esta oferta. Tus competencias se alinean bien con los requisitos.'

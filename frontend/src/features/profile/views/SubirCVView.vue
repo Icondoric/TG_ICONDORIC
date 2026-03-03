@@ -324,6 +324,7 @@
 import { ref, computed } from 'vue'
 import AppLayout from '@/shared/components/AppLayout.vue'
 import { uploadCV } from '@/features/profile/api/profile.api'
+import { formatApiError } from '@/shared/utils/apiError'
 
 const step = ref(1)
 const selectedFile = ref(null)
@@ -409,7 +410,7 @@ const uploadFile = async () => {
     step.value = 3
 
   } catch (e) {
-    error.value = e.response?.data?.detail || 'Error procesando el CV. Intenta de nuevo.'
+    error.value = formatApiError(e, 'Error procesando el CV. Intenta de nuevo.')
     step.value = 1
   } finally {
     uploading.value = false

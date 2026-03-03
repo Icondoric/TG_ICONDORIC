@@ -23,10 +23,6 @@ const sectorFilter = ref('')
 const reportData = ref(null)
 
 onMounted(async () => {
-    if (!authStore.isAdminOrOperator) {
-        router.push('/dashboard')
-        return
-    }
     const end = new Date()
     const start = new Date()
     start.setDate(end.getDate() - 90)

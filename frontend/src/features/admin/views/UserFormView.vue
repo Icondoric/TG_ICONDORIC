@@ -3,25 +3,25 @@
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="mb-8">
-        <router-link to="/admin/users" class="text-blue-600 hover:text-blue-800 flex items-center mb-4">
+        <router-link to="/admin/users" class="text-emi-navy-500 hover:text-emi-gold flex items-center mb-4 transition-colors">
           <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
           Volver a Usuarios
         </router-link>
-        <h1 class="text-3xl font-bold text-gray-900">Nuevo Usuario</h1>
+        <h1 class="text-3xl font-bold text-emi-navy-500">Nuevo Usuario</h1>
       </div>
 
       <!-- Form -->
-      <form @submit.prevent="saveUser" class="bg-white rounded-lg shadow p-6">
+      <form @submit.prevent="saveUser" class="card-emi p-6">
         <!-- Error -->
-        <div v-if="error" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p class="text-red-700">{{ error }}</p>
+        <div v-if="error" class="mb-6 p-4 bg-danger-50 border border-danger-200 rounded-lg">
+          <p class="text-danger-700 whitespace-pre-line">{{ error }}</p>
         </div>
 
         <!-- Success -->
-        <div v-if="success" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p class="text-green-700">{{ success }}</p>
+        <div v-if="success" class="mb-6 p-4 bg-success-50 border border-success-200 rounded-lg">
+          <p class="text-success-700">{{ success }}</p>
         </div>
 
         <div class="space-y-6">
@@ -31,7 +31,7 @@
               v-model="form.nombre_completo"
               type="text"
               required
-              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-emi-navy-500 focus:border-emi-navy-500 transition-colors"
               placeholder="Ej: Juan Perez Lopez"
             />
           </div>
@@ -42,7 +42,7 @@
               v-model="form.email"
               type="email"
               required
-              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-emi-navy-500 focus:border-emi-navy-500 transition-colors"
               placeholder="usuario@email.com"
             />
           </div>
@@ -55,13 +55,13 @@
                 type="text"
                 required
                 minlength="6"
-                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                class="block w-full border-slate-300 rounded-md shadow-sm focus:ring-emi-navy-500 focus:border-emi-navy-500 transition-colors"
                 placeholder="Minimo 6 caracteres"
               />
               <button
                 type="button"
                 @click="generatePassword"
-                class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-200 whitespace-nowrap"
+                class="btn-emi-secondary whitespace-nowrap"
               >
                 Generar
               </button>
@@ -73,29 +73,36 @@
             <select
               v-model="form.rol"
               required
-              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-emi-navy-500 focus:border-emi-navy-500 transition-colors"
             >
               <option value="">Seleccionar...</option>
-              <option value="estudiante">Estudiante</option>
-              <option value="titulado">Titulado</option>
-              <option value="operador">Operador</option>
-              <option value="administrador">Administrador</option>
+              <optgroup label="Roles del sistema">
+                <option value="estudiante">Estudiante</option>
+                <option value="titulado">Titulado</option>
+                <option value="operador">Operador</option>
+                <option value="administrador">Administrador</option>
+              </optgroup>
+              <optgroup v-if="customRoles.length" label="Roles personalizados">
+                <option v-for="r in customRoles" :key="r.id" :value="r.nombre">
+                  {{ r.nombre }}
+                </option>
+              </optgroup>
             </select>
           </div>
         </div>
 
         <!-- Actions -->
-        <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end gap-4">
+        <div class="mt-8 pt-6 border-t border-slate-200 flex justify-end gap-4">
           <router-link
             to="/admin/users"
-            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            class="px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors"
           >
             Cancelar
           </router-link>
           <button
             type="submit"
             :disabled="saving"
-            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            class="btn-emi-primary"
           >
             {{ saving ? 'Creando...' : 'Crear Usuario' }}
           </button>
@@ -106,10 +113,12 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { createUser } from '@/features/admin/api/users.api'
+import { fetchRoles } from '@/features/system/api/roles.api'
 import AppLayout from '@/shared/components/AppLayout.vue'
+import { formatApiError } from '@/shared/utils/apiError'
 
 const router = useRouter()
 
@@ -123,6 +132,15 @@ const form = reactive({
 const saving = ref(false)
 const error = ref(null)
 const success = ref(null)
+const customRoles = ref([])
+
+onMounted(async () => {
+  try {
+    customRoles.value = await fetchRoles()
+  } catch {
+    // Si falla la carga de roles personalizados, el select muestra solo los fijos
+  }
+})
 
 const generatePassword = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%'
@@ -149,7 +167,7 @@ const saveUser = async () => {
     router.push('/admin/users')
 
   } catch (e) {
-    error.value = e.response?.data?.detail || 'Error creando usuario'
+    error.value = formatApiError(e, 'Error creando usuario')
   } finally {
     saving.value = false
   }

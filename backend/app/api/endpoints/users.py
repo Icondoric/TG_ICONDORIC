@@ -164,9 +164,12 @@ async def create_user(
     if not supabase:
         raise HTTPException(status_code=500, detail="Database connection not available")
 
-    valid_roles = ["estudiante", "titulado", "operador", "administrador"]
-    if user_data.rol not in valid_roles:
-        raise HTTPException(status_code=400, detail=f"Rol inválido. Roles válidos: {', '.join(valid_roles)}")
+    fixed_roles = ["estudiante", "titulado", "operador", "administrador"]
+    if user_data.rol not in fixed_roles:
+        # Check if it's a valid custom role
+        custom_check = supabase.table("roles_personalizados").select("id").eq("nombre", user_data.rol).execute()
+        if not custom_check.data:
+            raise HTTPException(status_code=400, detail=f"Rol inválido. Roles fijos: {', '.join(fixed_roles)}. También puedes usar un rol personalizado creado en Gestión de Sistema.")
 
     if len(user_data.password) < 6:
         raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 6 caracteres")
@@ -381,6 +384,8 @@ async def get_user_profile_full(
             telefono=profile.get('telefono'),
             email_contacto=profile.get('email_contacto'),
             nacionalidad=profile.get('nacionalidad'),
+            carrera=profile.get('carrera'),
+            semestre_actual=profile.get('semestre_actual'),
             cv_filename=profile.get('cv_filename'),
             cv_uploaded_at=profile.get('cv_uploaded_at'),
             is_complete=profile.get('is_complete', False),

@@ -7,19 +7,19 @@ export default [
         path: '/mis-recomendaciones',
         name: 'mis-recomendaciones',
         component: MisRecomendacionesView,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true, moduleId: 'evaluacion_perfiles', submoduleId: 'correspondencia' }
     },
     {
         path: '/correspondencia-perfiles',
         name: 'correspondencia-perfiles',
         component: PostulacionesView,
-        meta: { requiresAuth: true, hideNavbar: true }
+        meta: { requiresAuth: true, hideNavbar: true, moduleId: 'evaluacion_perfiles', submoduleId: 'correspondencia' }
     },
     {
         path: '/historial-postulaciones',
         name: 'historial-postulaciones',
         component: HistorialPostulacionesView,
-        meta: { requiresAuth: true, hideNavbar: true }
+        meta: { requiresAuth: true, hideNavbar: true, moduleId: 'evaluacion_perfiles', submoduleId: 'historial' }
     },
     {
         path: '/recommendations',

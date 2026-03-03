@@ -153,30 +153,6 @@
               :readOnly="true"
             />
 
-            <!-- Actions Card -->
-            <Card title="Acciones">
-              <div class="flex flex-wrap gap-4">
-                <router-link
-                  to="/digitalizacion/editar"
-                  class="inline-flex items-center gap-2 btn-emi-primary"
-                >
-                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                  Editar Perfil
-                </router-link>
-                <router-link
-                  to="/mis-recomendaciones"
-                  class="inline-flex items-center gap-2 btn-emi-secondary"
-                  :class="{ 'opacity-50 cursor-not-allowed': !profile.is_complete }"
-                >
-                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                  </svg>
-                  Ver Recomendaciones
-                </router-link>
-              </div>
-            </Card>
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { useAuthStore } from '@/features/auth/store/auth.store'
 import { useRouter } from 'vue-router'
 import AppLayout from '@/shared/components/AppLayout.vue'
 import { permanentDeleteProfile } from '@/features/admin/api/profiles.api'
+import { formatApiError } from '@/shared/utils/apiError'
 
 const adminProfilesStore = useAdminProfilesStore()
 const authStore = useAuthStore()
@@ -25,11 +26,6 @@ const permanentDeleteError = ref(null)
 
 // Cargar al montar
 onMounted(async () => {
-    if (!authStore.isAdminOrOperator) {
-        router.push('/dashboard')
-        return
-    }
-
     await loadProfiles()
     await adminProfilesStore.loadSectors()
 })
@@ -115,7 +111,7 @@ const executePermanentDelete = async () => {
         )
         permanentDeleteConfirm.value = null
     } catch (err) {
-        permanentDeleteError.value = err.response?.data?.detail || 'Error eliminando perfil'
+        permanentDeleteError.value = formatApiError(err, 'Error eliminando perfil')
     }
 }
 
@@ -151,16 +147,16 @@ const formatWeights = (weights) => {
             <!-- Header -->
             <header class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-slate-800">Perfiles Institucionales</h1>
+                    <h1 class="text-3xl font-bold text-emi-navy-500">Lista de Perfiles Institucionales</h1>
                     <p class="mt-1 text-slate-600">
-                        Gestiona los perfiles de las instituciones para el matching de CVs
+                        Apartado para gestionar perfiles de las instituciones.
                     </p>
                 </div>
                 <router-link
                     to="/admin/profiles/new"
-                    class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                    class="btn-emi-primary flex items-center shadow-sm"
                 >
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                     Nuevo Perfil
@@ -176,7 +172,7 @@ const formatWeights = (weights) => {
                             v-model="searchQuery"
                             type="text"
                             placeholder="Buscar por nombre o sector..."
-                            class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            class="w-full border-slate-200 rounded-md shadow-sm focus:ring-emi-navy-500 focus:border-emi-navy-500 transition-colors"
                         />
                     </div>
 
@@ -185,7 +181,7 @@ const formatWeights = (weights) => {
                         <select
                             v-model="selectedSector"
                             @change="filterBySector"
-                            class="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            class="border-slate-200 rounded-md shadow-sm focus:ring-emi-navy-500 focus:border-emi-navy-500 transition-colors"
                         >
                             <option value="">Todos los sectores</option>
                             <option v-for="sector in adminProfilesStore.sectors" :key="sector" :value="sector">
@@ -211,13 +207,13 @@ const formatWeights = (weights) => {
 
             <!-- Loading -->
             <div v-if="adminProfilesStore.isLoadingProfiles" class="bg-white rounded-xl shadow-md p-8 text-center">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emi-gold mx-auto"></div>
                 <p class="mt-4 text-slate-500">Cargando perfiles...</p>
             </div>
 
             <!-- Error -->
-            <div v-else-if="adminProfilesStore.profilesError" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p class="text-red-700">{{ adminProfilesStore.profilesError }}</p>
+            <div v-else-if="adminProfilesStore.profilesError" class="bg-danger-50 border border-danger-200 rounded-lg p-4 mb-6">
+                <p class="text-danger-700">{{ adminProfilesStore.profilesError }}</p>
             </div>
 
             <!-- Lista de Perfiles -->
@@ -256,8 +252,8 @@ const formatWeights = (weights) => {
                                 </h3>
                                 <span
                                     :class="[
-                                        'px-2 py-1 text-xs font-medium rounded-full',
-                                        profile.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                        'badge-emi',
+                                        profile.is_active ? 'bg-success-100 text-success-800' : 'bg-danger-100 text-danger-800'
                                     ]"
                                 >
                                     {{ profile.is_active ? 'Activo' : 'Inactivo' }}
@@ -304,7 +300,7 @@ const formatWeights = (weights) => {
                                     <span
                                         v-for="(weight, key) in profile.weights"
                                         :key="key"
-                                        class="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs"
+                                        class="badge-emi bg-emi-navy-50 text-emi-navy-700"
                                     >
                                         {{ key.replace('_', ' ') }}: {{ Math.round(weight * 100) }}%
                                     </span>
@@ -316,27 +312,27 @@ const formatWeights = (weights) => {
                         <div class="flex md:flex-col gap-2">
                             <button
                                 @click="editProfile(profile.id)"
-                                class="flex-1 md:flex-none px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium"
+                                class="flex-1 md:flex-none px-3 py-1.5 bg-emi-navy-100 text-emi-navy-700 rounded-lg hover:bg-emi-navy-200 transition-colors text-sm font-medium"
                             >
                                 Editar
                             </button>
                             <button
                                 v-if="profile.is_active"
                                 @click="confirmDelete(profile)"
-                                class="flex-1 md:flex-none px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors text-sm font-medium"
+                                class="flex-1 md:flex-none px-3 py-1.5 bg-warning-100 text-warning-700 rounded-lg hover:bg-warning-200 transition-colors text-sm font-medium"
                             >
                                 Desactivar
                             </button>
                             <button
                                 v-else
                                 @click="activateProfile(profile.id)"
-                                class="flex-1 md:flex-none px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
+                                class="flex-1 md:flex-none px-3 py-1.5 bg-success-100 text-success-700 rounded-lg hover:bg-success-200 transition-colors text-sm font-medium"
                             >
                                 Activar
                             </button>
                             <button
                                 @click="confirmPermanentDelete(profile)"
-                                class="flex-1 md:flex-none px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
+                                class="flex-1 md:flex-none px-3 py-1.5 bg-danger-100 text-danger-700 rounded-lg hover:bg-danger-200 transition-colors text-sm font-medium"
                             >
                                 Eliminar
                             </button>

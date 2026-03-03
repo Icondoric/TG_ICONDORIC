@@ -59,6 +59,8 @@ async def get_my_profile(
             telefono=profile.get('telefono'),
             email_contacto=profile.get('email_contacto'),
             nacionalidad=profile.get('nacionalidad'),
+            carrera=profile.get('carrera'),
+            semestre_actual=profile.get('semestre_actual'),
             cv_filename=profile.get('cv_filename'),
             cv_uploaded_at=profile.get('cv_uploaded_at'),
             is_complete=profile.get('is_complete', False),
@@ -90,8 +92,9 @@ async def update_my_profile(
     profile_service = get_profile_service()
 
     try:
-        # Convertir a dict excluyendo None
-        update_dict = updates.model_dump(exclude_none=True)
+        # exclude_unset=True: solo incluye campos que el cliente envió explícitamente,
+        # preservando None cuando el usuario quiere limpiar un campo nullable.
+        update_dict = updates.model_dump(exclude_unset=True)
 
         if not update_dict:
             raise HTTPException(
@@ -118,6 +121,8 @@ async def update_my_profile(
             telefono=profile.get('telefono'),
             email_contacto=profile.get('email_contacto'),
             nacionalidad=profile.get('nacionalidad'),
+            carrera=profile.get('carrera'),
+            semestre_actual=profile.get('semestre_actual'),
             cv_filename=profile.get('cv_filename'),
             cv_uploaded_at=profile.get('cv_uploaded_at'),
             is_complete=profile.get('is_complete', False),

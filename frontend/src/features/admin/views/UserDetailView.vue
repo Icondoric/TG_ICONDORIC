@@ -7,7 +7,9 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from '@/features/admin/store/users.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
+import { fetchRoles } from '@/features/system/api/roles.api'
 import AppLayout from '@/shared/components/AppLayout.vue'
+import { formatApiError } from '@/shared/utils/apiError'
 
 const route = useRoute()
 const router = useRouter()
@@ -25,21 +27,25 @@ const editForm = ref({
     rol: ''
 })
 
-const ROLES = [
+const FIXED_ROLES = [
     { value: 'estudiante', label: 'Estudiante' },
     { value: 'titulado', label: 'Titulado' },
     { value: 'operador', label: 'Operador' },
     { value: 'administrador', label: 'Administrador' }
 ]
+const customRoles = ref([])
+const allRoles = computed(() => [
+    ...FIXED_ROLES,
+    ...customRoles.value.map(r => ({ value: r.nombre, label: r.nombre }))
+])
 
 onMounted(async () => {
-    if (!authStore.isAdminOrOperator) {
-        router.push('/dashboard')
-        return
-    }
-
     try {
-        await usersStore.loadUser(userId)
+        const [, roles] = await Promise.all([
+            usersStore.loadUser(userId),
+            fetchRoles()
+        ])
+        customRoles.value = roles
         resetForm()
     } catch (error) {
         // Redirigir si no existe
@@ -90,7 +96,7 @@ const confirmDeleteUser = async () => {
         await usersStore.deleteUserAction(userId)
         router.push('/admin/users')
     } catch (err) {
-        deleteError.value = err.response?.data?.detail || 'Error eliminando usuario'
+        deleteError.value = formatApiError(err, 'Error eliminando usuario')
     }
 }
 
@@ -116,7 +122,7 @@ const formatDate = (dateString, includeTime = false) => {
             <header class="mb-6">
                 <button
                     @click="router.push('/admin/users')"
-                    class="flex items-center text-slate-500 hover:text-slate-800 mb-2 text-sm font-medium transition-colors"
+                    class="flex items-center text-emi-navy-500 hover:text-emi-gold mb-2 text-sm font-medium transition-colors"
                 >
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -124,12 +130,12 @@ const formatDate = (dateString, includeTime = false) => {
                     Volver a Usuarios
                 </button>
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <h1 class="text-3xl font-bold text-slate-800">Detalle de Usuario</h1>
+                    <h1 class="text-3xl font-bold text-emi-navy-500">Detalle de Usuario</h1>
 
                     <div class="flex gap-2" v-if="user && user.id !== authStore.user?.user_id">
                         <button
                             @click="deleteUser"
-                            class="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium border border-red-100"
+                            class="px-4 py-2 bg-danger-50 text-danger-600 rounded-lg hover:bg-danger-100 transition-colors font-medium border border-danger-100"
                         >
                             Eliminar Cuenta
                         </button>
@@ -138,34 +144,34 @@ const formatDate = (dateString, includeTime = false) => {
             </header>
 
             <!-- Loading -->
-            <div v-if="usersStore.loading && !user" class="bg-white rounded-xl shadow-md p-12 text-center">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div v-if="usersStore.loading && !user" class="card-emi p-12 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emi-gold mx-auto"></div>
                 <p class="mt-4 text-slate-500">Cargando datos...</p>
             </div>
 
             <!-- Error -->
-            <div v-else-if="usersStore.error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p class="text-red-700">{{ usersStore.error }}</p>
+            <div v-else-if="usersStore.error" class="bg-danger-50 border border-danger-200 rounded-lg p-4 mb-6">
+                <p class="text-danger-700">{{ usersStore.error }}</p>
             </div>
 
             <!-- Content -->
             <div v-else-if="user" class="max-w-3xl mx-auto space-y-6">
 
                 <!-- Hero Card: Avatar + Identity -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="card-emi overflow-hidden">
                     <div class="h-24 bg-gradient-to-r"
-                         :class="user.rol === 'administrador' ? 'from-purple-500 to-purple-700' :
-                                 user.rol === 'operador' ? 'from-orange-400 to-orange-600' :
-                                 user.rol === 'titulado' ? 'from-indigo-500 to-indigo-700' :
-                                 'from-blue-500 to-blue-700'"
+                         :class="user.rol === 'administrador' ? 'from-info-500 to-info-700' :
+                                 user.rol === 'operador' ? 'from-warning-400 to-warning-600' :
+                                 user.rol === 'titulado' ? 'from-emi-navy-500 to-emi-navy-700' :
+                                 'from-emi-gold to-yellow-600'"
                     ></div>
                     <div class="px-6 pb-6 -mt-12">
                         <div class="flex flex-col sm:flex-row sm:items-end gap-4">
-                            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold text-3xl shadow-lg border-4 border-white"
-                                 :class="user.rol === 'administrador' ? 'text-purple-600' :
-                                         user.rol === 'operador' ? 'text-orange-600' :
-                                         user.rol === 'titulado' ? 'text-indigo-600' :
-                                         'text-blue-600'"
+                            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center font-bold text-3xl shadow-lg border-4 border-white"
+                                 :class="user.rol === 'administrador' ? 'text-info-600' :
+                                         user.rol === 'operador' ? 'text-warning-600' :
+                                         user.rol === 'titulado' ? 'text-emi-navy-600' :
+                                         'text-emi-gold'"
                             >
                                 {{ (user.nombre_completo || user.email).charAt(0).toUpperCase() }}
                             </div>
@@ -173,13 +179,7 @@ const formatDate = (dateString, includeTime = false) => {
                                 <h2 class="text-2xl font-bold text-slate-800">{{ user.nombre_completo || 'Sin nombre' }}</h2>
                                 <p class="text-slate-500 text-sm mt-0.5">{{ user.email }}</p>
                             </div>
-                            <span :class="[
-                                'px-3 py-1.5 rounded-full text-xs font-semibold capitalize self-start sm:self-auto',
-                                user.rol === 'administrador' ? 'bg-purple-100 text-purple-700' :
-                                user.rol === 'operador' ? 'bg-orange-100 text-orange-700' :
-                                user.rol === 'titulado' ? 'bg-indigo-100 text-indigo-700' :
-                                'bg-blue-100 text-blue-700'
-                            ]">
+                            <span class="badge-rol badge-rol-default self-start sm:self-auto" :data-rol="user.rol">
                                 {{ user.rol }}
                             </span>
                         </div>
@@ -189,19 +189,19 @@ const formatDate = (dateString, includeTime = false) => {
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <!-- Rol -->
-                    <div class="bg-white rounded-xl shadow-md p-5">
+                    <div class="card-emi p-5">
                         <div class="flex items-center gap-3 mb-2">
                             <div class="w-9 h-9 rounded-lg flex items-center justify-center"
-                                 :class="user.rol === 'administrador' ? 'bg-purple-100' :
-                                         user.rol === 'operador' ? 'bg-orange-100' :
-                                         user.rol === 'titulado' ? 'bg-indigo-100' :
-                                         'bg-blue-100'"
+                                 :class="user.rol === 'administrador' ? 'bg-info-100' :
+                                         user.rol === 'operador' ? 'bg-warning-100' :
+                                         user.rol === 'titulado' ? 'bg-emi-navy-100' :
+                                         'bg-yellow-100'"
                             >
                                 <svg class="w-5 h-5"
-                                     :class="user.rol === 'administrador' ? 'text-purple-600' :
-                                             user.rol === 'operador' ? 'text-orange-600' :
-                                             user.rol === 'titulado' ? 'text-indigo-600' :
-                                             'text-blue-600'"
+                                     :class="user.rol === 'administrador' ? 'text-info-600' :
+                                             user.rol === 'operador' ? 'text-warning-600' :
+                                             user.rol === 'titulado' ? 'text-emi-navy-600' :
+                                             'text-emi-gold'"
                                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
@@ -212,10 +212,10 @@ const formatDate = (dateString, includeTime = false) => {
                     </div>
 
                     <!-- Fecha Registro -->
-                    <div class="bg-white rounded-xl shadow-md p-5">
+                    <div class="card-emi p-5">
                         <div class="flex items-center gap-3 mb-2">
-                            <div class="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
-                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-9 h-9 bg-success-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                             </div>
@@ -225,13 +225,13 @@ const formatDate = (dateString, includeTime = false) => {
                     </div>
 
                     <!-- Estado Perfil -->
-                    <div class="bg-white rounded-xl shadow-md p-5">
+                    <div class="card-emi p-5">
                         <div class="flex items-center gap-3 mb-2">
                             <div class="w-9 h-9 rounded-lg flex items-center justify-center"
-                                 :class="user.tiene_perfil ? (user.perfil_completo ? 'bg-green-100' : 'bg-yellow-100') : 'bg-slate-100'"
+                                 :class="user.tiene_perfil ? (user.perfil_completo ? 'bg-success-100' : 'bg-warning-100') : 'bg-slate-100'"
                             >
                                 <svg class="w-5 h-5"
-                                     :class="user.tiene_perfil ? (user.perfil_completo ? 'text-green-600' : 'text-yellow-600') : 'text-slate-400'"
+                                     :class="user.tiene_perfil ? (user.perfil_completo ? 'text-success-600' : 'text-warning-600') : 'text-slate-400'"
                                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -243,12 +243,12 @@ const formatDate = (dateString, includeTime = false) => {
                                 <div class="flex items-center gap-2 mb-1">
                                     <p class="text-lg font-bold text-slate-800">{{ Math.round(user.completeness_score * 100) }}%</p>
                                     <span class="text-xs font-medium"
-                                          :class="user.perfil_completo ? 'text-green-600' : 'text-yellow-600'"
+                                          :class="user.perfil_completo ? 'text-success-600' : 'text-warning-600'"
                                     >{{ user.perfil_completo ? 'Completo' : 'En progreso' }}</span>
                                 </div>
                                 <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
                                     <div class="h-full rounded-full transition-all duration-500"
-                                         :class="user.perfil_completo ? 'bg-green-500' : 'bg-yellow-500'"
+                                         :class="user.perfil_completo ? 'bg-success-500' : 'bg-warning-500'"
                                          :style="{ width: `${user.completeness_score * 100}%` }"
                                     ></div>
                                 </div>
@@ -260,7 +260,7 @@ const formatDate = (dateString, includeTime = false) => {
                 </div>
 
                 <!-- Informacion de Cuenta Card -->
-                <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="card-emi p-6">
                     <div class="flex justify-between items-center mb-5">
                         <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
                             <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,7 +271,7 @@ const formatDate = (dateString, includeTime = false) => {
                         </h2>
                         <button
                             @click="toggleEdit"
-                            class="px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg font-medium transition-colors"
+                            class="px-3 py-1.5 text-sm text-emi-navy-500 hover:text-emi-gold transition-colors font-medium border border-transparent hover:border-emi-gold rounded-lg"
                         >
                             {{ isEditing ? 'Cancelar' : 'Editar' }}
                         </button>
@@ -289,13 +289,7 @@ const formatDate = (dateString, includeTime = false) => {
                             </div>
                             <div>
                                 <span class="text-xs text-slate-400 block uppercase tracking-wider mb-1">Rol Asignado</span>
-                                <span :class="[
-                                    'px-2.5 py-1 rounded-full text-xs font-medium capitalize',
-                                    user.rol === 'administrador' ? 'bg-purple-100 text-purple-700' :
-                                    user.rol === 'operador' ? 'bg-orange-100 text-orange-700' :
-                                    user.rol === 'titulado' ? 'bg-indigo-100 text-indigo-700' :
-                                    'bg-blue-100 text-blue-700'
-                                ]">
+                                <span class="badge-rol badge-rol-default" :data-rol="user.rol">
                                     {{ user.rol }}
                                 </span>
                             </div>
@@ -322,18 +316,25 @@ const formatDate = (dateString, includeTime = false) => {
                                 <input
                                     v-model="editForm.nombre_completo"
                                     type="text"
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-emi-navy-500 transition-colors"
                                 />
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Rol</label>
                                 <select
                                     v-model="editForm.rol"
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-emi-navy-500 transition-colors"
                                 >
-                                    <option v-for="role in ROLES" :key="role.value" :value="role.value">
-                                        {{ role.label }}
-                                    </option>
+                                    <optgroup label="Roles del sistema">
+                                        <option v-for="role in FIXED_ROLES" :key="role.value" :value="role.value">
+                                            {{ role.label }}
+                                        </option>
+                                    </optgroup>
+                                    <optgroup v-if="customRoles.length" label="Roles personalizados">
+                                        <option v-for="r in customRoles" :key="r.nombre" :value="r.nombre">
+                                            {{ r.nombre }}
+                                        </option>
+                                    </optgroup>
                                 </select>
                             </div>
                         </div>
@@ -349,7 +350,7 @@ const formatDate = (dateString, includeTime = false) => {
                             <button
                                 type="submit"
                                 :disabled="saving"
-                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium text-sm"
+                                class="btn-emi-primary font-medium text-sm"
                             >
                                 {{ saving ? 'Guardando...' : 'Guardar Cambios' }}
                             </button>
@@ -367,8 +368,8 @@ const formatDate = (dateString, includeTime = false) => {
         >
             <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex-shrink-0 w-10 h-10 bg-danger-100 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-danger-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                         </svg>
                     </div>
@@ -378,10 +379,10 @@ const formatDate = (dateString, includeTime = false) => {
                     Estas a punto de eliminar la cuenta de
                     <span class="font-semibold text-slate-800">{{ user?.nombre_completo || user?.email }}</span>.
                 </p>
-                <p class="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2 mb-4">
+                <p class="text-sm text-danger-600 bg-danger-50 rounded-lg px-3 py-2 mb-4">
                     Esta accion es irreversible. El usuario y todos sus datos seran eliminados.
                 </p>
-                <p v-if="deleteError" class="text-sm text-red-700 bg-red-50 border border-red-200 rounded px-3 py-2 mb-4">
+                <p v-if="deleteError" class="text-sm text-danger-700 bg-danger-50 border border-danger-200 rounded px-3 py-2 mb-4">
                     {{ deleteError }}
                 </p>
                 <div class="flex gap-3 justify-end">
@@ -393,7 +394,7 @@ const formatDate = (dateString, includeTime = false) => {
                     </button>
                     <button
                         @click="confirmDeleteUser"
-                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+                        class="px-4 py-2 bg-danger-600 text-white rounded-lg hover:bg-danger-700 font-medium"
                     >
                         Eliminar cuenta
                     </button>

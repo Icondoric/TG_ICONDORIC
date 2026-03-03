@@ -25,11 +25,6 @@ const profileCompleteFilter = ref('')
 const reportData = ref(null)
 
 onMounted(async () => {
-    if (!authStore.isAdminOrOperator) {
-        router.push('/dashboard')
-        return
-    }
-    // Default: last 90 days
     const end = new Date()
     const start = new Date()
     start.setDate(end.getDate() - 90)
@@ -214,13 +209,7 @@ const formatDate = (dateStr) => {
                                     <td class="px-4 py-3 text-sm text-slate-800">{{ user.nombre_completo || '-' }}</td>
                                     <td class="px-4 py-3 text-sm text-slate-600">{{ user.email }}</td>
                                     <td class="px-4 py-3">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize"
-                                              :class="{
-                                                  'bg-blue-100 text-blue-800': user.rol === 'estudiante',
-                                                  'bg-purple-100 text-purple-800': user.rol === 'titulado',
-                                                  'bg-yellow-100 text-yellow-800': user.rol === 'operador',
-                                                  'bg-red-100 text-red-800': user.rol === 'administrador',
-                                              }">
+                                        <span class="badge-rol badge-rol-default inline-flex" :data-rol="user.rol">
                                             {{ user.rol }}
                                         </span>
                                     </td>

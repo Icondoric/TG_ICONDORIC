@@ -35,11 +35,6 @@ const skillsCloud = ref(null)
 const profileStats = ref(null)
 
 onMounted(async () => {
-    if (!authStore.isAdminOrOperator) {
-        router.push('/dashboard')
-        return
-    }
-    // Set default dates based on selection
     updateCustomDatesFromRange()
     await loadData()
 })

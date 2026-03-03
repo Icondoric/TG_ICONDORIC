@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.endpoints import cv, auth, users, analytics
+from app.api.endpoints import cv, auth, users, analytics, roles
 from app.api.routes import ml_predictions, institutional_profiles, profile, ofertas, recommendations, postulaciones, admin_ranking
 from app.services.ml_integration_service import get_ml_service
 
@@ -107,6 +107,11 @@ app.include_router(
     analytics.router,
     prefix="/api/analytics",
     tags=["Admin - Analytics"]
+)
+app.include_router(
+    roles.router,
+    prefix="/api/roles",
+    tags=["System - Roles"]
 )
 
 

@@ -10,6 +10,7 @@ import evaluationRoutes from '@/features/evaluation/evaluation.routes'
 import recommendationsRoutes from '@/features/recommendations/recommendations.routes'
 import accountRoutes from '@/features/account/account.routes'
 import adminRoutes from '@/features/admin/admin.routes'
+import systemRoutes from '@/features/system/system.routes'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +23,7 @@ const router = createRouter({
         ...recommendationsRoutes,
         ...accountRoutes,
         ...adminRoutes,
+        ...systemRoutes,
 
         // Catch-all redirect
         {

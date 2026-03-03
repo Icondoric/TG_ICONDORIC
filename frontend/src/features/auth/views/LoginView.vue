@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import { useRouter } from 'vue-router'
+import { FIXED_ROLE_MODULES } from '@/shared/constants/modules'
+
+const FIXED_ROLES = Object.keys(FIXED_ROLE_MODULES)
 
 const email = ref('')
 const password = ref('')
@@ -56,6 +59,15 @@ const handleLogin = async () => {
             router.push('/admin')
         } else if (authStore.isOperator) {
             router.push('/admin/users')
+        } else if (!FIXED_ROLES.includes(authStore.user?.rol)) {
+            // Rol personalizado: redirigir al primer módulo disponible
+            const mods = authStore.allowedModules
+            if (mods && 'gestion_usuarios' in mods)        router.push('/admin/users')
+            else if (mods && 'oferta_laboral' in mods)     router.push('/admin/ofertas')
+            else if (mods && 'perfiles_institucionales' in mods) router.push('/admin/profiles')
+            else if (mods && 'informes_reportes' in mods)  router.push('/admin/reports')
+            else if (mods && 'evaluacion_perfiles' in mods) router.push('/correspondencia-perfiles')
+            else router.push('/digitalizacion/mi-perfil')
         } else {
             router.push('/digitalizacion/mi-perfil')
         }

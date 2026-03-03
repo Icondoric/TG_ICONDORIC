@@ -82,6 +82,66 @@
           </form>
         </div>
 
+        <!-- Academic Info Card (solo para estudiantes y titulados) -->
+        <div v-if="accountInfo.rol === 'estudiante' || accountInfo.rol === 'titulado'" class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-5">
+            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+            </svg>
+            Información Académica
+          </h2>
+          <p class="text-sm text-slate-500 mb-4 -mt-3">
+            Esta información se usa para verificar tu elegibilidad en convocatorias que requieren carrera o semestre específico.
+          </p>
+          <form @submit.prevent="updateAcademicInfo" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Carrera</label>
+                <select
+                  v-model="academicForm.carrera"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Sin especificar</option>
+                  <option v-for="c in EMI_CARRERAS" :key="c" :value="c">{{ c }}</option>
+                </select>
+              </div>
+              <div v-if="isEstudiante">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Semestre Actual</label>
+                <select
+                  v-model.number="academicForm.semestre_actual"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option :value="null">Sin especificar</option>
+                  <option v-for="n in 10" :key="n" :value="n">{{ n }}° semestre</option>
+                </select>
+                <p class="mt-1 text-xs text-slate-500">Solo requerido para estudiantes activos</p>
+              </div>
+            </div>
+
+            <div v-if="academicSuccess" class="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p class="text-green-700 text-sm flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                {{ academicSuccess }}
+              </p>
+            </div>
+            <div v-if="academicError" class="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p class="text-red-700 text-sm">{{ academicError }}</p>
+            </div>
+
+            <div class="flex justify-end">
+              <button
+                type="submit"
+                :disabled="savingAcademic || !hasAcademicChanges"
+                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+              >
+                {{ savingAcademic ? 'Guardando...' : 'Guardar Cambios' }}
+              </button>
+            </div>
+          </form>
+        </div>
+
         <!-- Password Change Card -->
         <div class="bg-white rounded-xl shadow-md p-6">
           <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-5">
@@ -179,10 +239,24 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getAccountInfo, updateAccount, changePassword } from '@/features/account/api/account.api'
+import { getMyProfile, updateMyProfile } from '@/features/profile/api/profile.api'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import AppLayout from '@/shared/components/AppLayout.vue'
+import { formatApiError } from '@/shared/utils/apiError'
 
 const authStore = useAuthStore()
+
+const EMI_CARRERAS = [
+  'Ingenieria Civil',
+  'Ingenieria de Sistemas',
+  'Ingenieria Geografica',
+  'Ingenieria Mecatronica',
+  'Ingenieria en Sistemas Electronicos',
+  'Ingenieria Financiera',
+  'Ingenieria Industrial',
+  'Derecho',
+  'Ingenieria Comercial',
+]
 
 // State
 const loading = ref(true)
@@ -194,6 +268,19 @@ const accountInfo = ref({
   rol: '',
   created_at: ''
 })
+
+// Academic Info Form
+const academicForm = ref({ carrera: '', semestre_actual: null })
+const originalAcademic = ref({ carrera: '', semestre_actual: null })
+const savingAcademic = ref(false)
+const academicSuccess = ref('')
+const academicError = ref('')
+
+const isEstudiante = computed(() => authStore.user?.rol === 'estudiante')
+const hasAcademicChanges = computed(() =>
+  academicForm.value.carrera !== originalAcademic.value.carrera ||
+  academicForm.value.semestre_actual !== originalAcademic.value.semestre_actual
+)
 
 // Personal Info Form
 const personalForm = ref({
@@ -244,17 +331,47 @@ const loadAccountInfo = async () => {
   error.value = null
 
   try {
-    const data = await getAccountInfo()
+    const [data, profileData] = await Promise.all([getAccountInfo(), getMyProfile().catch(() => null)])
     accountInfo.value = data
-
-    // Initialize form with current data
     personalForm.value.nombre_completo = data.nombre_completo || ''
     personalForm.value.email = data.email
+
+    if (profileData) {
+      academicForm.value.carrera = profileData.carrera || ''
+      academicForm.value.semestre_actual = profileData.semestre_actual ?? null
+      originalAcademic.value.carrera = profileData.carrera || ''
+      originalAcademic.value.semestre_actual = profileData.semestre_actual ?? null
+    }
   } catch (err) {
     console.error('Error loading account info:', err)
-    error.value = err.response?.data?.detail || 'Error al cargar información de la cuenta'
+    error.value = formatApiError(err, 'Error al cargar información de la cuenta')
   } finally {
     loading.value = false
+  }
+}
+
+const updateAcademicInfo = async () => {
+  savingAcademic.value = true
+  academicSuccess.value = ''
+  academicError.value = ''
+
+  try {
+    const updates = {}
+    if (academicForm.value.carrera !== originalAcademic.value.carrera) {
+      updates.carrera = academicForm.value.carrera || null
+    }
+    if (academicForm.value.semestre_actual !== originalAcademic.value.semestre_actual) {
+      updates.semestre_actual = academicForm.value.semestre_actual || null
+    }
+
+    await updateMyProfile(updates)
+    originalAcademic.value = { ...academicForm.value }
+    academicSuccess.value = 'Información académica actualizada'
+    setTimeout(() => { academicSuccess.value = '' }, 3000)
+  } catch (err) {
+    academicError.value = formatApiError(err, 'Error al actualizar información académica')
+  } finally {
+    savingAcademic.value = false
   }
 }
 
@@ -290,7 +407,7 @@ const updatePersonalInfo = async () => {
     }, 3000)
   } catch (err) {
     console.error('Error updating personal info:', err)
-    personalError.value = err.response?.data?.detail || 'Error al actualizar información'
+    personalError.value = formatApiError(err, 'Error al actualizar información')
   } finally {
     savingPersonal.value = false
   }
@@ -322,7 +439,7 @@ const updatePassword = async () => {
     }, 3000)
   } catch (err) {
     console.error('Error changing password:', err)
-    passwordError.value = err.response?.data?.detail || 'Error al cambiar contraseña'
+    passwordError.value = formatApiError(err, 'Error al cambiar contraseña')
   } finally {
     savingPassword.value = false
   }

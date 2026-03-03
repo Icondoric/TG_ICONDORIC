@@ -59,12 +59,8 @@ async def list_active_institutional_profiles(
                 institution_name=p['institution_name'],
                 sector=p['sector'],
                 description=p.get('description'),
-                area=p.get('area'),
                 contact_phone=p.get('contact_phone'),
                 contact_email=p.get('contact_email'),
-                weights=p.get('weights', {}),
-                requirements=p.get('requirements', {}),
-                thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),
                 is_active=True,
                 created_at=p['created_at'],
                 updated_at=p['updated_at'],
@@ -120,12 +116,8 @@ async def list_institutional_profiles(
                 institution_name=p['institution_name'],
                 sector=p['sector'],
                 description=p.get('description'),
-                area=p.get('area'),
                 contact_phone=p.get('contact_phone'),
                 contact_email=p.get('contact_email'),
-                weights=p.get('weights', {}),
-                requirements=p.get('requirements', {}),
-                thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),
                 is_active=p.get('is_active', True),
                 created_at=p['created_at'],
                 updated_at=p['updated_at'],
@@ -184,9 +176,6 @@ async def get_institutional_profile(
             ubicacion=p.get('ubicacion'),
             contact_phone=p.get('contact_phone'),
             contact_email=p.get('contact_email'),
-            weights=p.get('weights', {}),
-            requirements=p.get('requirements', {}),
-            thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),
             is_active=p.get('is_active', True),
             created_at=p['created_at'],
             updated_at=p['updated_at'],
@@ -242,12 +231,6 @@ async def create_institutional_profile(
             'ubicacion': profile.ubicacion,
             'contact_phone': profile.contact_phone,
             'contact_email': profile.contact_email,
-            'weights': profile.weights.model_dump(),
-            'requirements': profile.requirements.model_dump(),
-            'thresholds': profile.thresholds.model_dump() if profile.thresholds else {
-                'apto': 0.70,
-                'considerado': 0.50
-            },
             'is_active': True,
             'created_at': now,
             'updated_at': now,
@@ -277,9 +260,6 @@ async def create_institutional_profile(
             ubicacion=p.get('ubicacion'),
             contact_phone=p.get('contact_phone'),
             contact_email=p.get('contact_email'),
-            weights=p.get('weights', {}),
-            requirements=p.get('requirements', {}),
-            thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),
             is_active=p.get('is_active', True),
             created_at=p['created_at'],
             updated_at=p['updated_at'],
@@ -355,12 +335,6 @@ async def update_institutional_profile(
             update_data['contact_phone'] = profile.contact_phone
         if profile.contact_email is not None:
             update_data['contact_email'] = profile.contact_email
-        if profile.weights is not None:
-            update_data['weights'] = profile.weights.model_dump()
-        if profile.requirements is not None:
-            update_data['requirements'] = profile.requirements.model_dump()
-        if profile.thresholds is not None:
-            update_data['thresholds'] = profile.thresholds.model_dump()
         if profile.is_active is not None:
             update_data['is_active'] = profile.is_active
 
@@ -384,9 +358,6 @@ async def update_institutional_profile(
             ubicacion=p.get('ubicacion'),
             contact_phone=p.get('contact_phone'),
             contact_email=p.get('contact_email'),
-            weights=p.get('weights', {}),
-            requirements=p.get('requirements', {}),
-            thresholds=p.get('thresholds', {'apto': 0.70, 'considerado': 0.50}),
             is_active=p.get('is_active', True),
             created_at=p['created_at'],
             updated_at=p['updated_at'],
@@ -490,6 +461,12 @@ async def permanent_delete_institutional_profile(
             )
 
         institution_name = existing.data[0]['institution_name']
+
+        # Manual cascade delete for cv_evaluations
+        supabase.table("cv_evaluations") \
+            .delete() \
+            .eq("institutional_profile_id", profile_id) \
+            .execute()
 
         supabase.table("institutional_profiles") \
             .delete() \

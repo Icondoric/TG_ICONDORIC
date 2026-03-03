@@ -15,6 +15,14 @@ export const postularAOferta = (ofertaId) =>
     client.post(`/api/postulaciones/${ofertaId}`).then(r => r.data)
 
 /**
+ * Registra una postulación copiando los datos de la recomendación existente.
+ * No re-evalúa el CV — usar desde "Mejor Correspondencia".
+ * @param {string} ofertaId - UUID de la oferta
+ */
+export const postularDesdeRecomendacion = (ofertaId) =>
+    client.post(`/api/postulaciones/${ofertaId}/desde-recomendacion`).then(r => r.data)
+
+/**
  * Obtiene todas las postulaciones del usuario actual.
  */
 export const getMyPostulaciones = () =>

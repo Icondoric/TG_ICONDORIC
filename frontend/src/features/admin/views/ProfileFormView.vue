@@ -9,6 +9,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAdminProfilesStore } from '@/features/admin/store/adminProfiles.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import AppLayout from '@/shared/components/AppLayout.vue'
+import { formatApiError } from '@/shared/utils/apiError'
 
 const route = useRoute()
 const router = useRouter()
@@ -26,27 +27,6 @@ const form = ref({
     ubicacion: '',
     contact_phone: '',
     contact_email: '',
-    // Pesos con valores por defecto — no se muestran en el formulario,
-    // cada oferta define los suyos propios
-    weights: {
-        hard_skills: 0.30,
-        soft_skills: 0.20,
-        experience: 0.25,
-        education: 0.15,
-        languages: 0.10
-    },
-    requirements: {
-        min_experience_years: 0,
-        required_skills: [],
-        preferred_skills: [],
-        required_soft_skills: [],
-        required_education_level: 'Licenciatura',
-        required_languages: []
-    },
-    thresholds: {
-        apto: 0.70,
-        considerado: 0.50
-    }
 })
 
 const isEditMode = computed(() => !!route.params.id)
@@ -71,11 +51,6 @@ const canSave = computed(() => {
 })
 
 onMounted(async () => {
-    if (!authStore.isAdminOrOperator) {
-        router.push('/dashboard')
-        return
-    }
-
     if (isEditMode.value) {
         isLoading.value = true
         try {
@@ -97,14 +72,6 @@ onMounted(async () => {
                 form.value.ubicacion = p.ubicacion || ''
                 form.value.contact_phone = p.contact_phone || ''
                 form.value.contact_email = p.contact_email || ''
-                form.value.weights = { ...p.weights }
-                form.value.requirements = { ...p.requirements }
-                form.value.thresholds = { ...p.thresholds }
-
-                if (!form.value.requirements.required_skills) form.value.requirements.required_skills = []
-                if (!form.value.requirements.preferred_skills) form.value.requirements.preferred_skills = []
-                if (!form.value.requirements.required_soft_skills) form.value.requirements.required_soft_skills = []
-                if (!form.value.requirements.required_languages) form.value.requirements.required_languages = []
             }
         } catch (err) {
             error.value = 'Error cargando el perfil'
@@ -132,9 +99,6 @@ const save = async () => {
             ubicacion: form.value.ubicacion.trim() || null,
             contact_phone: form.value.contact_phone.trim() || null,
             contact_email: form.value.contact_email.trim() || null,
-            weights: form.value.weights,
-            requirements: form.value.requirements,
-            thresholds: form.value.thresholds
         }
 
         if (isEditMode.value) {
@@ -145,7 +109,7 @@ const save = async () => {
 
         router.push('/admin/profiles')
     } catch (err) {
-        error.value = err.response?.data?.detail || 'Error guardando el perfil'
+        error.value = formatApiError(err, 'Error guardando el perfil')
     } finally {
         isSaving.value = false
     }
@@ -184,7 +148,7 @@ const cancel = () => router.push('/admin/profiles')
 
                 <!-- Error -->
                 <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <p class="text-red-700">{{ error }}</p>
+                    <p class="text-red-700 whitespace-pre-line">{{ error }}</p>
                 </div>
 
                 <!-- ─── Informacion Basica ─── -->

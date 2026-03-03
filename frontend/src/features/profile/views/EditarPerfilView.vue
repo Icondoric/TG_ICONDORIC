@@ -46,6 +46,12 @@
               @showDelete="showDeleteConfirm = true"
             />
 
+            <!-- Información Personal (editable) -->
+            <PersonalInfoCard
+              :profile="profile"
+              @edit="openEditModal('personal_info')"
+            />
+
             <!-- Competencias (editable) -->
             <CompetenciasCard :profile="profile" @edit="openEditModal" />
 
@@ -133,6 +139,7 @@ import Card from '@/shared/components/ui/Card.vue'
 import ProfileSidebar from '../components/ProfileSidebar.vue'
 import CVUploadSection from '../components/CVUploadSection.vue'
 import CVUploadModal from '../components/CVUploadModal.vue'
+import PersonalInfoCard from '../components/PersonalInfoCard.vue'
 import CompetenciasCard from '../components/CompetenciasCard.vue'
 import EducationExperienceGrid from '../components/EducationExperienceGrid.vue'
 import EditProfileModal from '../components/EditProfileModal.vue'
