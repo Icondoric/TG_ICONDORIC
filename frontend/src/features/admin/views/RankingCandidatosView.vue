@@ -175,7 +175,7 @@
                 />
                 <div
                   :style="{ width: (oferta.stats.no_apto / oferta.stats.total * 100) + '%' }"
-                  class="bg-danger-400"
+                  class="bg-danger-500"
                   :title="`NO APTO: ${oferta.stats.no_apto}`"
                 />
               </div>

@@ -167,6 +167,14 @@ def parse_experience_duration(duration_str: str) -> float:
 
         return float(end_year - start_year)
 
+    # Caso 3b: Año suelto de 4 dígitos (ej: "2025") — se interpreta como
+    # inicio en ese año hasta la actualidad. Evita que "2025" se tome como
+    # 2025 años de experiencia en el caso 4.
+    match_single_year = re.fullmatch(r'\d{4}', duration_str.strip())
+    if match_single_year:
+        start_year = int(duration_str.strip())
+        return float(max(0, datetime.now().year - start_year))
+
     # Caso 4: Numero decimal directo
     match_number = re.search(r'(\d+\.?\d*)', duration_str)
     if match_number:

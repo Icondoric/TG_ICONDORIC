@@ -445,6 +445,15 @@ class ProfileService:
                 years_diff = end_year - start_year
                 if years_diff > 0:
                     total_years += years_diff
+                continue
+
+            # Patron: Año suelto de 4 digitos (ej: "2024") — interpreta como inicio hasta hoy
+            single_year_match = re.fullmatch(r'\d{4}', duration.strip())
+            if single_year_match:
+                start_year = int(duration.strip())
+                years_diff = datetime.now().year - start_year
+                if years_diff > 0:
+                    total_years += years_diff
 
         return round(total_years, 1)
 

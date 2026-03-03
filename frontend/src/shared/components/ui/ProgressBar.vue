@@ -37,14 +37,14 @@ const barColor = computed(() => {
         const colors = {
             navy: 'bg-emi-navy-500',
             gold: 'bg-emi-gold-500',
-            danger: 'bg-danger'
+            danger: 'bg-danger-500'
         }
         return colors[props.variant]
     }
     // Auto color based on value
     if (props.value >= 70) return 'bg-emi-gold-500'
     if (props.value >= 50) return 'bg-emi-navy-500'
-    return 'bg-danger'
+    return 'bg-danger-500'
 })
 
 const heightClass = computed(() => {
