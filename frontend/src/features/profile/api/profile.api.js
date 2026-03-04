@@ -33,3 +33,8 @@ export const getProfilePreview = async () => {
     const response = await api.get('/api/profile/preview')
     return response.data
 }
+
+export const downloadCVPdf = async () => {
+    const response = await api.get('/api/profile/me/cv-pdf', { responseType: 'blob' })
+    return response.data
+}

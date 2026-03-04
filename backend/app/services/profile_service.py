@@ -261,6 +261,8 @@ class ProfileService:
             'email_contacto', 'nacionalidad',
             # Información académica (elegibilidad)
             'carrera', 'semestre_actual',
+            # Extracción Gemini (para edición manual de educación y experiencia)
+            'gemini_extraction',
         ]
 
         # Campos que admiten None explícito (para poder limpiarlos)

@@ -40,6 +40,8 @@ export function useProfileEditor() {
         languages: [],
         education_level: '',
         experience_years: 0,
+        gemini_education: [],
+        gemini_experience: [],
         // Información personal
         nombre_completo: '',
         direccion: '',
@@ -51,6 +53,8 @@ export function useProfileEditor() {
     const newHardSkill = ref('')
     const newSoftSkill = ref('')
     const newLanguage = ref('')
+    const newEducationEntry = ref({ degree: '', institution: '', year: '' })
+    const newExperienceEntry = ref({ role: '', company: '', duration: '' })
 
     // Computed
     const geminiEducation = computed(() => {
@@ -188,12 +192,20 @@ export function useProfileEditor() {
                 editForm.value.languages = [...profile.value.languages]
                 break
             case 'education':
-                editModal.value.title = 'Editar Formacion'
+                editModal.value.title = 'Editar Formación Académica'
                 editForm.value.education_level = profile.value.education_level || ''
+                editForm.value.gemini_education = JSON.parse(JSON.stringify(
+                    profile.value.gemini_extraction?.education || []
+                ))
+                newEducationEntry.value = { degree: '', institution: '', year: '' }
                 break
             case 'experience':
-                editModal.value.title = 'Editar Experiencia'
+                editModal.value.title = 'Editar Experiencia Profesional'
                 editForm.value.experience_years = profile.value.experience_years || 0
+                editForm.value.gemini_experience = JSON.parse(JSON.stringify(
+                    profile.value.gemini_extraction?.experience || []
+                ))
+                newExperienceEntry.value = { role: '', company: '', duration: '' }
                 break
             case 'personal_info':
                 editModal.value.title = 'Información Personal'
@@ -227,6 +239,26 @@ export function useProfileEditor() {
         editForm.value[field].splice(index, 1)
     }
 
+    const addEducationEntry = (entry) => {
+        if (!entry.degree?.trim()) return
+        editForm.value.gemini_education.push({ ...entry })
+        newEducationEntry.value = { degree: '', institution: '', year: '' }
+    }
+
+    const removeEducationEntry = (index) => {
+        editForm.value.gemini_education.splice(index, 1)
+    }
+
+    const addExperienceEntry = (entry) => {
+        if (!entry.role?.trim()) return
+        editForm.value.gemini_experience.push({ ...entry })
+        newExperienceEntry.value = { role: '', company: '', duration: '' }
+    }
+
+    const removeExperienceEntry = (index) => {
+        editForm.value.gemini_experience.splice(index, 1)
+    }
+
     const saveChanges = async () => {
         saving.value = true
 
@@ -241,9 +273,17 @@ export function useProfileEditor() {
                     break
                 case 'education':
                     updates.education_level = editForm.value.education_level
+                    updates.gemini_extraction = {
+                        ...(profile.value.gemini_extraction || {}),
+                        education: editForm.value.gemini_education
+                    }
                     break
                 case 'experience':
                     updates.experience_years = editForm.value.experience_years
+                    updates.gemini_extraction = {
+                        ...(profile.value.gemini_extraction || {}),
+                        experience: editForm.value.gemini_experience
+                    }
                     break
                 case 'personal_info':
                     updates.nombre_completo = editForm.value.nombre_completo || null
@@ -286,6 +326,8 @@ export function useProfileEditor() {
         newHardSkill,
         newSoftSkill,
         newLanguage,
+        newEducationEntry,
+        newExperienceEntry,
         // Computed
         geminiEducation,
         geminiExperience,
@@ -303,6 +345,10 @@ export function useProfileEditor() {
         closeEditModal,
         addSkill,
         removeSkill,
+        addEducationEntry,
+        removeEducationEntry,
+        addExperienceEntry,
+        removeExperienceEntry,
         saveChanges
     }
 }

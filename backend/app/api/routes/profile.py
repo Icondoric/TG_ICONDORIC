@@ -7,8 +7,10 @@ import base64
 import logging
 from typing import Optional
 
+from io import BytesIO
+
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from app.api.dependencies import get_current_user, get_current_user_optional
 from app.api.schemas.ml_schemas import (
@@ -19,6 +21,7 @@ from app.api.schemas.ml_schemas import (
 )
 from app.services.profile_service import get_profile_service
 from app.services.ml_integration_service import get_ml_service
+from app.services.cv_pdf_service import get_cv_pdf_service
 
 # Configurar logging
 logger = logging.getLogger(__name__)
@@ -336,4 +339,42 @@ async def preview_profile_from_cv(
         raise
     except Exception as e:
         logger.error(f"Error en preview: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/me/cv-pdf")
+async def download_cv_pdf(
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Genera y descarga el Currículum Vítae del usuario en formato PDF (estilo Harvard).
+    """
+    profile_service = get_profile_service()
+    cv_service = get_cv_pdf_service()
+
+    try:
+        profile = profile_service.get_profile(current_user['user_id'])
+
+        if not profile:
+            raise HTTPException(
+                status_code=404,
+                detail="Perfil no encontrado. Sube tu CV primero."
+            )
+
+        pdf_bytes = cv_service.generate(profile)
+
+        nombre_raw = profile.get('nombre_completo') or 'curriculum'
+        nombre_slug = nombre_raw.lower().replace(' ', '-')
+        filename = f"CV-{nombre_slug}.pdf"
+
+        return StreamingResponse(
+            BytesIO(pdf_bytes),
+            media_type='application/pdf',
+            headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generando CV PDF: {e}")
         raise HTTPException(status_code=500, detail=str(e))

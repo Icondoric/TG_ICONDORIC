@@ -9,7 +9,9 @@
       "Bash(npx vite build)",
       "Bash(ls:*)",
       "Bash(del:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "Bash(xargs grep:*)",
+      "Bash(grep:*)"
     ]
   }
 }

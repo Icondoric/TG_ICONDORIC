@@ -426,6 +426,9 @@ class PerfilProfesionalUpdate(BaseModel):
     carrera: Optional[str] = Field(default=None, description="Carrera EMI que estudia o estudió")
     semestre_actual: Optional[int] = Field(default=None, ge=1, le=10, description="Semestre actual (solo estudiantes)")
 
+    # Extracción Gemini (para agregar/editar entradas de educación y experiencia manualmente)
+    gemini_extraction: Optional[Dict] = None
+
     @field_validator('education_level')
     @classmethod
     def validate_education_level(cls, v):
