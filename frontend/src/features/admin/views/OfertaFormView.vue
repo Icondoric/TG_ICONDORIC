@@ -10,6 +10,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useOfertasStore } from '@/features/admin/store/ofertas.store'
 import AppLayout from '@/shared/components/AppLayout.vue'
 import { formatApiError } from '@/shared/utils/apiError'
+import { analyzeOfertaPdf } from '@/features/admin/api/ofertas.api'
 
 const route = useRoute()
 const router = useRouter()
@@ -89,6 +90,105 @@ const newLanguage = ref('')
 const loading = ref(false)
 const saving = ref(false)
 const error = ref(null)
+
+// ── Análisis PDF de oferta ────────────────────────────────
+const analyzingPdf = ref(false)
+const pdfAnalysisError = ref(null)
+const autoFilledFields = ref(new Set())
+const pdfAnalysisSummary = ref(null)
+
+const af = (field) => autoFilledFields.value.has(field)
+
+const handleOfertaPdfSelect = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+    event.target.value = ''
+
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+        pdfAnalysisError.value = 'Solo se permiten archivos PDF.'
+        return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+        pdfAnalysisError.value = 'El archivo excede el tamaño máximo de 10MB.'
+        return
+    }
+
+    analyzingPdf.value = true
+    pdfAnalysisError.value = null
+    pdfAnalysisSummary.value = null
+    autoFilledFields.value = new Set()
+
+    try {
+        const data = await analyzeOfertaPdf(file)
+        const filled = []
+
+        const setField = (key, value, formSetter) => {
+            if (value !== null && value !== undefined && value !== '') {
+                formSetter(value)
+                autoFilledFields.value.add(key)
+                filled.push(key)
+            }
+        }
+
+        setField('titulo', data.titulo, v => { form.titulo = v })
+        setField('descripcion', data.descripcion, v => { form.descripcion = v })
+        setField('ubicacion', data.ubicacion, v => { form.ubicacion = v })
+        setField('area', data.area, v => { form.area = v })
+        setField('tipo', data.tipo, v => { form.tipo = v })
+        setField('modalidad', data.modalidad, v => { form.modalidad = v })
+        setField('fecha_cierre', data.fecha_cierre, v => { form.fecha_cierre = v })
+        setField('cupos_disponibles', data.cupos_disponibles, v => { form.cupos_disponibles = v })
+        setField('contact_phone', data.contact_phone, v => { form.contact_phone = v })
+        setField('contact_email', data.contact_email, v => { form.contact_email = v })
+
+        if (data.required_skills?.length) {
+            form.requirements.required_skills = data.required_skills
+            autoFilledFields.value.add('required_skills')
+            filled.push('required_skills')
+        }
+        if (data.required_soft_skills?.length) {
+            form.requirements.required_soft_skills = data.required_soft_skills
+            autoFilledFields.value.add('required_soft_skills')
+            filled.push('required_soft_skills')
+        }
+        if (data.required_languages?.length) {
+            form.requirements.required_languages = data.required_languages
+            autoFilledFields.value.add('required_languages')
+            filled.push('required_languages')
+        }
+        if (data.required_education_level) {
+            form.requirements.required_education_level = data.required_education_level
+            autoFilledFields.value.add('required_education_level')
+            filled.push('required_education_level')
+        }
+        if (data.min_experience_years !== null && data.min_experience_years !== undefined) {
+            form.requirements.min_experience_years = data.min_experience_years
+            autoFilledFields.value.add('min_experience_years')
+            filled.push('min_experience_years')
+        }
+        if (data.carreras_aceptadas?.length) {
+            form.requirements.carreras_aceptadas = data.carreras_aceptadas
+            autoFilledFields.value.add('carreras_aceptadas')
+            filled.push('carreras_aceptadas')
+        }
+        if (data.semestre_minimo !== null && data.semestre_minimo !== undefined) {
+            form.requirements.semestre_minimo = data.semestre_minimo
+            autoFilledFields.value.add('semestre_minimo')
+            filled.push('semestre_minimo')
+        }
+        if (data.semestre_maximo !== null && data.semestre_maximo !== undefined) {
+            form.requirements.semestre_maximo = data.semestre_maximo
+            autoFilledFields.value.add('semestre_maximo')
+            filled.push('semestre_maximo')
+        }
+
+        pdfAnalysisSummary.value = `Se completaron ${filled.length} campo${filled.length !== 1 ? 's' : ''} a partir del documento.`
+    } catch (e) {
+        pdfAnalysisError.value = formatApiError(e, 'No se pudo leer el documento. Verifica que el PDF sea legible e inténtalo de nuevo.')
+    } finally {
+        analyzingPdf.value = false
+    }
+}
 
 // ── Navegación por pasos ───────────────────────────────────
 const currentStep = ref(1)
@@ -387,6 +487,49 @@ onMounted(async () => {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <p class="text-red-700 text-sm whitespace-pre-line">{{ error }}</p>
+                </div>
+
+                <!-- ── Analizar PDF de oferta ── -->
+                <div v-if="!isEditing" class="rounded-xl border border-emi-navy-200 bg-emi-navy-50 p-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <div class="flex items-center gap-3 flex-1">
+                            <div class="w-9 h-9 bg-emi-navy-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-emi-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-emi-navy-700">¿Ya tienes la convocatoria en PDF?</p>
+                                <p class="text-xs text-emi-navy-500">Si la oferta ya está redactada como documento, súbela aquí y el sistema intentará completar el formulario por ti. Podrás revisar y ajustar todo antes de guardar.</p>
+                            </div>
+                        </div>
+
+                        <label class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emi-navy-500 hover:bg-emi-navy-600 rounded-lg cursor-pointer transition-colors shrink-0 disabled:opacity-60"
+                            :class="{ 'opacity-60 cursor-not-allowed': analyzingPdf }">
+                            <svg v-if="!analyzingPdf" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            <svg v-else class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            {{ analyzingPdf ? 'Leyendo documento...' : 'Subir PDF de oferta' }}
+                            <input v-if="!analyzingPdf" type="file" accept=".pdf" class="hidden" @change="handleOfertaPdfSelect" />
+                        </label>
+                    </div>
+
+                    <!-- Resultado del análisis -->
+                    <p v-if="pdfAnalysisSummary" class="mt-2.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {{ pdfAnalysisSummary }} Recorre los pasos del formulario para verificar que todo esté correcto antes de guardar.
+                    </p>
+                    <p v-if="pdfAnalysisError" class="mt-2.5 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        {{ pdfAnalysisError }}
+                    </p>
                 </div>
 
                 <!-- ── Indicador de pasos ── -->

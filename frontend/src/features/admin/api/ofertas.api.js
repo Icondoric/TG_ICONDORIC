@@ -46,3 +46,12 @@ export const getContactSuggestions = async (institutionId) => {
     })
     return response.data
 }
+
+export const analyzeOfertaPdf = async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await api.post('/api/admin/ofertas/analyze-pdf', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    return response.data
+}

@@ -15,7 +15,7 @@ from pathlib import Path
 import pdfplumber
 
 from app.db.client import supabase
-from app.core.llm_extractor import extract_skills_with_llm
+from app.core.llm_extractor import extract_skills_with_llm, extract_oferta_with_llm
 from app.scoring.feature_engineering import FeatureExtractor, extract_features
 from app.ml.models import MatchPredictor, InstitutionalMatchModel
 
@@ -149,6 +149,28 @@ class MLIntegrationService:
             result['personal_info'] = {'languages': [], 'summary': ''}
 
         logger.info(f"CV extraido: {len(result.get('hard_skills', []))} hard skills")
+        return result
+
+    async def extract_oferta_with_gemini(self, pdf_base64: str) -> Dict:
+        """
+        Extrae información estructurada de una convocatoria laboral en PDF usando Gemini (async).
+        Sigue el mismo patrón que extract_cv_with_gemini.
+        """
+        loop = asyncio.get_event_loop()
+        text = await loop.run_in_executor(None, self._extract_pdf_text_sync, pdf_base64)
+
+        logger.info("Extrayendo oferta laboral con Gemini (async)...")
+        result = await extract_oferta_with_llm(text)
+
+        if 'error' in result and result['error']:
+            raise ValueError(f"Error de Gemini: {result['error']}")
+
+        # Garantizar listas vacías donde corresponde
+        for list_field in ['required_skills', 'required_soft_skills', 'required_languages', 'carreras_aceptadas']:
+            if list_field not in result or result[list_field] is None:
+                result[list_field] = []
+
+        logger.info(f"Oferta extraída: titulo='{result.get('titulo')}', skills={len(result.get('required_skills', []))}")
         return result
 
     def load_institutional_profile(self, profile_id: str) -> Optional[Dict]:

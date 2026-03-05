@@ -3,10 +3,11 @@ Ofertas Routes - Sistema de Recomendaciones v2
 Endpoints para gestionar ofertas laborales (admin)
 """
 
+import base64
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 
 from app.api.dependencies import verify_admin_role, verify_operator_access
 from app.api.schemas.ml_schemas import (
@@ -16,6 +17,7 @@ from app.api.schemas.ml_schemas import (
     OfertaLaboralListResponse
 )
 from app.services.oferta_service import get_oferta_service
+from app.services.ml_integration_service import get_ml_service
 from app.db.client import supabase
 
 # Configurar logging
@@ -52,6 +54,35 @@ def _oferta_to_response(o: dict) -> OfertaLaboralResponse:
         created_at=o['created_at'],
         updated_at=o['updated_at']
     )
+
+
+@router.post("/analyze-pdf")
+async def analyze_oferta_pdf(
+    file: UploadFile = File(..., description="PDF de la convocatoria laboral"),
+    admin_user: dict = Depends(verify_operator_access)
+):
+    """
+    Analiza un PDF de convocatoria laboral con Gemini y retorna los campos extraídos
+    para pre-rellenar el formulario de Nueva Oferta.
+    """
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Solo se permiten archivos PDF")
+
+    contents = await file.read()
+    if len(contents) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="El archivo excede el tamaño máximo de 10MB")
+
+    ml_service = get_ml_service()
+    try:
+        pdf_base64 = base64.b64encode(contents).decode('utf-8')
+        logger.info(f"Analizando PDF de oferta: {file.filename}")
+        extraction = await ml_service.extract_oferta_with_gemini(pdf_base64)
+        return extraction
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error analizando PDF de oferta: {e}")
+        raise HTTPException(status_code=500, detail=f"Error procesando el PDF: {str(e)}")
 
 
 @router.get("/contact-suggestions")
