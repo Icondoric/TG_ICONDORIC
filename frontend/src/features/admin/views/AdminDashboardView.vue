@@ -5,7 +5,6 @@
  */
 
 import { ref, onMounted, computed } from 'vue'
-import { useAdminProfilesStore } from '@/features/admin/store/adminProfiles.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import { useRouter } from 'vue-router'
 import { getModelInfo } from '@/shared/api/ml.api'
@@ -14,16 +13,8 @@ import Badge from '@/shared/components/ui/Badge.vue'
 import ProgressBar from '@/shared/components/ui/ProgressBar.vue'
 import AppLayout from '@/shared/components/AppLayout.vue'
 
-const adminProfilesStore = useAdminProfilesStore()
 const authStore = useAuthStore()
 const router = useRouter()
-
-// Estado local
-const stats = ref({
-    totalProfiles: 0,
-    activeProfiles: 0,
-    sectors: []
-})
 
 const modelInfo = ref(null)
 
@@ -36,19 +27,7 @@ onMounted(async () => {
     }
 
     try {
-        // Cargar perfiles
-        await adminProfilesStore.loadProfiles(true) // Incluir inactivos
-
-        // Cargar sectores
-        await adminProfilesStore.loadSectors()
-        
-        // Cargar info del modelo
         modelInfo.value = await getModelInfo()
-
-        // Calcular stats
-        stats.value.totalProfiles = adminProfilesStore.profiles.length
-        stats.value.activeProfiles = adminProfilesStore.profiles.filter(p => p.is_active).length
-        stats.value.sectors = adminProfilesStore.sectors
     } catch (error) {
         console.error('Error cargando dashboard:', error)
     }
@@ -63,6 +42,50 @@ const modelStatus = computed(() => {
 const modelMetrics = computed(() => {
     return modelInfo.value?.training_metrics || {}
 })
+
+// Definición de módulos de la guía
+const ALL_MODULE_GUIDE = [
+    {
+        id: 'gestion_usuarios',
+        title: 'Gestión de Usuarios',
+        desc: 'Visualiza y administra todas las cuentas registradas en el sistema. Puedes crear nuevos usuarios, editar su información, asignarles un rol específico y activar o desactivar su acceso. Los roles determinan qué módulos y funciones puede utilizar cada usuario.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>`,
+    },
+    {
+        id: 'digitalizacion_perfiles',
+        title: 'Digitalización de Perfiles',
+        desc: 'Permite a los usuarios (estudiantes y titulados) construir su perfil profesional dentro del sistema: subir su CV para extracción automática de datos, completar su información académica, experiencia laboral, habilidades técnicas e idiomas. También posibilita buscar y explorar perfiles de otros usuarios registrados.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>`,
+    },
+    {
+        id: 'oferta_laboral',
+        title: 'Gestión de Oferta Laboral',
+        desc: 'Administra las convocatorias de pasantías y empleos publicadas en el sistema. Puedes crear nuevas ofertas definiendo requisitos, área, modalidad, cupos y fechas; editarlas, activarlas o cerrarlas. Los estudiantes y titulados podrán visualizarlas y postularse desde su perfil.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>`,
+    },
+    {
+        id: 'perfiles_institucionales',
+        title: 'Perfiles Institucionales',
+        desc: 'Registra y gestiona los perfiles de las empresas e instituciones que participan en el sistema como fuentes de oferta laboral. Cada perfil incluye información organizacional, sector de actividad y datos de contacto, y sirve como respaldo de las convocatorias publicadas.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>`,
+    },
+    {
+        id: 'evaluacion_perfiles',
+        title: 'Evaluación de Perfiles',
+        desc: 'Módulo central del sistema de recomendación. Permite ver la correspondencia entre los perfiles digitalizados y las ofertas laborales activas, consultar el historial de postulaciones y acceder al ranking de candidatos por oferta generado automáticamente por el modelo de Machine Learning, ordenando a los postulantes según su nivel de compatibilidad.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>`,
+    },
+    {
+        id: 'informes_reportes',
+        title: 'Informes y Reportes',
+        desc: 'Genera y consulta reportes estadísticos detallados sobre el funcionamiento del sistema: actividad de usuarios, métricas de ofertas laborales, distribución de perfiles institucionales y más. Permite aplicar filtros avanzados y exportar los resultados en formato PDF para su análisis o presentación.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>`,
+    },
+]
+
+const visibleModules = computed(() =>
+    ALL_MODULE_GUIDE.filter(m => authStore.hasModuleAccess(m.id))
+)
 </script>
 
 <template>
@@ -71,97 +94,56 @@ const modelMetrics = computed(() => {
             <!-- Header -->
             <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-emi-navy-500">Panel de Administracion</h1>
+                    <h1 class="text-3xl font-bold text-emi-navy-500">Panel de Administración</h1>
                     <p class="mt-2 text-gray-600">
-                        Vista general del sistema de Machine Learning
+                        Bienvenido al sistema. Desde aquí puedes acceder a todos los módulos disponibles según tu rol.
                     </p>
                 </div>
-                <div class="flex gap-3">
-                    <router-link
-                        to="/admin/profiles/new"
-                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-                    >
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        Nueva Institucion
-                    </router-link>
-                </div>
-            </div>
-
-            <!-- Stats Cards (Mobile) -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <!-- Modelo ML -->
-                <Card :hoverable="true" padding="p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 uppercase tracking-wider">Modelo</p>
-                            <p class="text-xl font-bold mt-1 text-red-600">
-                                {{ modelStatus }}
-                            </p>
-                        </div>
-                        <div class="p-2 rounded-full bg-red-100">
-                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                    </div>
-                </Card>
-
-                <!-- Perfiles Totales -->
-                <Card :hoverable="true" padding="p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 uppercase tracking-wider">Perfiles</p>
-                            <p class="text-xl font-bold text-emi-navy-500 mt-1">
-                                {{ stats.totalProfiles }}
-                            </p>
-                        </div>
-                        <div class="p-2 rounded-full bg-emi-navy-100">
-                            <svg class="w-5 h-5 text-emi-navy-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
-                        </div>
-                    </div>
-                </Card>
-
-                <!-- Perfiles Activos -->
-                <Card :hoverable="true" padding="p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 uppercase tracking-wider">Activos</p>
-                            <p class="text-xl font-bold text-emi-gold-600 mt-1">
-                                {{ stats.activeProfiles }}
-                            </p>
-                        </div>
-                        <div class="p-2 rounded-full bg-emi-gold-100">
-                            <svg class="w-5 h-5 text-emi-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </Card>
-
-                <!-- Sectores -->
-                <Card :hoverable="true" padding="p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500 uppercase tracking-wider">Sectores</p>
-                            <p class="text-xl font-bold text-gray-700 mt-1">
-                                {{ stats.sectors.length }}
-                            </p>
-                        </div>
-                        <div class="p-2 rounded-full bg-gray-100">
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                            </svg>
-                        </div>
-                    </div>
-                </Card>
             </div>
 
             <!-- Main Content Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Guía de navegación -->
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-5">
+                    <!-- Encabezado -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-1 h-6 rounded-full bg-emi-gold-500 flex-shrink-0"></div>
+                        <h2 class="text-base font-bold text-emi-navy-500">¿Cómo navegar el sistema?</h2>
+                    </div>
+
+                    <!-- Texto explicativo -->
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Todos los módulos del sistema están accesibles desde la
+                        <span class="font-semibold text-emi-navy-600">barra lateral izquierda</span>.
+                        Puedes expandirla o contraerla en cualquier momento usando el ícono del menú en la parte superior.
+                    </p>
+
+                    <!-- Lista de módulos filtrada por permisos del rol -->
+                    <ul v-if="visibleModules.length > 0" class="space-y-3">
+                        <li v-for="mod in visibleModules" :key="mod.id" class="flex items-start gap-3">
+                            <div class="mt-0.5 flex-shrink-0 w-7 h-7 rounded-lg bg-emi-navy-50 border border-emi-navy-100 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-emi-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" v-html="mod.icon"></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-emi-navy-700">{{ mod.title }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">{{ mod.desc }}</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <p v-else class="text-xs text-gray-400 italic">No hay módulos asignados a tu rol actual.</p>
+
+                    <!-- Nota al pie -->
+                    <div class="flex items-start gap-2 p-3 bg-emi-navy-50 border border-emi-navy-100 rounded-lg">
+                        <svg class="w-4 h-4 text-emi-navy-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p class="text-xs text-emi-navy-600">
+                            Los módulos visibles en la barra lateral varían según el <span class="font-semibold">rol asignado</span> a tu cuenta. Si necesitas acceso a un módulo adicional, contacta al administrador del sistema.
+                        </p>
+                    </div>
+                </div>
+
                 <!-- Info del Modelo -->
                 <Card title="Informacion del Modelo ML">
                     <div v-if="modelInfo" class="py-4">

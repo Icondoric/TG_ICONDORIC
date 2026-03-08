@@ -11,7 +11,7 @@
           <img 
             src="@/shared/assets/icons/logoEmi.png"
             alt="Logo EMI" 
-            class="h-10 w-auto transition-transform duration-300 group-hover:scale-105" 
+            class="h-[46px] w-auto transition-transform duration-300 group-hover:scale-105"
           />
         </div>
 
@@ -89,14 +89,7 @@
               size="sm"
               @click="handleNavigation('/admin')"
             >
-              Dashboard
-            </Button>
-            <Button
-              :variant="route.path.startsWith('/admin/ofertas') ? 'gold' : 'ghost'"
-              size="sm"
-              @click="handleNavigation('/admin/ofertas')"
-            >
-              Ofertas
+              Panel de Administración
             </Button>
             <Button
               variant="ghost"
@@ -232,15 +225,7 @@
               full-width
               @click="handleNavigation('/admin')"
             >
-              Dashboard
-            </Button>
-            <Button
-              variant="outline"
-              size="md"
-              full-width
-              @click="handleNavigation('/admin/ofertas')"
-            >
-              Ofertas
+              Panel de Administración
             </Button>
             <Button
               variant="outline"

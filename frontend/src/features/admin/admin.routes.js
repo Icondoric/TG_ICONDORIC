@@ -12,6 +12,7 @@ const OfertasAdminView = () => import('@/features/admin/views/OfertasAdminView.v
 const OfertaFormView = () => import('@/features/admin/views/OfertaFormView.vue')
 const RankingCandidatosView = () => import('@/features/admin/views/RankingCandidatosView.vue')
 const RankingDetalleView = () => import('@/features/admin/views/RankingDetalleView.vue')
+const CandidatoPerfilAdminView = () => import('@/features/admin/views/CandidatoPerfilAdminView.vue')
 
 const base = { requiresAuth: true, hideNavbar: true }
 
@@ -120,6 +121,12 @@ export default [
         path: '/admin/ranking-candidatos/:id',
         name: 'admin-ranking-detalle',
         component: RankingDetalleView,
+        meta: { ...base, requiresAdmin: true, moduleId: 'evaluacion_perfiles', submoduleId: 'ranking_candidatos' }
+    },
+    {
+        path: '/admin/candidato/:userId/perfil',
+        name: 'admin-candidato-perfil',
+        component: CandidatoPerfilAdminView,
         meta: { ...base, requiresAdmin: true, moduleId: 'evaluacion_perfiles', submoduleId: 'ranking_candidatos' }
     }
 ]

@@ -577,7 +577,9 @@ class RecommendationService:
             'top_skills': profile.get('hard_skills', [])[:5],
             'experience_years': profile.get('experience_years', 0),
             'education_level': profile.get('education_level'),
-            'languages': profile.get('languages', [])
+            'languages': profile.get('languages', []),
+            'carrera': profile.get('carrera'),
+            'semestre_actual': profile.get('semestre_actual'),
         }
 
     def _format_recommendations_response(

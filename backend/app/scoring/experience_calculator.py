@@ -154,20 +154,36 @@ def parse_experience_duration(duration_str: str) -> float:
     if match_months:
         return round(float(match_months.group(1)) / 12, 2)
 
-    # Caso 3: Formato "YYYY - YYYY" o "YYYY-YYYY"
-    match_range = re.search(r'(\d{4})\s*-\s*(\d{4}|presente|actual)', duration_str)
+    # Caso 3: Rango de fechas ISO "YYYY-MM-DD - YYYY-MM-DD" (Gemini puede devolver fechas completas)
+    match_iso_range = re.search(
+        r'(\d{4})-\d{2}-\d{2}\s*[-–]\s*(\d{4})-\d{2}-\d{2}', duration_str
+    )
+    if match_iso_range:
+        start_year = int(match_iso_range.group(1))
+        end_year = int(match_iso_range.group(2))
+        return float(max(0, end_year - start_year))
+
+    match_iso_open = re.search(
+        r'(\d{4})-\d{2}-\d{2}\s*[-–]\s*(presente|actual|present)', duration_str
+    )
+    if match_iso_open:
+        start_year = int(match_iso_open.group(1))
+        return float(max(0, datetime.now().year - start_year))
+
+    # Caso 3b: Formato "YYYY - YYYY" o "YYYY-YYYY"
+    match_range = re.search(r'(\d{4})\s*[-–]\s*(\d{4}|presente|actual|present)', duration_str)
     if match_range:
         start_year = int(match_range.group(1))
         end_year_str = match_range.group(2)
 
-        if end_year_str in ['presente', 'actual']:
+        if end_year_str in ['presente', 'actual', 'present']:
             end_year = datetime.now().year
         else:
             end_year = int(end_year_str)
 
-        return float(end_year - start_year)
+        return float(max(0, end_year - start_year))
 
-    # Caso 3b: Año suelto de 4 dígitos (ej: "2025") — se interpreta como
+    # Caso 3c: Año suelto de 4 dígitos (ej: "2025") — se interpreta como
     # inicio en ese año hasta la actualidad. Evita que "2025" se tome como
     # 2025 años de experiencia en el caso 4.
     match_single_year = re.fullmatch(r'\d{4}', duration_str.strip())
@@ -175,10 +191,20 @@ def parse_experience_duration(duration_str: str) -> float:
         start_year = int(duration_str.strip())
         return float(max(0, datetime.now().year - start_year))
 
-    # Caso 4: Numero decimal directo
+    # Caso 3d: Días ("X días" / "X days") — Gemini puede devolver duraciones en días
+    match_days = re.search(r'(\d+)\s*d[íi]as?|(\d+)\s*days?', duration_str)
+    if match_days:
+        days = float((match_days.group(1) or match_days.group(2)))
+        return round(days / 365, 2)
+
+    # Caso 4: Numero decimal directo — con límite de seguridad para valores absurdos
     match_number = re.search(r'(\d+\.?\d*)', duration_str)
     if match_number:
-        return float(match_number.group(1))
+        value = float(match_number.group(1))
+        # Si el valor supera 80 años de carrera razonable, ignorar (formato desconocido)
+        if value > 80:
+            return 0.0
+        return value
 
     # Default: 0
     return 0.0

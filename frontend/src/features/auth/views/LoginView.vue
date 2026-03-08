@@ -107,7 +107,7 @@ onMounted(() => {
         <div class="backdrop-blur-lg bg-white/70 rounded-2xl shadow-2xl border border-white/60 p-6 transition-all duration-300">
             <!-- Header -->
             <div class="text-center mb-5">
-                <img src="@/shared/assets/icons/logoEmi.png" alt="EMI Logo" class="w-16 h-16 mx-auto mb-3 object-contain" />
+                <img src="@/shared/assets/icons/logoEmi.png" alt="EMI Logo" class="w-[90px] h-[90px] mx-auto mb-3 object-contain" />
             </div>
 
             <!-- Title -->

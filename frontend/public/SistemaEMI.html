@@ -478,6 +478,7 @@
             { sigla: 'RGA', nombre: 'Registro y Gestión Académico' },
             { sigla: 'IGA-G', nombre: 'Información de Gestión Académica' },
             { sigla: 'RDG', nombre: 'Registro de Defensas de Grado' },
+            { sigla: 'SEPP', nombre: 'Sistema de Evaluación de Perfiles Profesionales', url: '/' },
         ];
 
         const administrativos = [
@@ -496,7 +497,7 @@
     </div>
     <div class="card-div"></div>
     <p class="card-desc">${s.nombre}</p>`;
-            d.addEventListener('click', () => console.log('Abriendo:', s.sigla));
+            d.addEventListener('click', () => s.url ? window.location.href = s.url : console.log('Abriendo:', s.sigla));
             return d;
         }
 

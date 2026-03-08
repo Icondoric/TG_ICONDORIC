@@ -171,10 +171,13 @@ async def get_users_report(
     role: Optional[str] = Query(None),
     has_cv: Optional[bool] = Query(None),
     profile_complete: Optional[bool] = Query(None),
+    completeness_min: Optional[float] = Query(None),
+    cv_updated_since: Optional[str] = Query(None),
+    carrera: Optional[str] = Query(None),
     current_user: dict = Depends(verify_operator_access)
 ):
     """
-    Reporte detallado de usuarios con filtros.
+    Reporte detallado de usuarios con filtros extendidos.
     """
     try:
         query = supabase.table("usuarios").select("id, email, nombre_completo, rol, created_at")
@@ -186,9 +189,9 @@ async def get_users_report(
         response = query.order("created_at", desc=True).execute()
         users = response.data
 
-        # Fetch profile info for all users
+        # Fetch extended profile info for all users
         profile_response = supabase.table("perfiles_profesionales") \
-            .select("usuario_id, is_complete, cv_filename, cv_uploaded_at, completeness_score") \
+            .select("usuario_id, is_complete, cv_filename, cv_uploaded_at, completeness_score, updated_at, carrera, semestre_actual, hard_skills, soft_skills, nombre_completo") \
             .execute()
 
         profiles_map = {}
@@ -200,22 +203,42 @@ async def get_users_report(
             profile = profiles_map.get(user['id'], {})
             has_cv_flag = bool(profile.get('cv_filename'))
             is_complete = profile.get('is_complete', False)
+            score = float(profile.get('completeness_score', 0))
+            cv_uploaded_at = profile.get('cv_uploaded_at')
+            perfil_updated_at = profile.get('updated_at')
+            carrera_val = profile.get('carrera')
+            semestre_val = profile.get('semestre_actual')
+            hard_skills = profile.get('hard_skills') or []
+            soft_skills = profile.get('soft_skills') or []
 
             # Apply client-side filters
             if has_cv is not None and has_cv_flag != has_cv:
                 continue
             if profile_complete is not None and is_complete != profile_complete:
                 continue
+            if completeness_min is not None and (score * 100) < completeness_min:
+                continue
+            if cv_updated_since and cv_uploaded_at:
+                if cv_uploaded_at[:10] < cv_updated_since:
+                    continue
+            if carrera and carrera_val and carrera.lower() not in carrera_val.lower():
+                continue
 
             result_users.append({
                 "id": user['id'],
                 "email": user['email'],
-                "nombre_completo": user.get('nombre_completo'),
+                "nombre_completo": user.get('nombre_completo') or profile.get('nombre_completo'),
                 "rol": user['rol'],
                 "fecha_registro": user['created_at'],
                 "tiene_cv": has_cv_flag,
                 "perfil_completo": is_complete,
-                "completeness_score": float(profile.get('completeness_score', 0))
+                "completeness_score": round(score * 100, 1),
+                "cv_uploaded_at": cv_uploaded_at,
+                "perfil_updated_at": perfil_updated_at,
+                "carrera": carrera_val,
+                "semestre_actual": semestre_val,
+                "hard_skills_count": len(hard_skills),
+                "soft_skills_count": len(soft_skills),
             })
 
         # Stats
@@ -223,6 +246,7 @@ async def get_users_report(
         roles_count = Counter(u['rol'] for u in result_users)
         with_cv = sum(1 for u in result_users if u['tiene_cv'])
         complete = sum(1 for u in result_users if u['perfil_completo'])
+        avg_score = round(sum(u['completeness_score'] for u in result_users) / total, 1) if total > 0 else 0
 
         return {
             "users": result_users,
@@ -232,7 +256,8 @@ async def get_users_report(
                 "with_cv": with_cv,
                 "with_cv_pct": round((with_cv / total * 100), 1) if total > 0 else 0,
                 "profile_complete": complete,
-                "profile_complete_pct": round((complete / total * 100), 1) if total > 0 else 0
+                "profile_complete_pct": round((complete / total * 100), 1) if total > 0 else 0,
+                "avg_completeness": avg_score
             }
         }
     except Exception as e:
@@ -245,10 +270,21 @@ async def get_offers_report(
     end_date: Optional[str] = Query(None),
     tipo: Optional[str] = Query(None),
     estado: Optional[str] = Query(None),
+    modalidad: Optional[str] = Query(None),
+    sector: Optional[str] = Query(None),
+    institucion: Optional[str] = Query(None),
+    area: Optional[str] = Query(None),
+    # Nuevos filtros por perfil de postulante
+    con_postulaciones: Optional[bool] = Query(None),
+    rol_postulante: Optional[str] = Query(None),
+    carrera_postulante: Optional[str] = Query(None),
+    min_postulaciones: Optional[int] = Query(None),
+    min_score: Optional[float] = Query(None),
     current_user: dict = Depends(verify_operator_access)
 ):
     """
-    Reporte detallado de ofertas laborales con filtros.
+    Reporte detallado de ofertas laborales con filtros extendidos,
+    incluyendo segmentacion por rol y carrera de postulantes.
     """
     try:
         query = supabase.table("ofertas_laborales") \
@@ -257,14 +293,45 @@ async def get_offers_report(
 
         if tipo:
             query = query.eq("tipo", tipo)
+        if modalidad:
+            query = query.eq("modalidad", modalidad)
 
         response = query.order("created_at", desc=True).execute()
         ofertas = response.data
 
-        today = datetime.now().strftime("%Y-%m-%d")
+        # Fetch postulaciones with usuario_id for role/career breakdown
+        postulaciones_resp = supabase.table("postulaciones") \
+            .select("oferta_id, match_score, clasificacion, usuario_id") \
+            .execute()
+
+        # Build user role map: usuario_id -> rol
+        users_resp = supabase.table("usuarios").select("id, rol").execute()
+        user_rol_map: Dict[str, str] = {u['id']: u.get('rol', '') for u in users_resp.data}
+
+        # Build user carrera map: usuario_id -> carrera
+        profiles_resp = supabase.table("perfiles_profesionales") \
+            .select("usuario_id, carrera").execute()
+        user_carrera_map: Dict[str, str] = {
+            p['usuario_id']: p['carrera']
+            for p in profiles_resp.data if p.get('carrera')
+        }
+
+        # Build enriched post_map: oferta_id -> [postulacion + rol + carrera]
+        post_map: Dict[str, List] = {}
+        for p in postulaciones_resp.data:
+            oid = p['oferta_id']
+            uid = p.get('usuario_id')
+            post_map.setdefault(oid, []).append({
+                **p,
+                'rol': user_rol_map.get(uid, '') if uid else '',
+                'carrera': user_carrera_map.get(uid, '') if uid else '',
+            })
+
+        today_dt = datetime.now()
+        today = today_dt.strftime("%Y-%m-%d")
+
         result_ofertas = []
         for o in ofertas:
-            # Determine status
             is_active = o.get('is_active', True)
             fecha_cierre = o.get('fecha_cierre')
             is_expired = bool(fecha_cierre and fecha_cierre < today)
@@ -276,25 +343,87 @@ async def get_offers_report(
             else:
                 oferta_estado = 'inactiva'
 
-            # Apply state filter
             if estado and oferta_estado != estado:
                 continue
 
             inst = o.get('institutional_profiles') or {}
+            inst_name = inst.get('institution_name') or ''
+            inst_sector = inst.get('sector') or ''
+
+            if sector and sector.lower() not in inst_sector.lower():
+                continue
+            if institucion and institucion.lower() not in inst_name.lower():
+                continue
+            area_val = o.get('area') or ''
+            if area and area.lower() not in area_val.lower():
+                continue
+
+            # Postulaciones stats
+            posts = post_map.get(o['id'], [])
+            total_posts = len(posts)
+            scores = [p['match_score'] for p in posts if p.get('match_score') is not None]
+            avg_score = round(sum(scores) / len(scores) * 100, 1) if scores else None
+            aptos = sum(1 for p in posts if p.get('clasificacion') == 'APTO')
+            considerados = sum(1 for p in posts if p.get('clasificacion') == 'CONSIDERADO')
+            no_aptos = sum(1 for p in posts if p.get('clasificacion') == 'NO_APTO')
+
+            # Role breakdown of applicants
+            n_estudiantes = sum(1 for p in posts if p.get('rol') == 'estudiante')
+            n_titulados = sum(1 for p in posts if p.get('rol') == 'titulado')
+
+            # Top 3 careers of applicants
+            carrera_counter = Counter(p['carrera'] for p in posts if p.get('carrera'))
+            top_carreras = [c for c, _ in carrera_counter.most_common(3)]
+
+            # Apply new filters
+            if con_postulaciones is True and total_posts == 0:
+                continue
+            if min_postulaciones is not None and total_posts < min_postulaciones:
+                continue
+            if min_score is not None and (avg_score is None or avg_score < min_score):
+                continue
+            if rol_postulante == 'estudiante' and n_estudiantes == 0:
+                continue
+            if rol_postulante == 'titulado' and n_titulados == 0:
+                continue
+            if carrera_postulante and not any(
+                carrera_postulante.lower() in c.lower() for c in carrera_counter
+            ):
+                continue
+
+            # Days remaining
+            dias_restantes = None
+            if fecha_cierre and oferta_estado == 'activa':
+                try:
+                    cierre_dt = datetime.strptime(fecha_cierre, "%Y-%m-%d")
+                    dias_restantes = (cierre_dt - today_dt).days
+                except Exception:
+                    pass
+
             result_ofertas.append({
                 "id": o['id'],
                 "titulo": o['titulo'],
                 "tipo": o['tipo'],
                 "modalidad": o.get('modalidad'),
+                "area": area_val or None,
                 "ubicacion": o.get('ubicacion'),
-                "institucion": inst.get('institution_name'),
-                "sector": inst.get('sector'),
+                "institucion": inst_name or None,
+                "sector": inst_sector or None,
                 "estado": oferta_estado,
-                "is_active": is_active,
                 "fecha_inicio": o.get('fecha_inicio'),
                 "fecha_cierre": fecha_cierre,
+                "dias_restantes": dias_restantes,
                 "cupos_disponibles": o.get('cupos_disponibles', 1),
-                "created_at": o['created_at']
+                "created_at": o['created_at'],
+                "updated_at": o.get('updated_at'),
+                "total_postulaciones": total_posts,
+                "avg_match_score": avg_score,
+                "aptos": aptos,
+                "considerados": considerados,
+                "no_aptos": no_aptos,
+                "postulantes_estudiantes": n_estudiantes,
+                "postulantes_titulados": n_titulados,
+                "top_carreras": top_carreras,
             })
 
         total = len(result_ofertas)
@@ -302,6 +431,16 @@ async def get_offers_report(
         inactivas = sum(1 for o in result_ofertas if o['estado'] == 'inactiva')
         expiradas = sum(1 for o in result_ofertas if o['estado'] == 'expirada')
         by_tipo = Counter(o['tipo'] for o in result_ofertas)
+        by_modalidad = Counter(o['modalidad'] for o in result_ofertas if o.get('modalidad'))
+        total_posts_all = sum(o['total_postulaciones'] for o in result_ofertas)
+        all_scores = [o['avg_match_score'] for o in result_ofertas if o['avg_match_score'] is not None]
+        avg_score_global = round(sum(all_scores) / len(all_scores), 1) if all_scores else 0
+
+        # Global carrera stats across all filtered offers
+        global_carrera = Counter()
+        for o in result_ofertas:
+            global_carrera.update({c: 1 for c in o['top_carreras']})
+        top_carreras_global = dict(global_carrera.most_common(8))
 
         return {
             "ofertas": result_ofertas,
@@ -310,7 +449,13 @@ async def get_offers_report(
                 "activas": activas,
                 "inactivas": inactivas,
                 "expiradas": expiradas,
-                "by_tipo": dict(by_tipo)
+                "by_tipo": dict(by_tipo),
+                "by_modalidad": dict(by_modalidad),
+                "total_postulaciones": total_posts_all,
+                "avg_match_score": avg_score_global,
+                "postulantes_estudiantes": sum(o['postulantes_estudiantes'] for o in result_ofertas),
+                "postulantes_titulados": sum(o['postulantes_titulados'] for o in result_ofertas),
+                "top_carreras": top_carreras_global,
             }
         }
     except Exception as e:
@@ -322,53 +467,97 @@ async def get_profiles_report(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
     sector: Optional[str] = Query(None),
+    estado: Optional[str] = Query(None),
+    nombre: Optional[str] = Query(None),
     current_user: dict = Depends(verify_operator_access)
 ):
     """
-    Reporte detallado de perfiles institucionales con filtros.
+    Reporte detallado de perfiles institucionales con filtros extendidos.
     """
     try:
         query = supabase.table("institutional_profiles").select("*")
         query = apply_date_filter(query, "created_at", start_date, end_date)
-
-        if sector:
-            query = query.eq("sector", sector)
-
         response = query.order("created_at", desc=True).execute()
         profiles = response.data
 
+        # Offers count per institution
+        today = datetime.now().strftime("%Y-%m-%d")
+        offers_resp = supabase.table("ofertas_laborales") \
+            .select("id, institutional_profile_id, is_active, fecha_cierre") \
+            .execute()
+
+        offers_map: Dict[str, Dict] = {}
+        oferta_inst_map: Dict[str, str] = {}
+        for o in offers_resp.data:
+            iid = o.get('institutional_profile_id')
+            oid = o.get('id')
+            if iid:
+                oferta_inst_map[oid] = iid
+                if iid not in offers_map:
+                    offers_map[iid] = {'total': 0, 'activas': 0}
+                offers_map[iid]['total'] += 1
+                is_active = o.get('is_active', True)
+                fecha_cierre = o.get('fecha_cierre')
+                if is_active and not (fecha_cierre and fecha_cierre < today):
+                    offers_map[iid]['activas'] += 1
+
+        # Postulaciones count per institution (through offers)
+        post_resp = supabase.table("postulaciones").select("oferta_id").execute()
+        post_by_inst: Dict[str, int] = {}
+        for p in post_resp.data:
+            iid = oferta_inst_map.get(p.get('oferta_id'))
+            if iid:
+                post_by_inst[iid] = post_by_inst.get(iid, 0) + 1
+
         result_profiles = []
-        all_skills = Counter()
 
         for p in profiles:
-            reqs = p.get('requirements') or {}
-            skills = reqs.get('hard_skills', []) if isinstance(reqs, dict) else []
-            for s in skills:
-                if s:
-                    all_skills[s.strip().lower()] += 1
+            inst_name = p.get('institution_name') or ''
+            inst_sector = p.get('sector') or ''
+            is_active = p.get('is_active', True)
+
+            # Apply client-side filters
+            if sector and sector.lower() not in inst_sector.lower():
+                continue
+            if nombre and nombre.lower() not in inst_name.lower():
+                continue
+            if estado == 'activo' and not is_active:
+                continue
+            if estado == 'inactivo' and is_active:
+                continue
+
+            inst_offers = offers_map.get(p['id'], {'total': 0, 'activas': 0})
 
             result_profiles.append({
                 "id": p['id'],
-                "institution_name": p.get('institution_name'),
-                "sector": p.get('sector'),
-                "is_active": p.get('is_active', True),
-                "min_score": reqs.get('min_score') if isinstance(reqs, dict) else None,
+                "institution_name": inst_name or None,
+                "sector": inst_sector or None,
+                "ubicacion": p.get('ubicacion'),
+                "contact_email": p.get('contact_email'),
+                "contact_phone": p.get('contact_phone'),
+                "is_active": is_active,
+                "total_ofertas": inst_offers['total'],
+                "ofertas_activas": inst_offers['activas'],
+                "total_postulaciones": post_by_inst.get(p['id'], 0),
                 "created_at": p['created_at'],
-                "updated_at": p.get('updated_at')
+                "updated_at": p.get('updated_at'),
             })
 
         total = len(result_profiles)
         activos = sum(1 for p in result_profiles if p['is_active'])
         by_sector = Counter(p['sector'] for p in result_profiles if p.get('sector'))
-        top_skills = [{"name": k, "count": v} for k, v in all_skills.most_common(15)]
+        total_ofertas_activas = sum(p['ofertas_activas'] for p in result_profiles)
+        total_postulaciones = sum(p['total_postulaciones'] for p in result_profiles)
 
         return {
             "profiles": result_profiles,
             "stats": {
                 "total": total,
                 "activos": activos,
+                "inactivos": total - activos,
                 "by_sector": dict(by_sector),
-                "top_skills_required": top_skills
+                "total_ofertas_activas": total_ofertas_activas,
+                "total_postulaciones": total_postulaciones,
             }
         }
     except Exception as e:

@@ -93,7 +93,7 @@ const handleRegister = async () => {
         <div class="backdrop-blur-lg bg-white/70 rounded-2xl shadow-2xl border border-white/60 p-5 transition-all duration-300">
             <!-- Header -->
             <div class="text-center mb-3">
-                <img src="@/shared/assets/icons/logoEmi.png" alt="EMI Logo" class="w-14 h-14 mx-auto mb-2 object-contain" />
+                <img src="@/shared/assets/icons/logoEmi.png" alt="EMI Logo" class="w-[90px] h-[90px] mx-auto mb-2 object-contain" />
             </div>
 
             <!-- Title -->

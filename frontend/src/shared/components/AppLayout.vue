@@ -17,7 +17,7 @@ const variant = computed(() => getSidebarVariant(authStore.user?.rol))
         <div class="flex">
             <AppSidebar :menuItems="menuItems" :variant="variant" />
             <main
-                class="flex-1 transition-all duration-300 min-h-screen"
+                class="flex-1 min-w-0 overflow-x-hidden transition-all duration-300 min-h-screen"
                 :class="uiStore.isSidebarOpen ? 'lg:ml-64' : 'lg:ml-20'"
             >
                 <slot />

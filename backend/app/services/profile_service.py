@@ -433,6 +433,28 @@ class ProfileService:
                 total_years += float(months_match.group(1)) / 12
                 continue
 
+            # Patron: rango ISO "YYYY-MM-DD - YYYY-MM-DD"
+            iso_range_match = re.search(
+                r'(\d{4})-\d{2}-\d{2}\s*[-–]\s*(\d{4})-\d{2}-\d{2}', duration.lower()
+            )
+            if iso_range_match:
+                start_year = int(iso_range_match.group(1))
+                end_year = int(iso_range_match.group(2))
+                years_diff = end_year - start_year
+                if years_diff > 0:
+                    total_years += years_diff
+                continue
+
+            iso_open_match = re.search(
+                r'(\d{4})-\d{2}-\d{2}\s*[-–]\s*(presente|actual|present)', duration.lower()
+            )
+            if iso_open_match:
+                start_year = int(iso_open_match.group(1))
+                years_diff = datetime.now().year - start_year
+                if years_diff > 0:
+                    total_years += years_diff
+                continue
+
             # Patron: "2020 - 2023" o "2020-2023"
             range_match = re.search(r'(\d{4})\s*[-–]\s*(\d{4}|presente|actual|present)', duration.lower())
             if range_match:

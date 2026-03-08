@@ -134,7 +134,7 @@ const getChildClasses = (child) => {
                 v-if="uiStore.isSidebarOpen"
                 src="@/shared/assets/icons/logoEmi.png"
                 alt="Logo EMI"
-                class="h-10 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+                class="h-11 w-auto cursor-pointer hover:opacity-80 transition-opacity"
                 @click="router.push('/')"
             />
             <button
@@ -422,7 +422,7 @@ const getChildClasses = (child) => {
         >
             <!-- Mobile Header -->
             <div class="flex items-center justify-between h-16 px-4" :class="isDark ? 'border-b border-emi-navy-700' : 'border-b border-gray-200'">
-                <img src="@/shared/assets/icons/logoEmi.png" alt="Logo EMI" class="h-10 w-auto" />
+                <img src="@/shared/assets/icons/logoEmi.png" alt="Logo EMI" class="h-11 w-auto" />
                 <button
                     @click="uiStore.closeMobileSidebar"
                     :class="isDark ? 'text-white hover:text-gray-300' : 'text-gray-600 hover:text-emi-navy-500'"

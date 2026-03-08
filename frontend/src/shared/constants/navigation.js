@@ -40,7 +40,7 @@ const MODULE_MENU_ITEMS = {
     },
     evaluacion_perfiles: {
         label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
-            { label: 'Mejor Correspondencia', path: '/mis-recomendaciones', submoduleId: 'correspondencia' },
+            { label: 'Lista de Perfiles Calificados', path: '/mis-recomendaciones', submoduleId: 'correspondencia' },
             { label: 'Correspondencia entre Perfiles', path: '/correspondencia-perfiles', submoduleId: 'correspondencia' },
             { label: 'Historial de Postulaciones', path: '/historial-postulaciones', submoduleId: 'historial' },
             { label: 'Evaluación de Candidatos', path: '/admin/ranking-candidatos', submoduleId: 'ranking_candidatos' },
@@ -108,7 +108,7 @@ export function getMenuItems(role, allowedModules = null) {
                 },
                 {
                     label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
-                        { label: 'Mejor Correspondencia', path: '/mis-recomendaciones' },
+                        { label: 'Lista de Perfiles Calificados', path: '/mis-recomendaciones' },
                         { label: 'Correspondencia entre Perfiles', path: '/correspondencia-perfiles' },
                         { label: 'Historial de Postulaciones', path: '/historial-postulaciones' },
                         { label: 'Evaluación de Candidatos', path: '/admin/ranking-candidatos' },
@@ -177,7 +177,7 @@ export function getMenuItems(role, allowedModules = null) {
                 },
                 {
                     label: 'Evaluación de Perfiles', icon: icons.evaluation, children: [
-                        { label: 'Mejor Correspondencia', path: '/mis-recomendaciones' },
+                        { label: 'Lista de Perfiles Calificados', path: '/mis-recomendaciones' },
                         { label: 'Correspondencia entre Perfiles', path: '/correspondencia-perfiles' },
                         { label: 'Historial de Postulaciones', path: '/historial-postulaciones' },
                     ]
