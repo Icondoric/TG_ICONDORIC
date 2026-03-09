@@ -66,7 +66,7 @@ const handleLogin = async () => {
             else if (mods && 'oferta_laboral' in mods)     router.push('/admin/convocatorias')
             else if (mods && 'perfiles_institucionales' in mods) router.push('/admin/profiles')
             else if (mods && 'informes_reportes' in mods)  router.push('/admin/reports')
-            else if (mods && 'evaluacion_perfiles' in mods) router.push('/correspondencia-perfiles')
+            else if (mods && 'evaluacion_perfiles' in mods) router.push('/mis-recomendaciones')
             else router.push('/digitalizacion/mi-perfil')
         } else {
             router.push('/digitalizacion/mi-perfil')

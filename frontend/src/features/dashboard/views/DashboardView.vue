@@ -32,7 +32,7 @@ onMounted(() => {
     } else if (mods && 'informes_reportes' in mods) {
       router.replace('/admin/reports')
     } else if (mods && 'evaluacion_perfiles' in mods) {
-      router.replace('/correspondencia-perfiles')
+      router.replace('/mis-recomendaciones')
     } else if (mods && 'digitalizacion_perfiles' in mods) {
       router.replace('/digitalizacion/mi-perfil')
     } else {
