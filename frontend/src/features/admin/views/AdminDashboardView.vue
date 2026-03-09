@@ -59,26 +59,26 @@ const ALL_MODULE_GUIDE = [
     },
     {
         id: 'oferta_laboral',
-        title: 'Gestión de Oferta Laboral',
-        desc: 'Administra las convocatorias de pasantías y empleos publicadas en el sistema. Puedes crear nuevas ofertas definiendo requisitos, área, modalidad, cupos y fechas; editarlas, activarlas o cerrarlas. Los estudiantes y titulados podrán visualizarlas y postularse desde su perfil.',
+        title: 'Gestión de Convocatorias Laborales',
+        desc: 'Administra las convocatorias de pasantías y empleos publicadas en el sistema. Puedes crear nuevas convocatorias definiendo requisitos, área, modalidad, cupos y fechas; editarlas, activarlas o cerrarlas. Los estudiantes y titulados podrán visualizarlas y postularse desde su perfil.',
         icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>`,
     },
     {
         id: 'perfiles_institucionales',
         title: 'Perfiles Institucionales',
-        desc: 'Registra y gestiona los perfiles de las empresas e instituciones que participan en el sistema como fuentes de oferta laboral. Cada perfil incluye información organizacional, sector de actividad y datos de contacto, y sirve como respaldo de las convocatorias publicadas.',
+        desc: 'Registra y gestiona los perfiles de las empresas e instituciones que participan en el sistema como fuentes de convocatorias laborales. Cada perfil incluye información organizacional, sector de actividad y datos de contacto, y sirve como respaldo de las convocatorias publicadas.',
         icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>`,
     },
     {
         id: 'evaluacion_perfiles',
         title: 'Evaluación de Perfiles',
-        desc: 'Módulo central del sistema de recomendación. Permite ver la correspondencia entre los perfiles digitalizados y las ofertas laborales activas, consultar el historial de postulaciones y acceder al ranking de candidatos por oferta generado automáticamente por el modelo de Machine Learning, ordenando a los postulantes según su nivel de compatibilidad.',
+        desc: 'Módulo central del sistema de recomendación. Permite ver la correspondencia entre los perfiles digitalizados y las convocatorias laborales activas, consultar el historial de postulaciones y acceder al ranking de candidatos por convocatoria generado automáticamente por el modelo de Machine Learning, ordenando a los postulantes según su nivel de compatibilidad.',
         icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>`,
     },
     {
         id: 'informes_reportes',
         title: 'Informes y Reportes',
-        desc: 'Genera y consulta reportes estadísticos detallados sobre el funcionamiento del sistema: actividad de usuarios, métricas de ofertas laborales, distribución de perfiles institucionales y más. Permite aplicar filtros avanzados y exportar los resultados en formato PDF para su análisis o presentación.',
+        desc: 'Genera y consulta reportes estadísticos detallados sobre el funcionamiento del sistema: actividad de usuarios, métricas de convocatorias laborales, distribución de perfiles institucionales y más. Permite aplicar filtros avanzados y exportar los resultados en formato PDF para su análisis o presentación.',
         icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>`,
     },
 ]

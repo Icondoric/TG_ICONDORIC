@@ -24,7 +24,7 @@ from app.db.client import supabase
 logger = logging.getLogger(__name__)
 
 # Router
-router = APIRouter(prefix="/api/admin/ofertas", tags=["Admin - Ofertas"])
+router = APIRouter(prefix="/api/admin/convocatorias", tags=["Admin - Convocatorias"])
 
 
 def _oferta_to_response(o: dict) -> OfertaLaboralResponse:
@@ -296,7 +296,7 @@ async def permanent_delete_oferta(
         raise HTTPException(status_code=503, detail="Base de datos no configurada")
 
     try:
-        existing = supabase.table("ofertas_laborales") \
+        existing = supabase.table("convocatorias_laborales") \
             .select("id, titulo") \
             .eq("id", oferta_id) \
             .execute()
@@ -306,7 +306,7 @@ async def permanent_delete_oferta(
 
         titulo = existing.data[0]['titulo']
 
-        supabase.table("ofertas_laborales") \
+        supabase.table("convocatorias_laborales") \
             .delete() \
             .eq("id", oferta_id) \
             .execute()

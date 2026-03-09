@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/admin/ranking", tags=["Admin - Ranking Candidatos"])
 
 
-@router.get("/ofertas")
+@router.get("/convocatorias")
 async def list_ofertas_con_stats(
     tipo: Optional[str] = Query(None, description="Filtrar por tipo: 'pasantia' o 'empleo'"),
     is_active: Optional[bool] = Query(None, description="Filtrar por estado activo"),
@@ -36,7 +36,7 @@ async def list_ofertas_con_stats(
         raise HTTPException(status_code=503, detail="Base de datos no disponible")
 
     try:
-        query = supabase.table("ofertas_laborales") \
+        query = supabase.table("convocatorias_laborales") \
             .select(
                 "id, titulo, tipo, modalidad, ubicacion, area, descripcion,"
                 " cupos_disponibles, is_active, fecha_inicio, fecha_cierre,"
@@ -91,7 +91,7 @@ async def list_ofertas_con_stats(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/ofertas/{oferta_id}/candidatos")
+@router.get("/convocatorias/{oferta_id}/candidatos")
 async def get_ranking_candidatos(
     oferta_id: str,
     top_n: int = Query(default=3, ge=1, le=20, description="Número de candidatos a mostrar"),
@@ -196,7 +196,7 @@ async def get_ranking_candidatos(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/ofertas/{oferta_id}/generar-informe")
+@router.get("/convocatorias/{oferta_id}/generar-informe")
 async def generar_informe_candidatos(
     oferta_id: str,
     top_n: int = Query(default=3, ge=1, le=20, description="Candidatos a incluir en el informe"),
@@ -209,7 +209,7 @@ async def generar_informe_candidatos(
     - Portada institucional con número de referencia
     - Resumen ejecutivo con estadísticas
     - Detalle de la convocatoria
-    - Metodología de evaluación
+    - Parámetros de evaluación
     - Resultados y estadísticas
     - Ranking detallado con desglose por dimensión
     - Anexos: CVs en formato Harvard por cada candidato

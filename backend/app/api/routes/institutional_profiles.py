@@ -58,6 +58,7 @@ async def list_active_institutional_profiles(
                 id=str(p['id']),
                 institution_name=p['institution_name'],
                 sector=p['sector'],
+                tipo_institucion=p.get('tipo_institucion'),
                 description=p.get('description'),
                 contact_phone=p.get('contact_phone'),
                 contact_email=p.get('contact_email'),
@@ -115,6 +116,7 @@ async def list_institutional_profiles(
                 id=str(p['id']),
                 institution_name=p['institution_name'],
                 sector=p['sector'],
+                tipo_institucion=p.get('tipo_institucion'),
                 description=p.get('description'),
                 contact_phone=p.get('contact_phone'),
                 contact_email=p.get('contact_email'),
@@ -172,6 +174,7 @@ async def get_institutional_profile(
             id=str(p['id']),
             institution_name=p['institution_name'],
             sector=p['sector'],
+            tipo_institucion=p.get('tipo_institucion'),
             description=p.get('description'),
             ubicacion=p.get('ubicacion'),
             contact_phone=p.get('contact_phone'),
@@ -227,6 +230,7 @@ async def create_institutional_profile(
         data = {
             'institution_name': profile.institution_name,
             'sector': profile.sector,
+            'tipo_institucion': profile.tipo_institucion,
             'description': profile.description,
             'ubicacion': profile.ubicacion,
             'contact_phone': profile.contact_phone,
@@ -256,6 +260,7 @@ async def create_institutional_profile(
             id=str(p['id']),
             institution_name=p['institution_name'],
             sector=p['sector'],
+            tipo_institucion=p.get('tipo_institucion'),
             description=p.get('description'),
             ubicacion=p.get('ubicacion'),
             contact_phone=p.get('contact_phone'),
@@ -327,6 +332,8 @@ async def update_institutional_profile(
             update_data['institution_name'] = profile.institution_name
         if profile.sector is not None:
             update_data['sector'] = profile.sector
+        if profile.tipo_institucion is not None:
+            update_data['tipo_institucion'] = profile.tipo_institucion
         if profile.description is not None:
             update_data['description'] = profile.description
         if profile.ubicacion is not None:
@@ -354,6 +361,7 @@ async def update_institutional_profile(
             id=str(p['id']),
             institution_name=p['institution_name'],
             sector=p['sector'],
+            tipo_institucion=p.get('tipo_institucion'),
             description=p.get('description'),
             ubicacion=p.get('ubicacion'),
             contact_phone=p.get('contact_phone'),

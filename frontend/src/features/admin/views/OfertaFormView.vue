@@ -1,7 +1,7 @@
 <script setup>
 /**
  * OfertaFormView
- * Vista para crear/editar ofertas laborales.
+ * Vista para crear/editar convocatorias laborales.
  * Formulario en 3 pasos: Información General / Publicación y Contacto / Criterios de Evaluación
  */
 
@@ -198,7 +198,7 @@ const useCustomEvaluation = ref(false)
 const steps = [
     { label: 'Información General' },
     { label: 'Publicación y Contacto' },
-    { label: 'Criterios de Evaluación' },
+    { label: 'Parámetros de Evaluación' },
 ]
 
 const goNext = () => {
@@ -436,7 +436,7 @@ const saveOferta = async () => {
         }
         if (isEditing.value) data.is_active = form.is_active
         await store.saveOferta(isEditing.value ? ofertaId.value : null, data)
-        router.push('/admin/ofertas')
+        router.push('/admin/convocatorias')
     } catch (e) {
         error.value = formatApiError(e, 'Ocurrio un error al guardar.')
     } finally {
@@ -456,27 +456,27 @@ onMounted(async () => {
 
             <!-- Encabezado -->
             <header class="mb-8">
-                <router-link to="/admin/ofertas"
+                <router-link to="/admin/convocatorias"
                     class="inline-flex items-center text-slate-500 hover:text-slate-700 mb-4 text-sm">
                     <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
-                    Volver a Ofertas
+                    Volver a Convocatorias
                 </router-link>
                 <h1 class="text-3xl font-bold text-emi-navy-500">
-                    {{ isEditing ? 'Editar Oferta' : 'Nueva Oferta Laboral' }}
+                    {{ isEditing ? 'Editar Convocatoria' : 'Nueva Convocatoria Laboral' }}
                 </h1>
                 <p class="mt-1 text-slate-500">
                     {{ isEditing
-                        ? 'Modifica los datos de la oferta y guarda los cambios.'
-                        : 'Completa la informacion para publicar la oferta y comenzar a recibir candidatos.' }}
+                        ? 'Modifica los datos de la convocatoria y guarda los cambios.'
+                        : 'Completa la informacion para publicar la convocatoria y comenzar a recibir candidatos.' }}
                 </p>
             </header>
 
             <!-- Cargando -->
             <div v-if="loading" class="card-emi p-12 text-center">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emi-gold mx-auto"></div>
-                <p class="mt-4 text-slate-500">Cargando oferta...</p>
+                <p class="mt-4 text-slate-500">Cargando convocatoria...</p>
             </div>
 
             <form v-else novalidate @submit.prevent="saveOferta" class="space-y-6">
@@ -501,7 +501,7 @@ onMounted(async () => {
                             </div>
                             <div>
                                 <p class="text-sm font-semibold text-emi-navy-700">¿Ya tienes la convocatoria en PDF?</p>
-                                <p class="text-xs text-emi-navy-500">Si la oferta ya está redactada como documento, súbela aquí y el sistema intentará completar el formulario por ti. Podrás revisar y ajustar todo antes de guardar.</p>
+                                <p class="text-xs text-emi-navy-500">Si la convocatoria ya está redactada como documento, súbela aquí y el sistema intentará completar el formulario por ti. Podrás revisar y ajustar todo antes de guardar.</p>
                             </div>
                         </div>
 
@@ -515,7 +515,7 @@ onMounted(async () => {
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                             </svg>
-                            {{ analyzingPdf ? 'Leyendo documento...' : 'Subir PDF de oferta' }}
+                            {{ analyzingPdf ? 'Leyendo documento...' : 'Subir PDF de convocatoria' }}
                             <input v-if="!analyzingPdf" type="file" accept=".pdf" class="hidden" @change="handleOfertaPdfSelect" />
                         </label>
                     </div>
@@ -573,7 +573,7 @@ onMounted(async () => {
                 <!-- ═══════════════════════════════════════════════ -->
                 <template v-if="currentStep === 1">
 
-                    <!-- ─── Detalle de la Oferta ─── -->
+                    <!-- ─── Detalle de la Convocatoria ─── -->
                     <div class="card-emi p-6">
                         <div class="flex items-center gap-3 mb-5">
                             <div class="w-9 h-9 bg-info-100 rounded-lg flex items-center justify-center shrink-0">
@@ -582,7 +582,7 @@ onMounted(async () => {
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-base font-semibold text-slate-800">Detalle de la Oferta</h2>
+                                <h2 class="text-base font-semibold text-slate-800">Detalle de la Convocatoria</h2>
                                 <p class="text-xs text-slate-400">Informacion principal que veran los candidatos</p>
                             </div>
                         </div>
@@ -633,7 +633,7 @@ onMounted(async () => {
                             </div>
                             <div>
                                 <h2 class="text-base font-semibold text-slate-800">Empresa y Lugar de Trabajo</h2>
-                                <p class="text-xs text-slate-400">Donde se publicara la oferta y donde se trabajara</p>
+                                <p class="text-xs text-slate-400">Donde se publicará la convocatoria y donde se trabajará</p>
                             </div>
                         </div>
 
@@ -792,7 +792,7 @@ onMounted(async () => {
 
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Tipo de Oferta *</label>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Tipo de Convocatoria *</label>
                                     <select
                                         v-model="form.tipo"
                                         class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emi-navy-500 focus:border-emi-navy-500 transition-colors"
@@ -853,7 +853,7 @@ onMounted(async () => {
                                         class="h-4 w-4 text-emi-navy-600 focus:ring-emi-navy-500 border-slate-300 rounded"
                                     />
                                     <label for="is_active" class="text-sm font-medium text-slate-700 cursor-pointer">
-                                        Oferta activa y visible para candidatos
+                                        Convocatoria activa y visible para candidatos
                                     </label>
                                 </div>
                             </div>
@@ -928,33 +928,26 @@ onMounted(async () => {
                 <!-- fin paso 2 -->
 
                 <!-- ═══════════════════════════════════════════════ -->
-                <!-- PASO 3 — Criterios de Evaluación              -->
+                <!-- PASO 3 — Parámetros de Evaluación             -->
                 <!-- ═══════════════════════════════════════════════ -->
                 <template v-if="currentStep === 3">
+
+                    <!-- ─── Card 1: Requisitos Mínimos ─── -->
                     <div class="card-emi p-6">
                         <div class="flex items-center gap-3 mb-6">
-                            <div class="w-9 h-9 bg-warning-100 rounded-lg flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-warning-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            <div class="w-9 h-9 bg-emi-navy-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-emi-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-base font-semibold text-slate-800">Configuracion de Evaluacion</h2>
-                                <p class="text-xs text-slate-400">Criterios para evaluar y clasificar a los candidatos que postulen</p>
+                                <h2 class="text-base font-semibold text-slate-800">Requisitos Mínimos</h2>
+                                <p class="text-xs text-slate-400">Condiciones que el candidato debe cumplir para ser evaluado</p>
                             </div>
                         </div>
 
-                        <div class="space-y-8">
-
-                            <!-- ── 1. Requisitos Mínimos ── -->
-                            <div>
-                                <div class="flex items-center gap-2 mb-4">
-                                    <span class="w-6 h-6 rounded-full bg-emi-navy-500 text-white text-xs flex items-center justify-center font-bold shrink-0">1</span>
-                                    <div>
-                                        <h3 class="text-sm font-semibold text-slate-700">Requisitos Minimos</h3>
-                                        <p class="text-xs text-slate-400">Condiciones que el candidato debe cumplir para ser evaluado</p>
-                                    </div>
-                                </div>
+                        <div class="space-y-4">
+                                <div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                                     <div>
@@ -1075,19 +1068,25 @@ onMounted(async () => {
                                 <datalist id="oferta-languagesList">
                                     <option v-for="l in commonLanguages" :key="l" :value="l" />
                                 </datalist>
-                            </div>
-
-                            <!-- ── 2. Elegibilidad ── -->
-                            <div class="border-t border-slate-100 pt-6">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <span class="w-6 h-6 rounded-full bg-emi-navy-500 text-white text-xs flex items-center justify-center font-bold shrink-0">2</span>
-                                    <div>
-                                        <h3 class="text-sm font-semibold text-slate-700">Filtro de Elegibilidad</h3>
-                                        <p class="text-xs text-slate-400">Pre-filtro binario: candidatos que no cumplan estos criterios quedan como NO_APTO sin pasar por el modelo ML</p>
-                                    </div>
                                 </div>
+                        </div>
+                    </div>
 
-                                <div class="space-y-4">
+                    <!-- ─── Card 2: Filtro de Elegibilidad ─── -->
+                    <div class="card-emi p-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-9 h-9 bg-info-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-info-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-base font-semibold text-slate-800">Filtro de Elegibilidad</h2>
+                                <p class="text-xs text-slate-400">Pre-filtro binario: candidatos que no cumplan estos criterios quedan como NO_APTO sin pasar por el modelo ML</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-600 mb-2">
                                             Carreras Aceptadas
@@ -1153,20 +1152,26 @@ onMounted(async () => {
                                         </p>
                                     </div>
                                     <p v-else class="text-xs text-slate-400 italic">
-                                        El filtro de semestre solo aplica a ofertas de tipo Pasantia.
+                                        El filtro de semestre solo aplica a convocatorias de tipo Pasantía.
                                     </p>
-                                </div>
-                            </div>
+                        </div>
+                    </div>
 
-                            <!-- ── 3 + 4. Pesos y Umbrales ── -->
-                            <div class="border-t border-slate-100 pt-6">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <span class="w-6 h-6 rounded-full bg-emi-navy-500 text-white text-xs flex items-center justify-center font-bold shrink-0">3</span>
-                                    <div>
-                                        <h3 class="text-sm font-semibold text-slate-700">Pesos y Umbrales de Evaluacion</h3>
-                                        <p class="text-xs text-slate-400">Importancia de cada dimension y puntuacion minima por categoria</p>
-                                    </div>
-                                </div>
+                    <!-- ─── Card 3: Pesos y Umbrales ─── -->
+                    <div class="card-emi p-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-9 h-9 bg-warning-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-warning-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-base font-semibold text-slate-800">Parámetros de Evaluación</h2>
+                                <p class="text-xs text-slate-400">Importancia de cada dimensión y puntuación mínima por categoría</p>
+                            </div>
+                        </div>
+
+                        <div>
 
                                 <!-- ── Panel estándar (colapsado) ── -->
                                 <div v-if="!useCustomEvaluation" class="border border-slate-200 rounded-xl p-5 bg-slate-50">
@@ -1224,7 +1229,7 @@ onMounted(async () => {
                                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-info-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        Valores calibrados para el sistema ICONDORIC. Representan el balance recomendado para la mayoria de ofertas. Personaliza solo si el perfil de evaluacion de esta oferta es muy especifico.
+                                        Valores calibrados para el sistema ICONDORIC. Representan el balance recomendado para la mayoría de convocatorias. Personaliza solo si el perfil de evaluación de esta convocatoria es muy específico.
                                     </div>
                                 </div>
 
@@ -1333,13 +1338,9 @@ onMounted(async () => {
 
                                     </div>
                                 </div>
-                                <!-- fin pesos y umbrales -->
-
-                            </div>
-                            <!-- fin sección 3 -->
-
                         </div>
                     </div>
+
                 </template>
                 <!-- fin paso 3 -->
 
@@ -1349,7 +1350,7 @@ onMounted(async () => {
                     <div>
                         <router-link
                             v-if="currentStep === 1"
-                            to="/admin/ofertas"
+                            to="/admin/convocatorias"
                             class="px-6 py-2.5 text-sm text-slate-600 hover:text-slate-800 font-medium rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
                         >
                             Cancelar
@@ -1398,7 +1399,7 @@ onMounted(async () => {
                                 </svg>
                                 Guardando...
                             </span>
-                            <span v-else>{{ isEditing ? 'Guardar Cambios' : 'Publicar Oferta' }}</span>
+                            <span v-else>{{ isEditing ? 'Guardar Cambios' : 'Publicar Convocatoria' }}</span>
                         </button>
                     </div>
                 </div>

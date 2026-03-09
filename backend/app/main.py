@@ -84,7 +84,7 @@ app.include_router(
 )
 app.include_router(
     ofertas.router,
-    tags=["Admin - Ofertas Laborales"]
+    tags=["Admin - Convocatorias Laborales"]
 )
 app.include_router(
     recommendations.router,

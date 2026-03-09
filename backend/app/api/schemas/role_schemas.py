@@ -7,7 +7,7 @@ VALID_SUBMODULES: Dict[str, List[str]] = {
     "oferta_laboral":           ["ver_ofertas", "nueva_oferta"],
     "perfiles_institucionales": ["ver_perfiles", "nuevo_perfil"],
     "evaluacion_perfiles":      ["correspondencia", "historial", "ranking_candidatos"],
-    "informes_reportes":        ["resumen_general", "reporte_usuarios", "reporte_ofertas", "reporte_perfiles"],
+    "informes_reportes":        ["resumen_general", "reporte_usuarios", "reporte_ofertas", "reporte_perfiles", "reporte_cumplimiento", "reporte_cargos"],
 }
 
 VALID_MODULES = list(VALID_SUBMODULES.keys())

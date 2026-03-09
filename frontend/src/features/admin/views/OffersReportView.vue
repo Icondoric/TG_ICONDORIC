@@ -8,6 +8,10 @@ import AppLayout from '@/shared/components/AppLayout.vue'
 const authStore = useAuthStore()
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
+// ── Tab ────────────────────────────────────────────────────────────────────
+const activeTab = ref('listado')
+
+// ── TAB 1: Listado ─────────────────────────────────────────────────────────
 const loading = ref(true)
 const error = ref(null)
 const generatingPdf = ref(false)
@@ -34,7 +38,7 @@ const reportData = ref(null)
 
 // ── Columnas PDF ───────────────────────────────────────────────────────────
 const PDF_COLUMNS = [
-    { key: 'oferta',             label: 'Oferta (Título + Institución)',   locked: true },
+    { key: 'oferta',             label: 'Convocatoria (Título + Institución)',   locked: true },
     { key: 'tipo',               label: 'Tipo' },
     { key: 'modalidad',          label: 'Modalidad' },
     { key: 'sector',             label: 'Sector' },
@@ -84,7 +88,7 @@ const loadData = async () => {
         reportData.value = res.data
     } catch (err) {
         console.error('Error loading offers report:', err)
-        error.value = 'Error al cargar el reporte de ofertas.'
+        error.value = 'Error al cargar el reporte de convocatorias.'
     } finally {
         loading.value = false
     }
@@ -212,6 +216,146 @@ const topCarrerasGlobal = computed(() => {
         .slice(0, 6)
         .map(([name, count]) => ({ name, count, pct: Math.round(count / max * 100) }))
 })
+
+// ── TAB 2: Cumplimiento por Convocatoria ───────────────────────────────────
+const compLoaded = ref(false)
+const compLoading = ref(false)
+const compError = ref(null)
+const compGeneratingPdf = ref(false)
+const compPdfMode = ref(false)
+const compShowPdfConfig = ref(false)
+
+const compStartDate = ref('')
+const compEndDate = ref('')
+const compTipoFilter = ref('')
+const compTipoInstFilter = ref('')
+const compEstadoFilter = ref('')
+const compInstitucionFilter = ref('')
+const compData = ref(null)
+
+const COMP_PDF_COLUMNS = [
+    { key: 'convocatoria', label: 'Convocatoria (Título + Institución)', locked: true },
+    { key: 'tipo_inst',    label: 'Tipo de institución' },
+    { key: 'tipo',         label: 'Tipo (Pasantía / Empleo)' },
+    { key: 'estado',       label: 'Estado' },
+    { key: 'fechas',       label: 'Fechas (Inicio / Cierre)' },
+    { key: 'cupos',        label: 'Cupos disponibles' },
+    { key: 'postulaciones',label: 'Postulaciones (Total / A-C-N)' },
+    { key: 'cumplimiento', label: '% Cumplimiento', locked: true },
+]
+const compPdfColEnabled = ref(Object.fromEntries(COMP_PDF_COLUMNS.map(c => [c.key, true])))
+const compColVisible = (key) => !compPdfMode.value || compPdfColEnabled.value[key]
+
+const compActiveFiltersCount = computed(() => {
+    let n = 0
+    if (compTipoFilter.value) n++
+    if (compTipoInstFilter.value) n++
+    if (compEstadoFilter.value) n++
+    if (compInstitucionFilter.value) n++
+    return n
+})
+
+const compEnabledPdfColCount = computed(() =>
+    COMP_PDF_COLUMNS.filter(c => compPdfColEnabled.value[c.key]).length
+)
+
+const convocatoriasOrdenadas = computed(() =>
+    [...(compData.value?.convocatorias || [])].sort((a, b) => a.pct_cumplimiento - b.pct_cumplimiento)
+)
+
+const loadCompliance = async () => {
+    compLoading.value = true
+    compError.value = null
+    try {
+        const headers = { Authorization: `Bearer ${authStore.token}` }
+        const params = {
+            start_date: compStartDate.value || undefined,
+            end_date: compEndDate.value || undefined,
+            tipo: compTipoFilter.value || undefined,
+            tipo_institucion: compTipoInstFilter.value || undefined,
+            estado: compEstadoFilter.value || undefined,
+            institucion: compInstitucionFilter.value || undefined,
+        }
+        const res = await axios.get(`${API_URL}/api/analytics/compliance-report`, { headers, params })
+        compData.value = res.data
+        compLoaded.value = true
+    } catch (err) {
+        console.error('Error loading compliance report:', err)
+        compError.value = 'Error al cargar el reporte de cumplimiento.'
+    } finally {
+        compLoading.value = false
+    }
+}
+
+const resetCompFilters = () => {
+    compTipoFilter.value = ''
+    compTipoInstFilter.value = ''
+    compEstadoFilter.value = ''
+    compInstitucionFilter.value = ''
+    const end = new Date()
+    const start = new Date()
+    start.setDate(end.getDate() - 90)
+    compEndDate.value = end.toISOString().split('T')[0]
+    compStartDate.value = start.toISOString().split('T')[0]
+    loadCompliance()
+}
+
+const confirmAndGenerateCompPDF = async () => {
+    compShowPdfConfig.value = false
+    compGeneratingPdf.value = true
+    compPdfMode.value = true
+    await new Promise(r => setTimeout(r, 150))
+    const element = document.getElementById('compliance-report-container')
+    const opt = {
+        margin: [12, 8, 12, 8],
+        filename: `reporte-cumplimiento-${compStartDate.value}_${compEndDate.value}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+        pagebreak: { mode: ['css', 'legacy'] }
+    }
+    try {
+        await html2pdf().set(opt).from(element).save()
+    } catch (err) {
+        console.error('Error generating PDF:', err)
+    } finally {
+        compPdfMode.value = false
+        compGeneratingPdf.value = false
+    }
+}
+
+const cumplimientoColor = (pct) => {
+    if (pct >= 80) return 'bg-green-500'
+    if (pct >= 40) return 'bg-yellow-400'
+    return 'bg-red-400'
+}
+const cumplimientoText = (pct) => {
+    if (pct >= 80) return 'text-green-700 font-semibold'
+    if (pct >= 40) return 'text-yellow-700 font-medium'
+    return 'text-red-600 font-medium'
+}
+
+const tipoBadgeInst = (tipo) => {
+    const map = {
+        'Pública':  'bg-blue-100 text-blue-700 border border-blue-200',
+        'Privada':  'bg-purple-100 text-purple-700 border border-purple-200',
+        'Mixta':    'bg-teal-100 text-teal-700 border border-teal-200',
+        'ONG':      'bg-orange-100 text-orange-700 border border-orange-200',
+    }
+    return map[tipo] || 'bg-gray-100 text-gray-600 border border-gray-200'
+}
+
+const switchTab = (tab) => {
+    activeTab.value = tab
+    if (tab === 'cumplimiento' && !compLoaded.value) {
+        const end = new Date()
+        const start = new Date()
+        start.setDate(end.getDate() - 90)
+        compEndDate.value = end.toISOString().split('T')[0]
+        compStartDate.value = start.toISOString().split('T')[0]
+        loadCompliance()
+    }
+}
 </script>
 
 <template>
@@ -219,13 +363,13 @@ const topCarrerasGlobal = computed(() => {
         <div class="py-6 px-4 sm:px-6 lg:px-8 min-w-0">
 
             <!-- ── Header ──────────────────────────────────────────────── -->
-            <header class="mb-6" :class="{ 'hidden': pdfMode }">
+            <header class="mb-4" :class="{ 'hidden': pdfMode && activeTab === 'listado' || compPdfMode && activeTab === 'cumplimiento' }">
                 <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
                     <div>
-                        <h1 class="text-2xl font-bold text-emi-navy-500">Reporte de Ofertas</h1>
-                        <p class="mt-0.5 text-sm text-gray-500">Detalle de ofertas laborales con segmentación por postulante.</p>
+                        <h1 class="text-2xl font-bold text-emi-navy-500">Reporte de Convocatorias</h1>
+                        <p class="mt-0.5 text-sm text-gray-500">Listado de convocatorias laborales y análisis de cumplimiento.</p>
                     </div>
-                    <button
+                    <button v-if="activeTab === 'listado'"
                         @click="openPdfConfig"
                         :disabled="loading || generatingPdf"
                         class="h-10 px-5 bg-emi-navy-600 text-white rounded-lg hover:bg-emi-navy-700 transition-colors text-sm font-medium inline-flex items-center gap-2 disabled:opacity-50 whitespace-nowrap self-start xl:self-auto"
@@ -236,8 +380,40 @@ const topCarrerasGlobal = computed(() => {
                         <div v-else class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                         {{ generatingPdf ? 'Generando PDF...' : 'Exportar PDF' }}
                     </button>
+                    <button v-if="activeTab === 'cumplimiento'"
+                        @click="compShowPdfConfig = true"
+                        :disabled="compLoading || compGeneratingPdf || !compLoaded"
+                        class="h-10 px-5 bg-emi-navy-600 text-white rounded-lg hover:bg-emi-navy-700 transition-colors text-sm font-medium inline-flex items-center gap-2 disabled:opacity-50 whitespace-nowrap self-start xl:self-auto"
+                    >
+                        <svg v-if="!compGeneratingPdf" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <div v-else class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        {{ compGeneratingPdf ? 'Generando PDF...' : 'Exportar PDF' }}
+                    </button>
                 </div>
             </header>
+
+            <!-- ── Tab bar ─────────────────────────────────────────────── -->
+            <div v-if="!pdfMode && !compPdfMode" class="flex border-b border-gray-200 mb-6">
+                <button @click="switchTab('listado')"
+                    class="px-5 py-2.5 text-sm font-medium border-b-2 transition-colors"
+                    :class="activeTab === 'listado' ? 'border-emi-navy-600 text-emi-navy-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                >
+                    Listado de Convocatorias
+                </button>
+                <button @click="switchTab('cumplimiento')"
+                    class="px-5 py-2.5 text-sm font-medium border-b-2 transition-colors"
+                    :class="activeTab === 'cumplimiento' ? 'border-emi-navy-600 text-emi-navy-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                >
+                    Cumplimiento por Convocatoria
+                </button>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════════ -->
+            <!-- TAB 1: Listado de Convocatorias                           -->
+            <!-- ══════════════════════════════════════════════════════════ -->
+            <template v-if="activeTab === 'listado' || pdfMode">
 
             <!-- ── Modal: configuración de columnas PDF ────────────────── -->
             <Teleport to="body">
@@ -353,7 +529,7 @@ const topCarrerasGlobal = computed(() => {
                         <input type="text" v-model="institucionFilter" placeholder="Ej: AGETIC, YPFB..." class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-emi-navy-200 focus:outline-none" />
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Área de la oferta</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Área de la convocatoria</label>
                         <input type="text" v-model="areaFilter" placeholder="Ej: Desarrollo, RRHH..." class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-emi-navy-200 focus:outline-none" />
                     </div>
                 </div>
@@ -437,19 +613,19 @@ const topCarrerasGlobal = computed(() => {
                 <div v-if="pdfMode" class="bg-emi-navy-700 text-white px-6 py-4 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-[10px] text-blue-200 uppercase tracking-widest mb-1">Sistema de Bolsa Laboral — EMI</p>
-                        <h1 class="text-xl font-bold">Reporte de Ofertas Laborales</h1>
+                        <h1 class="text-xl font-bold">Reporte de Convocatorias Laborales</h1>
                         <p class="text-xs text-blue-100 mt-0.5">Período: {{ formatDate(startDate) }} — {{ formatDate(endDate) }}</p>
                     </div>
                     <div class="text-right text-xs text-blue-100 space-y-1">
                         <p>Generado: {{ formatDate(new Date().toISOString()) }}</p>
-                        <p>Total mostrado: <span class="font-bold text-white">{{ reportData?.ofertas?.length }}</span> ofertas</p>
+                        <p>Total mostrado: <span class="font-bold text-white">{{ reportData?.ofertas?.length }}</span> convocatorias</p>
                     </div>
                 </div>
 
                 <!-- ── Fila 1: métricas principales ──────────────────── -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <div class="bg-white px-4 py-3 rounded-xl border border-gray-100 shadow-sm">
-                        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Total ofertas</p>
+                        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Total convocatorias</p>
                         <p class="text-2xl font-bold text-emi-navy-500 mt-1">{{ reportData?.stats.total }}</p>
                         <div class="flex gap-3 mt-1">
                             <span class="text-[11px] text-green-600">{{ reportData?.stats.activas }} activas</span>
@@ -539,7 +715,7 @@ const topCarrerasGlobal = computed(() => {
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
-                        <span class="text-sm font-semibold text-gray-700">Listado de ofertas</span>
+                        <span class="text-sm font-semibold text-gray-700">Listado de convocatorias</span>
                         <span class="text-xs text-gray-400">({{ reportData?.ofertas?.length }} registros)</span>
                     </div>
 
@@ -548,7 +724,7 @@ const topCarrerasGlobal = computed(() => {
                             <thead>
                                 <tr class="bg-gray-50 border-b border-gray-100">
                                     <th class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide">#</th>
-                                    <th class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Oferta</th>
+                                    <th class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Convocatoria</th>
                                     <th v-if="colVisible('tipo')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Tipo</th>
                                     <th v-if="colVisible('modalidad')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Modalidad</th>
                                     <th v-if="colVisible('sector')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Sector</th>
@@ -657,7 +833,7 @@ const topCarrerasGlobal = computed(() => {
 
                                 <tr v-if="!reportData?.ofertas?.length">
                                     <td colspan="15" class="px-4 py-10 text-center text-gray-400 text-sm">
-                                        No se encontraron ofertas con los filtros seleccionados.
+                                        No se encontraron convocatorias con los filtros seleccionados.
                                     </td>
                                 </tr>
                             </tbody>
@@ -670,6 +846,271 @@ const topCarrerasGlobal = computed(() => {
                     Reporte generado automáticamente — Sistema de Bolsa Laboral EMI
                 </div>
             </div>
+
+            </template>
+
+            <!-- ══════════════════════════════════════════════════════════ -->
+            <!-- TAB 2: Cumplimiento por Convocatoria                      -->
+            <!-- ══════════════════════════════════════════════════════════ -->
+            <template v-if="activeTab === 'cumplimiento' || compPdfMode">
+
+                <!-- Modal PDF compliance -->
+                <Teleport to="body">
+                    <div v-if="compShowPdfConfig" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4">
+                            <div class="px-6 pt-5 pb-4 border-b border-gray-100 flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-base font-semibold text-gray-800">Configurar exportación PDF</h2>
+                                    <p class="text-xs text-gray-400 mt-0.5">Selecciona las columnas que aparecerán en el PDF</p>
+                                </div>
+                                <button @click="compShowPdfConfig = false" class="text-gray-400 hover:text-gray-600 p-1">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="px-6 py-4 space-y-1">
+                                <label v-for="col in COMP_PDF_COLUMNS" :key="col.key"
+                                    class="flex items-center gap-3 p-2.5 rounded-lg cursor-pointer"
+                                    :class="col.locked ? 'bg-gray-50 cursor-not-allowed opacity-60' : 'hover:bg-gray-50'"
+                                >
+                                    <input type="checkbox" v-model="compPdfColEnabled[col.key]" :disabled="col.locked" class="w-4 h-4 rounded accent-blue-600" />
+                                    <span class="text-sm text-gray-700">{{ col.label }}</span>
+                                    <span v-if="col.locked" class="ml-auto text-xs text-gray-400 italic">obligatorio</span>
+                                </label>
+                            </div>
+                            <div class="px-6 pb-5 pt-3 flex items-center justify-between border-t border-gray-100">
+                                <span class="text-xs text-gray-400">{{ compEnabledPdfColCount }} columnas seleccionadas</span>
+                                <div class="flex gap-2">
+                                    <button @click="compShowPdfConfig = false" class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:text-gray-800">Cancelar</button>
+                                    <button @click="confirmAndGenerateCompPDF" class="px-5 py-2 text-sm bg-emi-navy-600 text-white rounded-lg hover:bg-emi-navy-700 font-medium">Generar PDF</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Teleport>
+
+                <!-- Filtros compliance -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6" :class="{ 'hidden': compPdfMode }">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-sm font-semibold text-gray-700 inline-flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                            </svg>
+                            Filtros
+                            <span v-if="compActiveFiltersCount > 0" class="bg-emi-navy-100 text-emi-navy-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                                {{ compActiveFiltersCount }} activos
+                            </span>
+                        </h2>
+                        <button @click="resetCompFilters" class="text-xs text-gray-400 hover:text-gray-600 underline">Limpiar todo</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Publicado desde</label>
+                            <input type="date" v-model="compStartDate" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-emi-navy-200 focus:outline-none" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Publicado hasta</label>
+                            <input type="date" v-model="compEndDate" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-emi-navy-200 focus:outline-none" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Institución</label>
+                            <input type="text" v-model="compInstitucionFilter" placeholder="Ej: AGETIC, YPFB..." class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-emi-navy-200 focus:outline-none" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Tipo de institución</label>
+                            <select v-model="compTipoInstFilter" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-emi-navy-200 focus:outline-none">
+                                <option value="">Todos los tipos</option>
+                                <option value="Pública">Pública</option>
+                                <option value="Privada">Privada</option>
+                                <option value="Mixta">Mixta</option>
+                                <option value="ONG">ONG</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Tipo de oferta</label>
+                            <select v-model="compTipoFilter" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-emi-navy-200 focus:outline-none">
+                                <option value="">Todos los tipos</option>
+                                <option value="pasantia">Pasantía</option>
+                                <option value="empleo">Empleo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Estado</label>
+                            <select v-model="compEstadoFilter" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-emi-navy-200 focus:outline-none">
+                                <option value="">Todos los estados</option>
+                                <option value="activa">Activa</option>
+                                <option value="inactiva">Inactiva</option>
+                                <option value="expirada">Expirada</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button @click="loadCompliance" :disabled="compLoading" class="px-5 py-2 bg-emi-navy-600 text-white rounded-lg text-sm hover:bg-emi-navy-700 disabled:opacity-50 font-medium">
+                            Aplicar filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading compliance -->
+                <div v-if="compLoading" class="bg-white rounded-xl p-12 text-center">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-emi-navy-500 mx-auto"></div>
+                    <p class="mt-4 text-sm text-gray-400">Cargando reporte de cumplimiento...</p>
+                </div>
+
+                <!-- Error compliance -->
+                <div v-else-if="compError" class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p class="text-sm text-red-700">{{ compError }}</p>
+                </div>
+
+                <!-- Contenido compliance -->
+                <div v-else-if="compLoaded" id="compliance-report-container" class="space-y-5">
+
+                    <!-- Encabezado PDF -->
+                    <div v-if="compPdfMode" class="bg-emi-navy-700 text-white px-6 py-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] text-blue-200 uppercase tracking-widest mb-1">Sistema de Bolsa Laboral — EMI</p>
+                            <h1 class="text-xl font-bold">Reporte de Cumplimiento por Convocatoria</h1>
+                            <p class="text-xs text-blue-100 mt-0.5">Período: {{ formatDate(compStartDate) }} — {{ formatDate(compEndDate) }}</p>
+                        </div>
+                        <div class="text-right text-xs text-blue-100 space-y-1">
+                            <p>Generado: {{ formatDate(new Date().toISOString()) }}</p>
+                            <p>Total: <span class="font-bold text-white">{{ compData?.convocatorias?.length }}</span> convocatorias</p>
+                        </div>
+                    </div>
+
+                    <!-- Tarjetas resumen -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div class="bg-white px-4 py-3 rounded-xl border border-gray-100 shadow-sm">
+                            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Convocatorias</p>
+                            <p class="text-2xl font-bold text-emi-navy-500 mt-1">{{ compData?.stats.total }}</p>
+                            <p class="text-[11px] text-gray-400">en el período</p>
+                        </div>
+                        <div class="bg-white px-4 py-3 rounded-xl border border-gray-100 shadow-sm">
+                            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Cupos totales</p>
+                            <p class="text-2xl font-bold text-blue-600 mt-1">{{ compData?.stats.total_cupos }}</p>
+                            <p class="text-[11px] text-gray-400">disponibles</p>
+                        </div>
+                        <div class="bg-white px-4 py-3 rounded-xl border border-gray-100 shadow-sm">
+                            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Aptos totales</p>
+                            <p class="text-2xl font-bold text-green-600 mt-1">{{ compData?.stats.total_aptos }}</p>
+                            <p class="text-[11px] text-gray-400">postulantes APTOS</p>
+                        </div>
+                        <div class="bg-white px-4 py-3 rounded-xl border border-gray-100 shadow-sm">
+                            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Cumplimiento global</p>
+                            <p class="text-2xl font-bold mt-1" :class="cumplimientoText(compData?.stats.pct_cumplimiento_global)">
+                                {{ compData?.stats.pct_cumplimiento_global }}%
+                            </p>
+                            <p class="text-[11px] text-gray-400">aptos / cupos total</p>
+                        </div>
+                    </div>
+
+                    <!-- Por tipo institución -->
+                    <div v-if="Object.keys(compData?.stats.by_tipo_institucion || {}).length" class="bg-white px-5 py-4 rounded-xl border border-gray-100 shadow-sm">
+                        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Convocatorias por Tipo de Institución</p>
+                        <div class="flex flex-wrap gap-2">
+                            <div v-for="(count, tipo) in compData?.stats.by_tipo_institucion" :key="tipo"
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                                :class="tipoBadgeInst(tipo)"
+                            >
+                                <span class="text-xs font-semibold">{{ tipo }}</span>
+                                <span class="text-xs font-bold bg-white/50 px-1.5 py-0.5 rounded-full">{{ count }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla cumplimiento -->
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div class="px-5 py-3 border-b border-gray-100 flex items-center gap-2" :class="{ 'hidden': compPdfMode }">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            <span class="text-sm font-semibold text-gray-700">Detalle por convocatoria</span>
+                            <span class="text-xs text-gray-400">(ordenado por menor cumplimiento)</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-xs">
+                                <thead>
+                                    <tr class="bg-gray-50 border-b border-gray-100">
+                                        <th class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide">#</th>
+                                        <th class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Convocatoria</th>
+                                        <th v-if="compColVisible('tipo_inst')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Tipo inst.</th>
+                                        <th v-if="compColVisible('tipo')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Tipo</th>
+                                        <th v-if="compColVisible('estado')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Estado</th>
+                                        <th v-if="compColVisible('fechas')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Inicio / Cierre</th>
+                                        <th v-if="compColVisible('cupos')" class="px-4 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Cupos</th>
+                                        <th v-if="compColVisible('postulaciones')" class="px-4 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Postul.</th>
+                                        <th v-if="compColVisible('cumplimiento')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">% Cumplimiento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="(conv, idx) in convocatoriasOrdenadas"
+                                        :key="conv.id"
+                                        class="border-b border-gray-100 hover:bg-gray-50/60 transition-colors"
+                                        :class="idx % 2 === 0 ? '' : 'bg-gray-50/30'"
+                                    >
+                                        <td class="px-4 py-2.5 text-gray-300 font-mono select-none">{{ idx + 1 }}</td>
+                                        <td class="px-4 py-2.5 min-w-[200px]">
+                                            <p class="font-medium text-gray-800 leading-tight">{{ conv.titulo }}</p>
+                                            <p class="text-gray-400 mt-0.5">{{ conv.institucion || '—' }}</p>
+                                        </td>
+                                        <td v-if="compColVisible('tipo_inst')" class="px-4 py-2.5">
+                                            <span v-if="conv.tipo_institucion" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" :class="tipoBadgeInst(conv.tipo_institucion)">
+                                                {{ conv.tipo_institucion }}
+                                            </span>
+                                            <span v-else class="text-gray-300">—</span>
+                                        </td>
+                                        <td v-if="compColVisible('tipo')" class="px-4 py-2.5">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium capitalize"
+                                                :class="conv.tipo === 'pasantia' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-purple-100 text-purple-700 border border-purple-200'"
+                                            >{{ conv.tipo }}</span>
+                                        </td>
+                                        <td v-if="compColVisible('estado')" class="px-4 py-2.5">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium capitalize" :class="estadoBadge(conv.estado)">
+                                                {{ conv.estado }}
+                                            </span>
+                                        </td>
+                                        <td v-if="compColVisible('fechas')" class="px-4 py-2.5 whitespace-nowrap">
+                                            <p class="text-gray-500">{{ formatDate(conv.fecha_inicio) }}</p>
+                                            <p class="text-gray-400 mt-0.5">→ {{ formatDate(conv.fecha_cierre) }}</p>
+                                        </td>
+                                        <td v-if="compColVisible('cupos')" class="px-4 py-2.5 text-center font-semibold text-gray-700">{{ conv.cupos_disponibles }}</td>
+                                        <td v-if="compColVisible('postulaciones')" class="px-4 py-2.5 text-center">
+                                            <span class="font-semibold text-blue-600">{{ conv.total_postulaciones }}</span>
+                                            <div v-if="conv.total_postulaciones > 0" class="text-[10px] text-gray-400 mt-0.5">
+                                                {{ conv.aptos }}A · {{ conv.considerados }}C · {{ conv.no_aptos }}N
+                                            </div>
+                                        </td>
+                                        <td v-if="compColVisible('cumplimiento')" class="px-4 py-2.5 min-w-[130px]">
+                                            <div class="flex items-center gap-2">
+                                                <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                                    <div class="h-2 rounded-full transition-all" :class="cumplimientoColor(conv.pct_cumplimiento)" :style="{ width: conv.pct_cumplimiento + '%' }"></div>
+                                                </div>
+                                                <span class="text-xs w-10 text-right shrink-0" :class="cumplimientoText(conv.pct_cumplimiento)">{{ conv.pct_cumplimiento }}%</span>
+                                            </div>
+                                            <p class="text-[10px] text-gray-400 mt-0.5">{{ conv.aptos }} apto{{ conv.aptos !== 1 ? 's' : '' }} / {{ conv.cupos_disponibles }} cupo{{ conv.cupos_disponibles !== 1 ? 's' : '' }}</p>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="!compData?.convocatorias?.length">
+                                        <td colspan="9" class="px-4 py-10 text-center text-gray-400 text-sm">
+                                            No se encontraron convocatorias con los filtros seleccionados.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pie PDF -->
+                    <div v-if="compPdfMode" class="text-center text-[10px] text-gray-400 pt-1">
+                        Reporte generado automáticamente — Sistema de Bolsa Laboral EMI
+                    </div>
+                </div>
+            </template>
+
         </div>
     </AppLayout>
 </template>

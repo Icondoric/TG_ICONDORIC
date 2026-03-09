@@ -4,24 +4,24 @@
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-emi-navy-500">Lista de Ofertas Laborales</h1>
-          <p class="mt-2 text-slate-600">Gestiona pasantias y empleos disponibles</p>
+          <h1 class="text-3xl font-bold text-emi-navy-500">Lista de Convocatorias Laborales</h1>
+          <p class="mt-2 text-slate-600">Gestiona convocatorias de pasantías y empleos disponibles</p>
         </div>
         <router-link
-          to="/admin/ofertas/new"
+          to="/admin/convocatorias/new"
           class="btn-emi-primary flex items-center shadow-sm"
         >
           <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          Nueva Oferta
+          Nueva Convocatoria
         </router-link>
       </div>
 
       <!-- Stats Cards -->
       <div class="mb-3">
         <h2 class="text-sm font-semibold text-slate-600 uppercase tracking-wider">Resumen de convocatorias</h2>
-        <p class="text-xs text-slate-400 mt-0.5">Estado actual de todas las ofertas registradas en el sistema</p>
+        <p class="text-xs text-slate-400 mt-0.5">Estado actual de todas las convocatorias registradas en el sistema</p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="card-emi p-4">
@@ -142,7 +142,7 @@
           <thead class="bg-slate-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Oferta
+                Convocatoria
               </th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Tipo
@@ -195,7 +195,7 @@
               <td class="px-6 py-4">
                 <div class="flex flex-col gap-2 items-end">
                   <router-link
-                    :to="`/admin/ofertas/edit/${oferta.id}`"
+                    :to="`/admin/convocatorias/edit/${oferta.id}`"
                     class="px-3 py-1.5 bg-emi-navy-100 text-emi-navy-700 rounded-lg hover:bg-emi-navy-200 transition-colors text-sm font-medium"
                   >
                     Editar
@@ -220,7 +220,7 @@
 
             <tr v-if="filteredOfertas.length === 0">
               <td colspan="6" class="px-6 py-12 text-center text-slate-500">
-                No hay ofertas que coincidan con los filtros
+                No hay convocatorias que coincidan con los filtros
               </td>
             </tr>
           </tbody>
@@ -229,7 +229,7 @@
         <!-- Pagination -->
         <div v-if="totalPages > 1" class="px-6 py-4 border-t border-slate-200 flex justify-between items-center">
           <p class="text-sm text-slate-500">
-            Mostrando {{ ofertas.length }} de {{ total }} ofertas
+            Mostrando {{ ofertas.length }} de {{ total }} convocatorias
           </p>
           <div class="flex gap-2">
             <button
@@ -265,10 +265,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-slate-800">Desactivar Oferta</h3>
+            <h3 class="text-lg font-semibold text-slate-800">Desactivar Convocatoria</h3>
           </div>
           <p class="text-slate-600 mb-4">
-            ¿Deseas desactivar la oferta
+            ¿Deseas desactivar la convocatoria
             <span class="font-semibold text-slate-800">{{ deactivateConfirm.titulo }}</span>?
             Podras reactivarla posteriormente.
           </p>

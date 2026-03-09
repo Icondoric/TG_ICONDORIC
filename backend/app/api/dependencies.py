@@ -19,14 +19,14 @@ FIXED_ROLE_MODULES: Dict[str, Dict[str, List[str]]] = {
         "oferta_laboral":           ["ver_ofertas", "nueva_oferta"],
         "perfiles_institucionales": ["ver_perfiles", "nuevo_perfil"],
         "evaluacion_perfiles":      ["correspondencia", "historial", "ranking_candidatos"],
-        "informes_reportes":        ["resumen_general", "reporte_usuarios", "reporte_ofertas", "reporte_perfiles"],
+        "informes_reportes":        ["resumen_general", "reporte_usuarios", "reporte_ofertas", "reporte_perfiles", "reporte_cumplimiento", "reporte_cargos"],
     },
     "operador": {
         "gestion_usuarios":         ["lista_usuarios", "nuevo_usuario"],
         "digitalizacion_perfiles":  ["buscar_perfiles"],
         "oferta_laboral":           ["ver_ofertas", "nueva_oferta"],
         "perfiles_institucionales": ["ver_perfiles", "nuevo_perfil"],
-        "informes_reportes":        ["resumen_general", "reporte_usuarios", "reporte_ofertas", "reporte_perfiles"],
+        "informes_reportes":        ["resumen_general", "reporte_usuarios", "reporte_ofertas", "reporte_perfiles", "reporte_cumplimiento", "reporte_cargos"],
     },
     "estudiante": {
         "digitalizacion_perfiles": ["subir_cv", "mi_perfil", "editar_perfil"],

@@ -27,9 +27,9 @@ const MODULE_MENU_ITEMS = {
         ]
     },
     oferta_laboral: {
-        label: 'Gestión de Oferta Laboral', icon: icons.ofertas, children: [
-            { label: 'Lista de Ofertas Laborales', path: '/admin/ofertas', submoduleId: 'ver_ofertas' },
-            { label: 'Nueva Oferta', path: '/admin/ofertas/new', submoduleId: 'nueva_oferta' },
+        label: 'Gestión de Convocatorias Laborales', icon: icons.ofertas, children: [
+            { label: 'Lista de Convocatorias Laborales', path: '/admin/convocatorias', submoduleId: 'ver_ofertas' },
+            { label: 'Nueva Convocatoria', path: '/admin/convocatorias/new', submoduleId: 'nueva_oferta' },
         ]
     },
     perfiles_institucionales: {
@@ -48,10 +48,9 @@ const MODULE_MENU_ITEMS = {
     },
     informes_reportes: {
         label: 'Informes y Reportes', icon: icons.reports, children: [
-            { label: 'Resumen General', path: '/admin/reports', submoduleId: 'resumen_general' },
             { label: 'Reporte de Usuarios', path: '/admin/reports/users', submoduleId: 'reporte_usuarios' },
-            { label: 'Reporte de Ofertas', path: '/admin/reports/offers', submoduleId: 'reporte_ofertas' },
-            { label: 'Reporte de Perfiles', path: '/admin/reports/profiles', submoduleId: 'reporte_perfiles' },
+            { label: 'Reporte de Convocatorias', path: '/admin/reports/offers', submoduleId: 'reporte_ofertas' },
+            { label: 'Reporte de Perfiles Institucionales', path: '/admin/reports/profiles', submoduleId: 'reporte_perfiles' },
         ]
     },
 }
@@ -95,9 +94,9 @@ export function getMenuItems(role, allowedModules = null) {
                     ]
                 },
                 {
-                    label: 'Gestión de Oferta Laboral', icon: icons.ofertas, children: [
-                        { label: 'Lista de Ofertas Laborales', path: '/admin/ofertas' },
-                        { label: 'Nueva Oferta', path: '/admin/ofertas/new' },
+                    label: 'Gestión de Convocatorias Laborales', icon: icons.ofertas, children: [
+                        { label: 'Lista de Convocatorias Laborales', path: '/admin/convocatorias' },
+                        { label: 'Nueva Convocatoria', path: '/admin/convocatorias/new' },
                     ]
                 },
                 {
@@ -116,10 +115,9 @@ export function getMenuItems(role, allowedModules = null) {
                 },
                 {
                     label: 'Informes y Reportes', icon: icons.reports, children: [
-                        { label: 'Resumen General', path: '/admin/reports' },
                         { label: 'Reporte de Usuarios', path: '/admin/reports/users' },
-                        { label: 'Reporte de Ofertas', path: '/admin/reports/offers' },
-                        { label: 'Reporte de Perfiles', path: '/admin/reports/profiles' },
+                        { label: 'Reporte de Convocatorias', path: '/admin/reports/offers' },
+                        { label: 'Reporte de Perfiles Institucionales', path: '/admin/reports/profiles' },
                     ]
                 },
                 {
@@ -143,9 +141,9 @@ export function getMenuItems(role, allowedModules = null) {
                     ]
                 },
                 {
-                    label: 'Gestión de Oferta Laboral', icon: icons.ofertas, children: [
-                        { label: 'Lista de Ofertas Laborales', path: '/admin/ofertas' },
-                        { label: 'Nueva Oferta', path: '/admin/ofertas/new' },
+                    label: 'Gestión de Convocatorias Laborales', icon: icons.ofertas, children: [
+                        { label: 'Lista de Convocatorias Laborales', path: '/admin/convocatorias' },
+                        { label: 'Nueva Convocatoria', path: '/admin/convocatorias/new' },
                     ]
                 },
                 {
@@ -156,10 +154,9 @@ export function getMenuItems(role, allowedModules = null) {
                 },
                 {
                     label: 'Informes y Reportes', icon: icons.reports, children: [
-                        { label: 'Resumen General', path: '/admin/reports' },
                         { label: 'Reporte de Usuarios', path: '/admin/reports/users' },
-                        { label: 'Reporte de Ofertas', path: '/admin/reports/offers' },
-                        { label: 'Reporte de Perfiles', path: '/admin/reports/profiles' },
+                        { label: 'Reporte de Convocatorias', path: '/admin/reports/offers' },
+                        { label: 'Reporte de Perfiles Institucionales', path: '/admin/reports/profiles' },
                     ]
                 },
             ]

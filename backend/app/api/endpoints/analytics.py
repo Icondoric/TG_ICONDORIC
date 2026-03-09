@@ -287,7 +287,7 @@ async def get_offers_report(
     incluyendo segmentacion por rol y carrera de postulantes.
     """
     try:
-        query = supabase.table("ofertas_laborales") \
+        query = supabase.table("convocatorias_laborales") \
             .select("*, institutional_profiles(institution_name, sector)")
         query = apply_date_filter(query, "created_at", start_date, end_date)
 
@@ -469,6 +469,7 @@ async def get_profiles_report(
     sector: Optional[str] = Query(None),
     estado: Optional[str] = Query(None),
     nombre: Optional[str] = Query(None),
+    tipo_institucion: Optional[str] = Query(None),
     current_user: dict = Depends(verify_operator_access)
 ):
     """
@@ -482,7 +483,7 @@ async def get_profiles_report(
 
         # Offers count per institution
         today = datetime.now().strftime("%Y-%m-%d")
-        offers_resp = supabase.table("ofertas_laborales") \
+        offers_resp = supabase.table("convocatorias_laborales") \
             .select("id, institutional_profile_id, is_active, fecha_cierre") \
             .execute()
 
@@ -516,6 +517,8 @@ async def get_profiles_report(
             inst_sector = p.get('sector') or ''
             is_active = p.get('is_active', True)
 
+            inst_tipo = p.get('tipo_institucion') or ''
+
             # Apply client-side filters
             if sector and sector.lower() not in inst_sector.lower():
                 continue
@@ -525,6 +528,8 @@ async def get_profiles_report(
                 continue
             if estado == 'inactivo' and is_active:
                 continue
+            if tipo_institucion and tipo_institucion != inst_tipo:
+                continue
 
             inst_offers = offers_map.get(p['id'], {'total': 0, 'activas': 0})
 
@@ -532,6 +537,7 @@ async def get_profiles_report(
                 "id": p['id'],
                 "institution_name": inst_name or None,
                 "sector": inst_sector or None,
+                "tipo_institucion": inst_tipo or None,
                 "ubicacion": p.get('ubicacion'),
                 "contact_email": p.get('contact_email'),
                 "contact_phone": p.get('contact_phone'),
@@ -546,6 +552,7 @@ async def get_profiles_report(
         total = len(result_profiles)
         activos = sum(1 for p in result_profiles if p['is_active'])
         by_sector = Counter(p['sector'] for p in result_profiles if p.get('sector'))
+        by_tipo = Counter(p['tipo_institucion'] for p in result_profiles if p.get('tipo_institucion'))
         total_ofertas_activas = sum(p['ofertas_activas'] for p in result_profiles)
         total_postulaciones = sum(p['total_postulaciones'] for p in result_profiles)
 
@@ -556,12 +563,210 @@ async def get_profiles_report(
                 "activos": activos,
                 "inactivos": total - activos,
                 "by_sector": dict(by_sector),
+                "by_tipo": dict(by_tipo),
                 "total_ofertas_activas": total_ofertas_activas,
                 "total_postulaciones": total_postulaciones,
             }
         }
     except Exception as e:
         print(f"Error fetching profiles report: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/compliance-report")
+async def get_compliance_report(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    tipo: Optional[str] = Query(None),
+    tipo_institucion: Optional[str] = Query(None),
+    estado: Optional[str] = Query(None),
+    institucion: Optional[str] = Query(None),
+    current_user: dict = Depends(verify_operator_access)
+):
+    """
+    Reporte de % de cumplimiento por convocatoria.
+    Muestra cupos disponibles vs postulaciones APTAS por oferta.
+    """
+    try:
+        query = supabase.table("convocatorias_laborales") \
+            .select("*, institutional_profiles(institution_name, sector, tipo_institucion)")
+        query = apply_date_filter(query, "created_at", start_date, end_date)
+        if tipo:
+            query = query.eq("tipo", tipo)
+        response = query.order("created_at", desc=True).execute()
+        ofertas = response.data
+
+        # Postulaciones con clasificacion
+        post_resp = supabase.table("postulaciones") \
+            .select("oferta_id, clasificacion").execute()
+        post_map: Dict[str, List] = {}
+        for p in post_resp.data:
+            post_map.setdefault(p['oferta_id'], []).append(p)
+
+        today = datetime.now().strftime("%Y-%m-%d")
+        result = []
+
+        for o in ofertas:
+            inst = o.get('institutional_profiles') or {}
+            inst_name = inst.get('institution_name') or ''
+            inst_sector = inst.get('sector') or ''
+            inst_tipo = inst.get('tipo_institucion') or ''
+            is_active = o.get('is_active', True)
+            fecha_cierre = o.get('fecha_cierre')
+            is_expired = bool(fecha_cierre and fecha_cierre < today)
+
+            if is_expired:
+                oferta_estado = 'expirada'
+            elif is_active:
+                oferta_estado = 'activa'
+            else:
+                oferta_estado = 'inactiva'
+
+            if estado and oferta_estado != estado:
+                continue
+            if tipo_institucion and tipo_institucion != inst_tipo:
+                continue
+            if institucion and institucion.lower() not in inst_name.lower():
+                continue
+
+            posts = post_map.get(o['id'], [])
+            total_posts = len(posts)
+            aptos = sum(1 for p in posts if p.get('clasificacion') == 'APTO')
+            considerados = sum(1 for p in posts if p.get('clasificacion') == 'CONSIDERADO')
+            no_aptos = sum(1 for p in posts if p.get('clasificacion') == 'NO_APTO')
+            cupos = o.get('cupos_disponibles') or 1
+            # % cumplimiento: aptos / cupos * 100, capped at 100
+            pct_cumplimiento = round(min(aptos / cupos * 100, 100), 1) if cupos > 0 else 0
+
+            result.append({
+                "id": o['id'],
+                "titulo": o['titulo'],
+                "tipo": o['tipo'],
+                "institucion": inst_name or None,
+                "sector": inst_sector or None,
+                "tipo_institucion": inst_tipo or None,
+                "estado": oferta_estado,
+                "fecha_inicio": o.get('fecha_inicio'),
+                "fecha_cierre": fecha_cierre,
+                "cupos_disponibles": cupos,
+                "total_postulaciones": total_posts,
+                "aptos": aptos,
+                "considerados": considerados,
+                "no_aptos": no_aptos,
+                "pct_cumplimiento": pct_cumplimiento,
+            })
+
+        total = len(result)
+        total_cupos = sum(r['cupos_disponibles'] for r in result)
+        total_aptos = sum(r['aptos'] for r in result)
+        avg_cumplimiento = round(sum(r['pct_cumplimiento'] for r in result) / total, 1) if total > 0 else 0
+        pct_global = round(min(total_aptos / total_cupos * 100, 100), 1) if total_cupos > 0 else 0
+        by_tipo_inst = Counter(r['tipo_institucion'] for r in result if r.get('tipo_institucion'))
+
+        return {
+            "convocatorias": result,
+            "stats": {
+                "total": total,
+                "total_cupos": total_cupos,
+                "total_aptos": total_aptos,
+                "pct_cumplimiento_global": pct_global,
+                "avg_cumplimiento_por_oferta": avg_cumplimiento,
+                "by_tipo_institucion": dict(by_tipo_inst),
+            }
+        }
+    except Exception as e:
+        print(f"Error fetching compliance report: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/positions-by-sector")
+async def get_positions_by_sector(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    tipo: Optional[str] = Query(None),
+    tipo_institucion: Optional[str] = Query(None),
+    current_user: dict = Depends(verify_operator_access)
+):
+    """
+    Cargos/puestos enviados por tipo de institución (Pública, Privada, Mixta, ONG).
+    Muestra qué posiciones publicaron las empresas públicas y privadas.
+    """
+    try:
+        query = supabase.table("convocatorias_laborales") \
+            .select("id, titulo, tipo, area, created_at, institutional_profiles(institution_name, sector, tipo_institucion)")
+        query = apply_date_filter(query, "created_at", start_date, end_date)
+        if tipo:
+            query = query.eq("tipo", tipo)
+        response = query.order("created_at", desc=True).execute()
+        ofertas = response.data
+
+        # Postulaciones count per offer
+        post_resp = supabase.table("postulaciones").select("oferta_id").execute()
+        post_count: Dict[str, int] = {}
+        for p in post_resp.data:
+            oid = p['oferta_id']
+            post_count[oid] = post_count.get(oid, 0) + 1
+
+        positions = []
+        # Aggregated by cargo title + tipo_institucion
+        cargo_by_tipo: Dict[str, Dict[str, Any]] = {}
+
+        for o in ofertas:
+            inst = o.get('institutional_profiles') or {}
+            inst_name = inst.get('institution_name') or ''
+            inst_tipo = inst.get('tipo_institucion') or 'Sin clasificar'
+            inst_sector = inst.get('sector') or ''
+
+            if tipo_institucion and tipo_institucion != inst_tipo:
+                continue
+
+            n_posts = post_count.get(o['id'], 0)
+            cargo = (o.get('titulo') or '').strip()
+            area = (o.get('area') or '').strip()
+
+            positions.append({
+                "id": o['id'],
+                "titulo": cargo,
+                "tipo": o['tipo'],
+                "area": area or None,
+                "institucion": inst_name or None,
+                "sector": inst_sector or None,
+                "tipo_institucion": inst_tipo,
+                "fecha_publicacion": o['created_at'],
+                "total_postulaciones": n_posts,
+            })
+
+            # Aggregate by tipo_institucion
+            key = inst_tipo
+            if key not in cargo_by_tipo:
+                cargo_by_tipo[key] = {"total_ofertas": 0, "total_postulaciones": 0, "top_cargos": Counter()}
+            cargo_by_tipo[key]["total_ofertas"] += 1
+            cargo_by_tipo[key]["total_postulaciones"] += n_posts
+            if cargo:
+                cargo_by_tipo[key]["top_cargos"][cargo] += 1
+
+        # Build summary per tipo_institucion
+        summary_by_tipo = {}
+        for tipo_key, data in cargo_by_tipo.items():
+            summary_by_tipo[tipo_key] = {
+                "total_ofertas": data["total_ofertas"],
+                "total_postulaciones": data["total_postulaciones"],
+                "top_cargos": [
+                    {"titulo": t, "count": c}
+                    for t, c in data["top_cargos"].most_common(10)
+                ]
+            }
+
+        return {
+            "posiciones": positions,
+            "summary_by_tipo": summary_by_tipo,
+            "stats": {
+                "total": len(positions),
+                "by_tipo_institucion": {k: v["total_ofertas"] for k, v in summary_by_tipo.items()},
+            }
+        }
+    except Exception as e:
+        print(f"Error fetching positions by sector: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/profile-completion")

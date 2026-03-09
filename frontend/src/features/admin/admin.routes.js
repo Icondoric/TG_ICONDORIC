@@ -4,10 +4,11 @@ const ProfileFormView = () => import('@/features/admin/views/ProfileFormView.vue
 const UsersAdminView = () => import('@/features/admin/views/UsersAdminView.vue')
 const UserDetailView = () => import('@/features/admin/views/UserDetailView.vue')
 const UserFormView = () => import('@/features/admin/views/UserFormView.vue')
-const ReportsView = () => import('@/features/admin/views/ReportsView.vue')
 const UsersReportView = () => import('@/features/admin/views/UsersReportView.vue')
 const OffersReportView = () => import('@/features/admin/views/OffersReportView.vue')
 const ProfilesReportView = () => import('@/features/admin/views/ProfilesReportView.vue')
+const ComplianceReportView = () => import('@/features/admin/views/ComplianceReportView.vue')
+const PositionsBySectorView = () => import('@/features/admin/views/PositionsBySectorView.vue')
 const OfertasAdminView = () => import('@/features/admin/views/OfertasAdminView.vue')
 const OfertaFormView = () => import('@/features/admin/views/OfertaFormView.vue')
 const RankingCandidatosView = () => import('@/features/admin/views/RankingCandidatosView.vue')
@@ -67,9 +68,7 @@ export default [
     // Informes y Reportes
     {
         path: '/admin/reports',
-        name: 'admin-reports',
-        component: ReportsView,
-        meta: { ...base, requiresAdmin: true, moduleId: 'informes_reportes', submoduleId: 'resumen_general' }
+        redirect: '/admin/reports/users'
     },
     {
         path: '/admin/reports/users',
@@ -89,22 +88,34 @@ export default [
         component: ProfilesReportView,
         meta: { ...base, requiresAdmin: true, moduleId: 'informes_reportes', submoduleId: 'reporte_perfiles' }
     },
-
-    // Gestión de Oferta Laboral
     {
-        path: '/admin/ofertas',
+        path: '/admin/reports/compliance',
+        name: 'admin-reports-compliance',
+        component: ComplianceReportView,
+        meta: { ...base, requiresAdmin: true, moduleId: 'informes_reportes', submoduleId: 'reporte_cumplimiento' }
+    },
+    {
+        path: '/admin/reports/positions',
+        name: 'admin-reports-positions',
+        component: PositionsBySectorView,
+        meta: { ...base, requiresAdmin: true, moduleId: 'informes_reportes', submoduleId: 'reporte_cargos' }
+    },
+
+    // Gestión de Convocatorias Laborales
+    {
+        path: '/admin/convocatorias',
         name: 'admin-ofertas',
         component: OfertasAdminView,
         meta: { ...base, requiresAdmin: true, moduleId: 'oferta_laboral', submoduleId: 'ver_ofertas' }
     },
     {
-        path: '/admin/ofertas/new',
+        path: '/admin/convocatorias/new',
         name: 'admin-ofertas-new',
         component: OfertaFormView,
         meta: { ...base, requiresAdmin: true, moduleId: 'oferta_laboral', submoduleId: 'nueva_oferta' }
     },
     {
-        path: '/admin/ofertas/edit/:id',
+        path: '/admin/convocatorias/edit/:id',
         name: 'admin-ofertas-edit',
         component: OfertaFormView,
         meta: { ...base, requiresAdmin: true, moduleId: 'oferta_laboral', submoduleId: 'nueva_oferta' }

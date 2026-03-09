@@ -5,7 +5,7 @@ Produce un documento A4 con:
   - Portada institucional
   - Resumen ejecutivo
   - Información de la convocatoria
-  - Metodología de evaluación
+  - Parámetros de evaluación
   - Resultados y estadísticas
   - Ranking detallado de candidatos
   - Anexos: CV en formato Harvard por cada candidato
@@ -431,7 +431,7 @@ class PDFReportService:
         story.append(self._p(
             'En esta sección se detallan todas las características de la convocatoria laboral '
             'para la cual se realizó el proceso de evaluación, incluyendo las condiciones de '
-            'la oferta, el objetivo de la convocatoria y el perfil de candidato requerido.',
+            'la convocatoria, el objetivo y el perfil de candidato requerido.',
             'body',
         ))
         story.append(self._spacer(6))
@@ -490,11 +490,11 @@ class PDFReportService:
         return story
 
     # ─────────────────────────────────────────
-    #  3. METODOLOGÍA
+    #  3. PARÁMETROS
     # ─────────────────────────────────────────
     def _build_methodology(self, oferta: dict) -> list:
         story = []
-        story += self._section_header('3. METODOLOGÍA DE EVALUACIÓN')
+        story += self._section_header('3. PARÁMETROS DE EVALUACIÓN')
         story.append(self._p(
             'La evaluación de candidatos se realiza mediante un modelo de correspondencia '
             'multidimensional basado en Regresión Ridge (Ridge Regression). El modelo compara el perfil '
@@ -510,7 +510,7 @@ class PDFReportService:
         dim_rows = [
             ['Dimensión', 'Descripción', 'Peso'],
             ['Habilidades técnicas',
-             'Correspondencia entre las habilidades técnicas del candidato y las requeridas por la oferta',
+             'Correspondencia entre las habilidades técnicas del candidato y las requeridas por la convocatoria',
              f"{round(weights.get('hard_skills_weight', 0.35) * 100)}%"],
             ['Habilidades blandas',
              'Alineación de competencias interpersonales y de gestión con el perfil solicitado',

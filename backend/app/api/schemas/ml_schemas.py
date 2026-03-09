@@ -78,6 +78,7 @@ class InstitutionalProfileCreate(BaseModel):
     """Request para crear perfil institucional"""
     institution_name: str = Field(min_length=2, max_length=200, description="Nombre de la institucion")
     sector: str = Field(min_length=2, max_length=100, description="Sector de la institucion")
+    tipo_institucion: Optional[str] = Field(default=None, description="Tipo: Pública, Privada, Mixta, ONG")
     description: Optional[str] = Field(default=None, max_length=1000, description="Descripcion")
     ubicacion: Optional[str] = Field(default=None, max_length=200, description="Ubicacion geografica")
     contact_phone: Optional[str] = Field(default=None, max_length=50, description="Telefono de contacto")
@@ -88,6 +89,7 @@ class InstitutionalProfileUpdate(BaseModel):
     """Request para actualizar perfil institucional"""
     institution_name: Optional[str] = Field(default=None, min_length=2, max_length=200)
     sector: Optional[str] = Field(default=None, min_length=2, max_length=100)
+    tipo_institucion: Optional[str] = Field(default=None, description="Tipo: Pública, Privada, Mixta, ONG")
     description: Optional[str] = Field(default=None, max_length=1000)
     ubicacion: Optional[str] = Field(default=None, max_length=200)
     contact_phone: Optional[str] = Field(default=None, max_length=50)
@@ -100,6 +102,7 @@ class InstitutionalProfileResponse(BaseModel):
     id: str
     institution_name: str
     sector: str
+    tipo_institucion: Optional[str] = None
     description: Optional[str] = None
     ubicacion: Optional[str] = None
     contact_phone: Optional[str] = None

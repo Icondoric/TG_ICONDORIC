@@ -5,7 +5,7 @@ import client from '@/shared/api/client'
  * Estudiante → pasantías | Titulado → empleos | Admin → todas
  */
 export const getOfertasDisponibles = () =>
-    client.get('/api/postulaciones/ofertas').then(r => r.data)
+    client.get('/api/postulaciones/convocatorias').then(r => r.data)
 
 /**
  * Postula al usuario a una oferta y devuelve el resultado de evaluación ML.

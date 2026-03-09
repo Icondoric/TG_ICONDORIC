@@ -26,7 +26,7 @@ onMounted(() => {
     if (mods && 'gestion_usuarios' in mods) {
       router.replace('/admin/users')
     } else if (mods && 'oferta_laboral' in mods) {
-      router.replace('/admin/ofertas')
+      router.replace('/admin/convocatorias')
     } else if (mods && 'perfiles_institucionales' in mods) {
       router.replace('/admin/profiles')
     } else if (mods && 'informes_reportes' in mods) {

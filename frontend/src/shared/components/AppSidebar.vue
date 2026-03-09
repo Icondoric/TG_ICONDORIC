@@ -634,11 +634,11 @@ const getChildClasses = (child) => {
 /* Submenu slide animation */
 .submenu-enter-active {
     transition: max-height 0.25s ease-out, opacity 0.2s ease-out;
-    max-height: 300px;
+    max-height: 500px;
 }
 .submenu-leave-active {
     transition: max-height 0.2s ease-in, opacity 0.15s ease-in;
-    max-height: 300px;
+    max-height: 500px;
 }
 .submenu-enter-from {
     max-height: 0;

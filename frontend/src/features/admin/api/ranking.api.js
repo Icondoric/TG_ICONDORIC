@@ -5,7 +5,7 @@ import client from '@/shared/api/client'
  * @param {Object} params - { tipo, is_active, include_expired, search }
  */
 export const getOfertasConStats = (params = {}) =>
-    client.get('/api/admin/ranking/ofertas', { params }).then(r => r.data)
+    client.get('/api/admin/ranking/convocatorias', { params }).then(r => r.data)
 
 /**
  * Obtiene el ranking de candidatos para una oferta.
@@ -13,7 +13,7 @@ export const getOfertasConStats = (params = {}) =>
  * @param {number} topN - Número de candidatos (default: 3)
  */
 export const getRankingCandidatos = (ofertaId, topN = 3) =>
-    client.get(`/api/admin/ranking/ofertas/${ofertaId}/candidatos`, {
+    client.get(`/api/admin/ranking/convocatorias/${ofertaId}/candidatos`, {
         params: { top_n: topN }
     }).then(r => r.data)
 
@@ -25,7 +25,7 @@ export const getRankingCandidatos = (ofertaId, topN = 3) =>
  */
 export const generarInforme = async (ofertaId, topN = 3, filename = 'informe-candidatos.pdf') => {
     const response = await client.get(
-        `/api/admin/ranking/ofertas/${ofertaId}/generar-informe`,
+        `/api/admin/ranking/convocatorias/${ofertaId}/generar-informe`,
         { params: { top_n: topN }, responseType: 'blob' }
     )
     const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))

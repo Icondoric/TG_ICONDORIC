@@ -264,7 +264,7 @@ class PostulacionService:
         try:
             response = supabase.table("postulaciones") \
                 .select(
-                    "*, ofertas_laborales(*, institutional_profiles(institution_name, sector))"
+                    "*, convocatorias_laborales(*, institutional_profiles(institution_name, sector))"
                 ) \
                 .eq("usuario_id", user_id) \
                 .order("created_at", desc=True) \
@@ -272,7 +272,7 @@ class PostulacionService:
 
             result = []
             for p in response.data or []:
-                oferta_data = p.pop('ofertas_laborales', {}) or {}
+                oferta_data = p.pop('convocatorias_laborales', {}) or {}
                 inst_profile = oferta_data.pop('institutional_profiles', None) or {}
                 result.append({
                     **p,

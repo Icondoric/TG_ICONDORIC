@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/postulaciones", tags=["Postulaciones"])
 
 
-@router.get("/ofertas")
+@router.get("/convocatorias")
 async def get_ofertas_disponibles(
     current_user: dict = Depends(get_current_user)
 ):
@@ -118,7 +118,7 @@ async def postular_desde_recomendacion(
         row = saved.data[0] if saved.data else {}
 
         # Obtener datos de la oferta para devolver al frontend
-        oferta_row = supabase.table("ofertas_laborales") \
+        oferta_row = supabase.table("convocatorias_laborales") \
             .select("*, institutional_profiles(institution_name, sector)") \
             .eq("id", oferta_id) \
             .limit(1) \

@@ -1,7 +1,7 @@
 export const MODULES = [
     { id: 'gestion_usuarios',         label: 'Gestión de Usuarios' },
     { id: 'digitalizacion_perfiles',  label: 'Digitalización de Perfiles' },
-    { id: 'oferta_laboral',           label: 'Gestión de Oferta Laboral' },
+    { id: 'oferta_laboral',           label: 'Gestión de Convocatorias' },
     { id: 'perfiles_institucionales', label: 'Perfiles Institucionales' },
     { id: 'evaluacion_perfiles',      label: 'Evaluación de Perfiles' },
     { id: 'informes_reportes',        label: 'Informes y Reportes' },
@@ -20,8 +20,8 @@ export const SUB_MODULES = {
         { id: 'buscar_perfiles', label: 'Buscar Perfiles' },
     ],
     oferta_laboral: [
-        { id: 'ver_ofertas',  label: 'Ver Ofertas' },
-        { id: 'nueva_oferta', label: 'Nueva / Editar Oferta' },
+        { id: 'ver_ofertas',  label: 'Ver Convocatorias' },
+        { id: 'nueva_oferta', label: 'Nueva / Editar Convocatoria' },
     ],
     perfiles_institucionales: [
         { id: 'ver_perfiles',  label: 'Ver Perfiles' },
@@ -33,10 +33,12 @@ export const SUB_MODULES = {
         { id: 'ranking_candidatos', label: 'Evaluación de Candidatos' },
     ],
     informes_reportes: [
-        { id: 'resumen_general',   label: 'Resumen General' },
-        { id: 'reporte_usuarios',  label: 'Reporte de Usuarios' },
-        { id: 'reporte_ofertas',   label: 'Reporte de Ofertas' },
-        { id: 'reporte_perfiles',  label: 'Reporte de Perfiles' },
+        { id: 'resumen_general',       label: 'Resumen General' },
+        { id: 'reporte_usuarios',      label: 'Reporte de Usuarios' },
+        { id: 'reporte_ofertas',       label: 'Reporte de Convocatorias' },
+        { id: 'reporte_perfiles',      label: 'Reporte de Perfiles' },
+        { id: 'reporte_cumplimiento',  label: 'Cumplimiento por Convocatoria' },
+        { id: 'reporte_cargos',        label: 'Cargos por Tipo de Institución' },
     ],
 }
 
@@ -48,14 +50,14 @@ export const FIXED_ROLE_MODULES = {
         oferta_laboral:           ['ver_ofertas', 'nueva_oferta'],
         perfiles_institucionales: ['ver_perfiles', 'nuevo_perfil'],
         evaluacion_perfiles:      ['correspondencia', 'historial', 'ranking_candidatos'],
-        informes_reportes:        ['resumen_general', 'reporte_usuarios', 'reporte_ofertas', 'reporte_perfiles'],
+        informes_reportes:        ['resumen_general', 'reporte_usuarios', 'reporte_ofertas', 'reporte_perfiles', 'reporte_cumplimiento', 'reporte_cargos'],
     },
     operador: {
         gestion_usuarios:         ['lista_usuarios', 'nuevo_usuario'],
         digitalizacion_perfiles:  ['buscar_perfiles'],
         oferta_laboral:           ['ver_ofertas', 'nueva_oferta'],
         perfiles_institucionales: ['ver_perfiles', 'nuevo_perfil'],
-        informes_reportes:        ['resumen_general', 'reporte_usuarios', 'reporte_ofertas', 'reporte_perfiles'],
+        informes_reportes:        ['resumen_general', 'reporte_usuarios', 'reporte_ofertas', 'reporte_perfiles', 'reporte_cumplimiento', 'reporte_cargos'],
     },
     estudiante: {
         digitalizacion_perfiles: ['subir_cv', 'mi_perfil', 'editar_perfil'],

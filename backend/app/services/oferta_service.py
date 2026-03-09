@@ -68,7 +68,7 @@ class OfertaService:
                 'created_by': created_by
             }
 
-            response = supabase.table("ofertas_laborales") \
+            response = supabase.table("convocatorias_laborales") \
                 .insert(oferta_data) \
                 .execute()
 
@@ -117,7 +117,7 @@ class OfertaService:
                 if field in data and data[field] is not None:
                     update_data[field] = data[field]
 
-            response = supabase.table("ofertas_laborales") \
+            response = supabase.table("convocatorias_laborales") \
                 .update(update_data) \
                 .eq("id", oferta_id) \
                 .execute()
@@ -146,7 +146,7 @@ class OfertaService:
             raise ValueError("Base de datos no configurada")
 
         try:
-            response = supabase.table("ofertas_laborales") \
+            response = supabase.table("convocatorias_laborales") \
                 .select("*, institutional_profiles(institution_name, sector)") \
                 .eq("id", oferta_id) \
                 .execute()
@@ -187,7 +187,7 @@ class OfertaService:
             raise ValueError("Base de datos no configurada")
 
         try:
-            query = supabase.table("ofertas_laborales") \
+            query = supabase.table("convocatorias_laborales") \
                 .select("*, institutional_profiles(institution_name, sector)", count="exact")
 
             # Aplicar filtros
@@ -246,7 +246,7 @@ class OfertaService:
             raise ValueError("Base de datos no configurada")
 
         try:
-            response = supabase.table("ofertas_laborales") \
+            response = supabase.table("convocatorias_laborales") \
                 .update({
                     'is_active': False,
                     'updated_at': datetime.utcnow().isoformat()
@@ -278,7 +278,7 @@ class OfertaService:
             raise ValueError("Base de datos no configurada")
 
         try:
-            response = supabase.table("ofertas_laborales") \
+            response = supabase.table("convocatorias_laborales") \
                 .update({
                     'is_active': True,
                     'updated_at': datetime.utcnow().isoformat()
@@ -341,13 +341,13 @@ class OfertaService:
 
         try:
             # Total por tipo
-            pasantias = supabase.table("ofertas_laborales") \
+            pasantias = supabase.table("convocatorias_laborales") \
                 .select("id", count="exact") \
                 .eq("tipo", "pasantia") \
                 .eq("is_active", True) \
                 .execute()
 
-            empleos = supabase.table("ofertas_laborales") \
+            empleos = supabase.table("convocatorias_laborales") \
                 .select("id", count="exact") \
                 .eq("tipo", "empleo") \
                 .eq("is_active", True) \
@@ -355,13 +355,13 @@ class OfertaService:
 
             # Expiradas
             today = date.today().isoformat()
-            expiradas = supabase.table("ofertas_laborales") \
+            expiradas = supabase.table("convocatorias_laborales") \
                 .select("id", count="exact") \
                 .lt("fecha_cierre", today) \
                 .execute()
 
             # Total inactivas
-            inactivas = supabase.table("ofertas_laborales") \
+            inactivas = supabase.table("convocatorias_laborales") \
                 .select("id", count="exact") \
                 .eq("is_active", False) \
                 .execute()
@@ -398,7 +398,7 @@ class OfertaService:
 
         try:
             # Buscar en ofertas recientes de la institucion
-            response = supabase.table("ofertas_laborales") \
+            response = supabase.table("convocatorias_laborales") \
                 .select("contact_phone, contact_email, area") \
                 .eq("institutional_profile_id", institution_id) \
                 .order("updated_at", desc=True) \

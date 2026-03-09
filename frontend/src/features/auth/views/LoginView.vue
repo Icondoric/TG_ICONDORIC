@@ -63,7 +63,7 @@ const handleLogin = async () => {
             // Rol personalizado: redirigir al primer módulo disponible
             const mods = authStore.allowedModules
             if (mods && 'gestion_usuarios' in mods)        router.push('/admin/users')
-            else if (mods && 'oferta_laboral' in mods)     router.push('/admin/ofertas')
+            else if (mods && 'oferta_laboral' in mods)     router.push('/admin/convocatorias')
             else if (mods && 'perfiles_institucionales' in mods) router.push('/admin/profiles')
             else if (mods && 'informes_reportes' in mods)  router.push('/admin/reports')
             else if (mods && 'evaluacion_perfiles' in mods) router.push('/correspondencia-perfiles')

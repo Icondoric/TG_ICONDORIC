@@ -428,7 +428,7 @@ class RecommendationService:
 
         try:
             response = supabase.table("recomendaciones") \
-                .select("*, ofertas_laborales(*, institutional_profiles(institution_name, sector))") \
+                .select("*, convocatorias_laborales(*, institutional_profiles(institution_name, sector))") \
                 .eq("usuario_id", user_id) \
                 .in_("oferta_id", oferta_ids) \
                 .order("match_score", desc=True) \
@@ -440,7 +440,7 @@ class RecommendationService:
             # Formatear respuesta
             result = []
             for rec in response.data:
-                oferta_data = rec.pop('ofertas_laborales', {}) or {}
+                oferta_data = rec.pop('convocatorias_laborales', {}) or {}
                 inst_profile = oferta_data.pop('institutional_profiles', None) or {}
 
                 result.append({
@@ -491,7 +491,7 @@ class RecommendationService:
         try:
             # Obtener recomendaciones
             response = supabase.table("recomendaciones") \
-                .select("*, ofertas_laborales(*, institutional_profiles(institution_name, sector))", count="exact") \
+                .select("*, convocatorias_laborales(*, institutional_profiles(institution_name, sector))", count="exact") \
                 .eq("usuario_id", user_id) \
                 .order("created_at", desc=True) \
                 .range(offset, offset + limit - 1) \
@@ -507,7 +507,7 @@ class RecommendationService:
             # Formatear
             recomendaciones = []
             for rec in response.data or []:
-                oferta_data = rec.pop('ofertas_laborales', {}) or {}
+                oferta_data = rec.pop('convocatorias_laborales', {}) or {}
                 inst_profile = oferta_data.pop('institutional_profiles', None) or {}
 
                 recomendaciones.append({

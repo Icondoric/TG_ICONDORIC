@@ -259,7 +259,13 @@ const formatWeights = (weights) => {
                                     {{ profile.is_active ? 'Activo' : 'Inactivo' }}
                                 </span>
                             </div>
-                            <p class="text-sm text-slate-500 mt-1">{{ profile.sector }}</p>
+                            <p class="text-sm text-slate-500 mt-1">
+                                {{ profile.sector }}
+                                <span v-if="profile.tipo_institucion"
+                                    class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emi-navy-50 text-emi-navy-600 border border-emi-navy-200">
+                                    {{ profile.tipo_institucion }}
+                                </span>
+                            </p>
                             <p v-if="profile.description" class="text-sm text-slate-600 mt-2">
                                 {{ profile.description }}
                             </p>

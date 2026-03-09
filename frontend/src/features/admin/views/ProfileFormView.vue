@@ -23,11 +23,14 @@ const error = ref(null)
 const form = ref({
     institution_name: '',
     sector: '',
+    tipo_institucion: '',
     description: '',
     ubicacion: '',
     contact_phone: '',
     contact_email: '',
 })
+
+const tipoInstitucionOptions = ['Pública', 'Privada', 'Mixta', 'ONG']
 
 const isEditMode = computed(() => !!route.params.id)
 const profileId = computed(() => route.params.id)
@@ -68,6 +71,7 @@ onMounted(async () => {
                     customSector.value = loadedSector
                 }
 
+                form.value.tipo_institucion = p.tipo_institucion || ''
                 form.value.description = p.description || ''
                 form.value.ubicacion = p.ubicacion || ''
                 form.value.contact_phone = p.contact_phone || ''
@@ -95,6 +99,7 @@ const save = async () => {
         const data = {
             institution_name: form.value.institution_name.trim(),
             sector: finalSector,
+            tipo_institucion: form.value.tipo_institucion || null,
             description: form.value.description.trim() || null,
             ubicacion: form.value.ubicacion.trim() || null,
             contact_phone: form.value.contact_phone.trim() || null,
@@ -196,6 +201,19 @@ const cancel = () => router.push('/admin/profiles')
                         </div>
 
                         <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Tipo de Institución</label>
+                            <select
+                                v-model="form.tipo_institucion"
+                                class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="">Sin especificar</option>
+                                <option v-for="tipo in tipoInstitucionOptions" :key="tipo" :value="tipo">
+                                    {{ tipo }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Descripcion</label>
                             <textarea
                                 v-model="form.description"
@@ -214,7 +232,7 @@ const cancel = () => router.push('/admin/profiles')
                                 placeholder="Ej: La Paz, Bolivia"
                             />
                             <p class="text-xs text-slate-400 mt-1">
-                                Se usara para autocompletar la ubicacion al crear ofertas de esta institucion.
+                                Se usará para autocompletar la ubicación al crear convocatorias de esta institución.
                             </p>
                         </div>
 
