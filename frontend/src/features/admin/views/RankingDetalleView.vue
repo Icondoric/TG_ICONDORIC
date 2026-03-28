@@ -831,7 +831,7 @@ const rankScoreColorText = (val) =>
   val >= 0.7 ? 'text-success-600' : val >= 0.4 ? 'text-warning-600' : 'text-danger-500'
 
 const rankScoreColorBg = (val) =>
-  val >= 0.7 ? 'bg-success-500' : val >= 0.4 ? 'bg-warning-400' : 'bg-danger-500'
+  val >= 0.7 ? 'bg-success-500' : val >= 0.4 ? 'bg-warning-500' : 'bg-danger-500'
 
 // ── Carga de datos ─────────────────────────────────────
 const loadOferta = async () => {

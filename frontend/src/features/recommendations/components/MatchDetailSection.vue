@@ -237,7 +237,7 @@ const hardCoveragePercent = computed(() =>
 )
 const hardCoverageColor = computed(() => {
   if (hardCoveragePercent.value >= 70) return 'bg-success-500'
-  if (hardCoveragePercent.value >= 40) return 'bg-warning-400'
+  if (hardCoveragePercent.value >= 40) return 'bg-warning-500'
   return 'bg-danger-500'
 })
 const hardCoverageTextColor = computed(() => {
@@ -260,7 +260,7 @@ const softCoveragePercent = computed(() =>
 )
 const softCoverageColor = computed(() => {
   if (softCoveragePercent.value >= 70) return 'bg-success-500'
-  if (softCoveragePercent.value >= 40) return 'bg-warning-400'
+  if (softCoveragePercent.value >= 40) return 'bg-warning-500'
   return 'bg-danger-500'
 })
 const softCoverageTextColor = computed(() => {
@@ -285,7 +285,7 @@ const langCoveragePercent = computed(() =>
 )
 const langCoverageColor = computed(() => {
   if (langCoveragePercent.value >= 70) return 'bg-success-500'
-  if (langCoveragePercent.value >= 40) return 'bg-warning-400'
+  if (langCoveragePercent.value >= 40) return 'bg-warning-500'
   return 'bg-danger-500'
 })
 const langCoverageTextColor = computed(() => {

@@ -723,20 +723,20 @@ const switchTab = (tab) => {
                         <table class="min-w-full text-xs">
                             <thead>
                                 <tr class="bg-gray-50 border-b border-gray-100">
-                                    <th class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide">#</th>
-                                    <th class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Convocatoria</th>
-                                    <th v-if="colVisible('tipo')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Tipo</th>
-                                    <th v-if="colVisible('modalidad')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Modalidad</th>
-                                    <th v-if="colVisible('sector')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Sector</th>
-                                    <th v-if="colVisible('area')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Área</th>
-                                    <th v-if="colVisible('estado')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Estado</th>
-                                    <th v-if="colVisible('fechas')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Inicio / Cierre</th>
-                                    <th v-if="colVisible('dias_restantes')" class="px-4 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Días rest.</th>
-                                    <th v-if="colVisible('cupos')" class="px-4 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Cupos</th>
-                                    <th v-if="colVisible('postulaciones')" class="px-4 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Postul.</th>
-                                    <th v-if="colVisible('postulantes_rol')" class="px-4 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Est. / Tit.</th>
-                                    <th v-if="colVisible('carreras')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Top carreras</th>
-                                    <th v-if="colVisible('score')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Score prom.</th>
+                                    <th class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide">#</th>
+                                    <th class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Convocatoria</th>
+                                    <th v-if="colVisible('tipo')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Tipo</th>
+                                    <th v-if="colVisible('modalidad')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Modalidad</th>
+                                    <th v-if="colVisible('sector')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Sector</th>
+                                    <th v-if="colVisible('area')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Área</th>
+                                    <th v-if="colVisible('estado')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Estado</th>
+                                    <th v-if="colVisible('fechas')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Inicio / Cierre</th>
+                                    <th v-if="colVisible('dias_restantes')" class="px-2 py-2 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Días rest.</th>
+                                    <th v-if="colVisible('cupos')" class="px-2 py-2 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Cupos</th>
+                                    <th v-if="colVisible('postulaciones')" class="px-2 py-2 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Postul.</th>
+                                    <th v-if="colVisible('postulantes_rol')" class="px-2 py-2 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Est. / Tit.</th>
+                                    <th v-if="colVisible('carreras')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Top carreras</th>
+                                    <th v-if="colVisible('score')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Score prom.</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -746,52 +746,52 @@ const switchTab = (tab) => {
                                     class="border-b border-gray-100 hover:bg-gray-50/60 transition-colors"
                                     :class="idx % 2 === 0 ? '' : 'bg-gray-50/30'"
                                 >
-                                    <td class="px-4 py-2.5 text-gray-300 font-mono select-none">{{ idx + 1 }}</td>
+                                    <td class="px-2 py-2 text-gray-300 font-mono select-none">{{ idx + 1 }}</td>
 
-                                    <td class="px-4 py-2.5 min-w-[180px]">
+                                    <td class="px-2 py-2 min-w-[130px]">
                                         <p class="font-medium text-gray-800 leading-tight">{{ oferta.titulo }}</p>
                                         <p class="text-gray-400 mt-0.5">{{ oferta.institucion || '—' }}</p>
                                     </td>
 
-                                    <td v-if="colVisible('tipo')" class="px-4 py-2.5">
+                                    <td v-if="colVisible('tipo')" class="px-2 py-2">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium capitalize" :class="tipoBadge(oferta.tipo)">
                                             {{ oferta.tipo }}
                                         </span>
                                     </td>
 
-                                    <td v-if="colVisible('modalidad')" class="px-4 py-2.5">
+                                    <td v-if="colVisible('modalidad')" class="px-2 py-2">
                                         <span v-if="oferta.modalidad" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium capitalize" :class="modalidadBadge(oferta.modalidad)">
                                             {{ oferta.modalidad }}
                                         </span>
                                         <span v-else class="text-gray-300">—</span>
                                     </td>
 
-                                    <td v-if="colVisible('sector')" class="px-4 py-2.5 text-gray-600 whitespace-nowrap">{{ oferta.sector || '—' }}</td>
-                                    <td v-if="colVisible('area')" class="px-4 py-2.5 text-gray-600 whitespace-nowrap">{{ oferta.area || '—' }}</td>
+                                    <td v-if="colVisible('sector')" class="px-2 py-2 text-gray-600 whitespace-nowrap">{{ oferta.sector || '—' }}</td>
+                                    <td v-if="colVisible('area')" class="px-2 py-2 text-gray-600 whitespace-nowrap">{{ oferta.area || '—' }}</td>
 
-                                    <td v-if="colVisible('estado')" class="px-4 py-2.5">
+                                    <td v-if="colVisible('estado')" class="px-2 py-2">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium capitalize" :class="estadoBadge(oferta.estado)">
                                             {{ oferta.estado }}
                                         </span>
                                     </td>
 
-                                    <td v-if="colVisible('fechas')" class="px-4 py-2.5 whitespace-nowrap">
+                                    <td v-if="colVisible('fechas')" class="px-2 py-2 whitespace-nowrap">
                                         <p class="text-gray-500">{{ formatDate(oferta.fecha_inicio) }}</p>
                                         <p class="text-gray-400 mt-0.5">→ {{ formatDate(oferta.fecha_cierre) }}</p>
                                     </td>
 
-                                    <td v-if="colVisible('dias_restantes')" class="px-4 py-2.5 text-center whitespace-nowrap">
+                                    <td v-if="colVisible('dias_restantes')" class="px-2 py-2 text-center whitespace-nowrap">
                                         <span v-if="oferta.dias_restantes !== null && oferta.dias_restantes !== undefined" :class="diasColor(oferta.dias_restantes)">
                                             {{ oferta.dias_restantes }}d
                                         </span>
                                         <span v-else class="text-gray-300">—</span>
                                     </td>
 
-                                    <td v-if="colVisible('cupos')" class="px-4 py-2.5 text-center font-medium text-gray-700">
+                                    <td v-if="colVisible('cupos')" class="px-2 py-2 text-center font-medium text-gray-700">
                                         {{ oferta.cupos_disponibles }}
                                     </td>
 
-                                    <td v-if="colVisible('postulaciones')" class="px-4 py-2.5 text-center">
+                                    <td v-if="colVisible('postulaciones')" class="px-2 py-2 text-center">
                                         <span v-if="oferta.total_postulaciones > 0" class="font-semibold text-blue-600">
                                             {{ oferta.total_postulaciones }}
                                         </span>
@@ -802,7 +802,7 @@ const switchTab = (tab) => {
                                     </td>
 
                                     <!-- Nueva col: Est. vs Tit. -->
-                                    <td v-if="colVisible('postulantes_rol')" class="px-4 py-2.5 text-center whitespace-nowrap">
+                                    <td v-if="colVisible('postulantes_rol')" class="px-2 py-2 text-center whitespace-nowrap">
                                         <div v-if="oferta.total_postulaciones > 0" class="space-y-0.5">
                                             <p class="text-indigo-600 font-medium">{{ oferta.postulantes_estudiantes }}<span class="text-[10px] font-normal text-gray-400"> est.</span></p>
                                             <p class="text-purple-600 font-medium">{{ oferta.postulantes_titulados }}<span class="text-[10px] font-normal text-gray-400"> tit.</span></p>
@@ -811,14 +811,14 @@ const switchTab = (tab) => {
                                     </td>
 
                                     <!-- Nueva col: Top carreras -->
-                                    <td v-if="colVisible('carreras')" class="px-4 py-2.5 min-w-[130px]">
+                                    <td v-if="colVisible('carreras')" class="px-2 py-2 min-w-[90px]">
                                         <div v-if="oferta.top_carreras?.length" class="space-y-0.5">
-                                            <p v-for="c in oferta.top_carreras" :key="c" class="text-[11px] text-gray-600 capitalize leading-tight truncate max-w-[120px]">· {{ c }}</p>
+                                            <p v-for="c in oferta.top_carreras" :key="c" class="text-[11px] text-gray-600 capitalize leading-tight truncate max-w-[85px]">· {{ c }}</p>
                                         </div>
                                         <span v-else class="text-gray-300">—</span>
                                     </td>
 
-                                    <td v-if="colVisible('score')" class="px-4 py-2.5 min-w-[110px]">
+                                    <td v-if="colVisible('score')" class="px-2 py-2 min-w-[80px]">
                                         <div v-if="oferta.avg_match_score !== null" class="flex items-center gap-2">
                                             <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                                 <div class="h-1.5 rounded-full" :class="scoreBar(oferta.avg_match_score)" :style="{ width: oferta.avg_match_score + '%' }"></div>
@@ -1034,15 +1034,15 @@ const switchTab = (tab) => {
                             <table class="min-w-full text-xs">
                                 <thead>
                                     <tr class="bg-gray-50 border-b border-gray-100">
-                                        <th class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide">#</th>
-                                        <th class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Convocatoria</th>
-                                        <th v-if="compColVisible('tipo_inst')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Tipo inst.</th>
-                                        <th v-if="compColVisible('tipo')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Tipo</th>
-                                        <th v-if="compColVisible('estado')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Estado</th>
-                                        <th v-if="compColVisible('fechas')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Inicio / Cierre</th>
-                                        <th v-if="compColVisible('cupos')" class="px-4 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Cupos</th>
-                                        <th v-if="compColVisible('postulaciones')" class="px-4 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Postul.</th>
-                                        <th v-if="compColVisible('cumplimiento')" class="px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">% Cumplimiento</th>
+                                        <th class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide">#</th>
+                                        <th class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Convocatoria</th>
+                                        <th v-if="compColVisible('tipo_inst')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Tipo inst.</th>
+                                        <th v-if="compColVisible('tipo')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Tipo</th>
+                                        <th v-if="compColVisible('estado')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Estado</th>
+                                        <th v-if="compColVisible('fechas')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Inicio / Cierre</th>
+                                        <th v-if="compColVisible('cupos')" class="px-2 py-2 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Cupos</th>
+                                        <th v-if="compColVisible('postulaciones')" class="px-2 py-2 text-center font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Postul.</th>
+                                        <th v-if="compColVisible('cumplimiento')" class="px-2 py-2 text-left font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">% Cumplimiento</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1052,39 +1052,39 @@ const switchTab = (tab) => {
                                         class="border-b border-gray-100 hover:bg-gray-50/60 transition-colors"
                                         :class="idx % 2 === 0 ? '' : 'bg-gray-50/30'"
                                     >
-                                        <td class="px-4 py-2.5 text-gray-300 font-mono select-none">{{ idx + 1 }}</td>
-                                        <td class="px-4 py-2.5 min-w-[200px]">
+                                        <td class="px-2 py-2 text-gray-300 font-mono select-none">{{ idx + 1 }}</td>
+                                        <td class="px-2 py-2 min-w-[150px]">
                                             <p class="font-medium text-gray-800 leading-tight">{{ conv.titulo }}</p>
                                             <p class="text-gray-400 mt-0.5">{{ conv.institucion || '—' }}</p>
                                         </td>
-                                        <td v-if="compColVisible('tipo_inst')" class="px-4 py-2.5">
+                                        <td v-if="compColVisible('tipo_inst')" class="px-2 py-2">
                                             <span v-if="conv.tipo_institucion" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" :class="tipoBadgeInst(conv.tipo_institucion)">
                                                 {{ conv.tipo_institucion }}
                                             </span>
                                             <span v-else class="text-gray-300">—</span>
                                         </td>
-                                        <td v-if="compColVisible('tipo')" class="px-4 py-2.5">
+                                        <td v-if="compColVisible('tipo')" class="px-2 py-2">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium capitalize"
                                                 :class="conv.tipo === 'pasantia' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-purple-100 text-purple-700 border border-purple-200'"
                                             >{{ conv.tipo }}</span>
                                         </td>
-                                        <td v-if="compColVisible('estado')" class="px-4 py-2.5">
+                                        <td v-if="compColVisible('estado')" class="px-2 py-2">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium capitalize" :class="estadoBadge(conv.estado)">
                                                 {{ conv.estado }}
                                             </span>
                                         </td>
-                                        <td v-if="compColVisible('fechas')" class="px-4 py-2.5 whitespace-nowrap">
+                                        <td v-if="compColVisible('fechas')" class="px-2 py-2 whitespace-nowrap">
                                             <p class="text-gray-500">{{ formatDate(conv.fecha_inicio) }}</p>
                                             <p class="text-gray-400 mt-0.5">→ {{ formatDate(conv.fecha_cierre) }}</p>
                                         </td>
-                                        <td v-if="compColVisible('cupos')" class="px-4 py-2.5 text-center font-semibold text-gray-700">{{ conv.cupos_disponibles }}</td>
-                                        <td v-if="compColVisible('postulaciones')" class="px-4 py-2.5 text-center">
+                                        <td v-if="compColVisible('cupos')" class="px-2 py-2 text-center font-semibold text-gray-700">{{ conv.cupos_disponibles }}</td>
+                                        <td v-if="compColVisible('postulaciones')" class="px-2 py-2 text-center">
                                             <span class="font-semibold text-blue-600">{{ conv.total_postulaciones }}</span>
                                             <div v-if="conv.total_postulaciones > 0" class="text-[10px] text-gray-400 mt-0.5">
                                                 {{ conv.aptos }}A · {{ conv.considerados }}C · {{ conv.no_aptos }}N
                                             </div>
                                         </td>
-                                        <td v-if="compColVisible('cumplimiento')" class="px-4 py-2.5 min-w-[130px]">
+                                        <td v-if="compColVisible('cumplimiento')" class="px-2 py-2 min-w-[130px]">
                                             <div class="flex items-center gap-2">
                                                 <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                                                     <div class="h-2 rounded-full transition-all" :class="cumplimientoColor(conv.pct_cumplimiento)" :style="{ width: conv.pct_cumplimiento + '%' }"></div>

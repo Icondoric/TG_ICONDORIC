@@ -32,10 +32,7 @@
               <div class="text-3xl font-bold text-emi-gold-400">&lt; 30s</div>
               <div class="text-sm text-white/70 mt-1">Procesamiento NLP</div>
             </div>
-            <div class="glass px-6 py-4 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
-              <div class="text-3xl font-bold text-emi-gold-400">100+</div>
-              <div class="text-sm text-white/70 mt-1">Convenios activos</div>
-            </div>
+
           </div>
         </div>
 

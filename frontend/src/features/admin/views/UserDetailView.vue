@@ -161,7 +161,7 @@ const formatDate = (dateString, includeTime = false) => {
                 <div class="card-emi overflow-hidden">
                     <div class="h-24 bg-gradient-to-r"
                          :class="user.rol === 'administrador' ? 'from-info-500 to-info-700' :
-                                 user.rol === 'operador' ? 'from-warning-400 to-warning-600' :
+                                 user.rol === 'operador' ? 'from-warning-500 to-warning-600' :
                                  user.rol === 'titulado' ? 'from-emi-navy-500 to-emi-navy-700' :
                                  'from-emi-gold to-yellow-600'"
                     ></div>

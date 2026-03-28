@@ -203,7 +203,7 @@
                     </div>
                     <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div class="h-full rounded-full transition-all duration-700"
-                        :class="dim.val >= 0.7 ? 'bg-success-500' : dim.val >= 0.4 ? 'bg-warning-400' : 'bg-danger-500'"
+                        :class="dim.val >= 0.7 ? 'bg-success-500' : dim.val >= 0.4 ? 'bg-warning-500' : 'bg-danger-500'"
                         :style="{ width: Math.round(dim.val * 100) + '%' }"/>
                     </div>
                   </div>
@@ -295,7 +295,7 @@
             <!-- ════════════════════════════════════════════════════
                  PANEL EXPANDIBLE
             ════════════════════════════════════════════════════ -->
-            <div v-if="expandedId === rec.oferta_id" class="mt-6 space-y-8">
+            <div v-show="expandedId === rec.oferta_id" class="mt-6 space-y-8">
 
               <!-- ──────────────────────────────────────────────
                    1. DETALLE DE LA OFERTA
@@ -952,7 +952,7 @@ const getExtraSkills = (rec) => {
 const scoreColorText = (val) =>
   val >= 0.7 ? 'text-success-600' : val >= 0.4 ? 'text-warning-600' : 'text-danger-500'
 const scoreColorBg = (val) =>
-  val >= 0.7 ? 'bg-success-500' : val >= 0.4 ? 'bg-warning-400' : 'bg-danger-500'
+  val >= 0.7 ? 'bg-success-500' : val >= 0.4 ? 'bg-warning-500' : 'bg-danger-500'
 
 // ── Fortalezas / mejoras ──────────────────────────────────
 const hasNoStrengths = (rec) => {
