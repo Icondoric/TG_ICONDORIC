@@ -1,6 +1,6 @@
-# Plataforma de Intermediación Laboral con NLP
+# Sistema de Evaluación de Perfiles Profesionales
 
-Sistema web de recomendación de candidatos que conecta estudiantes con ofertas laborales mediante análisis inteligente de CVs.
+Sistema web de recomendación de candidatos que recomienda estudiantes con ofertas laborales mediante análisis inteligente de CVs.
 
 ## Estructura del Proyecto
 
