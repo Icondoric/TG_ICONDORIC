@@ -10,7 +10,7 @@
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <!-- Step 1 -->
         <div class="relative animate-slide-up">
           <div class="bg-gradient-to-br from-emi-navy-50 to-white rounded-2xl p-6 border border-emi-navy-100 hover:shadow-emi transition-all duration-300">

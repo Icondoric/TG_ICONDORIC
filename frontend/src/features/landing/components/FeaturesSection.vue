@@ -3,11 +3,13 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-16 animate-slide-up">
         <h2 class="font-display font-bold text-4xl lg:text-5xl text-emi-navy-900 mb-4">
-          Tecnología de Vanguardia
+          Características Principales del SEPP
         </h2>
+        <!-- 
         <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-          Sistema inteligente que conecta estudiantes y titulados de la EMI con oportunidades institucionales
+        ...
         </p>
+        -->
       </div>
 
       <div class="grid md:grid-cols-3 gap-8">
@@ -19,10 +21,10 @@
             </svg>
           </div>
           <h3 class="font-display font-bold text-2xl text-emi-navy-900 mb-4">
-            Extracción Automática con NLP
+            Digitalización Estructurada con PLN
           </h3>
           <p class="text-gray-600 leading-relaxed">
-            Procesamiento híbrido que combina <span class="font-semibold text-emi-navy-700">Regex</span> para datos de contacto y <span class="font-semibold text-emi-navy-700">spaCy</span> para identificar competencias técnicas y blandas en español
+            Utiliza un pipeline de Procesamiento de Lenguaje Natural que combina <span class="font-semibold text-emi-navy-700"> pdfplumber, spaCy y la API de Google Gemini </span> para leer tu currículum en PDF. El sistema extrae y estructura tu información en 5 dimensiones clave: <span class="font-semibold text-emi-navy-700"> habilidades técnicas, habilidades blandas, formación, experiencia e idiomas</span>.
           </p>
         </div>
 
@@ -34,10 +36,10 @@
             </svg>
           </div>
           <h3 class="font-display font-bold text-2xl text-emi-navy-900 mb-4">
-            Evaluación Inteligente con ML
+            Evaluación Inteligente con Machine Learning
           </h3>
           <p class="text-gray-600 leading-relaxed">
-            Modelo de Machine Learning (<span class="font-semibold text-emi-navy-700">TF-IDF + Similitud Coseno</span>) que calcula la correspondencia entre tu perfil y las ofertas laborales con precisión del 92%
+            Implementa un modelo predictivo basado en <span class="font-semibold text-emi-navy-700">Regresión Ridge</span> Este algoritmo procesa un vector de 18 características para calcular la correspondencia exacta entre tu perfil y las demandas de la institución.
           </p>
         </div>
 
@@ -49,10 +51,10 @@
             </svg>
           </div>
           <h3 class="font-display font-bold text-2xl text-emi-navy-900 mb-4">
-            Explicabilidad Total
+            Resultados Claros y Accionables
           </h3>
           <p class="text-gray-600 leading-relaxed">
-            No solo recibes un porcentaje de compatibilidad. El sistema te muestra <span class="font-semibold text-emi-navy-700">exactamente</span> qué competencias coinciden y cuáles te faltan para cada oferta
+            El sistema te clasifica en tres niveles objetivos <span class="font-semibold text-emi-navy-700">(APTO, CONSIDERADO o NO APTO)</span> basados en un umbral institucional. Además del porcentaje global, recibes un desglose visual por cada dimensión evaluada, identificando tus principales fortalezas y las debilidades frente a cada convocatoria.
           </p>
         </div>
       </div>

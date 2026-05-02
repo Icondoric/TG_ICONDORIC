@@ -4,7 +4,7 @@
  * Vista para ver el historial de evaluaciones del usuario
  */
 
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useEvaluationStore } from '@/features/evaluation/store/evaluation.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import AppLayout from '@/shared/components/AppLayout.vue'
@@ -13,6 +13,9 @@ import EvaluationSidebar from '@/features/evaluation/components/EvaluationSideba
 const mlStore = useEvaluationStore()
 const authStore = useAuthStore()
 const isSecondarySidebarOpen = ref(true)
+const isLargeScreen = ref(window.innerWidth >= 1024)
+const onResize = () => { isLargeScreen.value = window.innerWidth >= 1024 }
+onUnmounted(() => window.removeEventListener('resize', onResize))
 
 // Estado local
 const currentPage = ref(1)
@@ -21,6 +24,7 @@ const selectedEvaluation = ref(null)
 
 // Cargar historial al montar
 onMounted(async () => {
+    window.addEventListener('resize', onResize)
     if (authStore.isAuthenticated) {
         await loadHistory()
     }
@@ -99,7 +103,7 @@ const formatScore = (score) => {
             <!-- Main Content -->
             <div
                 class="flex-1 transition-[margin] duration-300 ease-in-out min-h-screen"
-                :style="{ marginLeft: isSecondarySidebarOpen ? '280px' : '60px' }"
+                :style="{ marginLeft: isLargeScreen ? (isSecondarySidebarOpen ? '280px' : '60px') : '0' }"
             >
                 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <!-- Header -->

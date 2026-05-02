@@ -1,9 +1,11 @@
+import logging
 from fastapi import APIRouter, HTTPException, status, Depends
 from app.db.client import supabase
 from app.core.security import get_password_hash, verify_password, create_access_token
 from app.api.models import UserRegister, UserLogin, Token
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 @router.post("/register", response_model=Token)
 async def register(user: UserRegister):
@@ -15,13 +17,13 @@ async def register(user: UserRegister):
 
     # 1. Check if email exists
     try:
-        # Supabase select
         check = supabase.table("usuarios").select("id").eq("email", user.email).execute()
-        if check.data:
-            raise HTTPException(status_code=400, detail="Email ya registrado")
     except Exception as e:
-         # If table doesn't exist or connection fails
-         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        logger.error(f"Error de base de datos al verificar email: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+    if check.data:
+        raise HTTPException(status_code=400, detail="Email ya registrado")
 
     # 2. Create user
     hashed_password = get_password_hash(user.password)
@@ -63,24 +65,41 @@ async def login(user: UserLogin):
     # 1. Get user
     try:
         response = supabase.table("usuarios").select("*").eq("email", user.email).execute()
-        if not response.data:
-             raise HTTPException(status_code=400, detail="Email o contraseña incorrectos")
-        
-        db_user = response.data[0]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al verificar usuario: {str(e)}")
-        
-    # 2. Verify password
-    if not verify_password(user.password, db_user["password_hash"]):
+        logger.error(f"Error de base de datos al buscar usuario: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error de conexión con la base de datos: {str(e)}")
+
+    if not response.data:
         raise HTTPException(status_code=400, detail="Email o contraseña incorrectos")
-        
+
+    db_user = response.data[0]
+
+    # 2. Verify password
+    password_hash = db_user.get("password_hash")
+    if not password_hash:
+        logger.error(f"Usuario {user.email} no tiene password_hash en la base de datos")
+        raise HTTPException(status_code=400, detail="Email o contraseña incorrectos")
+
+    try:
+        if not verify_password(user.password, password_hash):
+            raise HTTPException(status_code=400, detail="Email o contraseña incorrectos")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error verificando contraseña: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Error interno al verificar credenciales")
+
     # 3. Generate Token
-    access_token = create_access_token(db_user["id"], db_user["rol"])
-    
+    try:
+        access_token = create_access_token(db_user["id"], db_user["rol"])
+    except Exception as e:
+        logger.error(f"Error generando token: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Error generando token de acceso")
+
     return {
-        "access_token": access_token, 
+        "access_token": access_token,
         "token_type": "bearer",
-        "user_id": db_user["id"],
+        "user_id": str(db_user["id"]),
         "rol": db_user["rol"],
         "nombre_completo": db_user.get("nombre_completo"),
         "email": db_user.get("email")

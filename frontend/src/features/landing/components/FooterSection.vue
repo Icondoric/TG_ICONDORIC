@@ -7,7 +7,7 @@
           <h3 class="font-display font-bold text-xl mb-1 text-emi-gold-400">SEPP</h3>
           <p class="text-white/50 text-xs mb-3">Sistema de Evaluación de Perfiles Profesionales</p>
           <p class="text-gray-300 text-sm leading-relaxed">
-            Sistema de Evaluación de Perfiles Profesionales Aplicando Procesamiento de Lenguaje Natural  para la Escuela Militar de Ingeniería
+            Sistema de Evaluación de Perfiles Profesionales Aplicando Procesamiento de Lenguaje Natural 
           </p>
         </div>
 

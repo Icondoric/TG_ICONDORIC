@@ -391,7 +391,7 @@ class ProfileService:
         highest_name = None
 
         for edu in education_list:
-            degree = edu.get('degree', '').lower()
+            degree = (edu.get('degree') or '').lower()
 
             for level_name, level_value in self.EDUCATION_LEVELS.items():
                 if level_name in degree:
@@ -419,7 +419,7 @@ class ProfileService:
         total_years = 0.0
 
         for exp in experience_list:
-            duration = exp.get('duration', '')
+            duration = exp.get('duration') or ''
 
             # Patron: "X anos" o "X years"
             years_match = re.search(r'(\d+(?:\.\d+)?)\s*(anos?|years?)', duration.lower())

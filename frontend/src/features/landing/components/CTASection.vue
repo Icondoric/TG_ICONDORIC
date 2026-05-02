@@ -11,7 +11,7 @@
         ¿Listo para Descubrir tus Oportunidades?
       </h2>
       <p class="text-xl text-white/80 mb-10 animate-slide-up" style="animation-delay: 0.1s;">
-        Sistema desarrollado para el Vicerrectorado de Grado de la Escuela Militar de Ingeniería
+        Sistema desarrollado para estudiantes y titulados de la Escuela Militar de Ingeniería UALP
       </p>
       <button
         class="bg-gradient-to-r from-emi-gold-500 to-emi-gold-600 hover:from-emi-gold-600 hover:to-emi-gold-700 text-white font-bold py-4 px-10 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-gold animate-slide-up inline-flex items-center gap-3"

@@ -23,7 +23,7 @@
         <h2 class="text-sm font-semibold text-slate-600 uppercase tracking-wider">Resumen de convocatorias</h2>
         <p class="text-xs text-slate-400 mt-0.5">Estado actual de todas las convocatorias registradas en el sistema</p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="card-emi p-4">
           <div class="flex items-center">
             <div class="flex-shrink-0 bg-info-100 rounded-lg p-3">
@@ -83,7 +83,7 @@
 
       <!-- Filters -->
       <div class="card-emi p-4 mb-6">
-        <div class="flex flex-col md:flex-row flex-wrap gap-4">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-4">
           <!-- Búsqueda por texto -->
           <div class="flex-1 min-w-[200px]">
             <input
@@ -141,33 +141,33 @@
         <table class="min-w-full divide-y divide-slate-200">
           <thead class="bg-slate-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th class="px-4 md:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Convocatoria
               </th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th class="hidden sm:table-cell px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Tipo
               </th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Institucion
               </th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th class="px-4 md:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Estado
               </th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th class="hidden lg:table-cell px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Vigencia
               </th>
-              <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th class="px-4 md:px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-slate-200">
             <tr v-for="oferta in filteredOfertas" :key="oferta.id" class="hover:bg-slate-50 transition-colors">
-              <td class="px-6 py-4">
+              <td class="px-4 md:px-6 py-4">
                 <div class="text-sm font-semibold text-slate-900">{{ oferta.titulo }}</div>
                 <div v-if="oferta.ubicacion" class="text-sm text-slate-500">{{ oferta.ubicacion }}</div>
               </td>
-              <td class="px-6 py-4">
+              <td class="hidden sm:table-cell px-6 py-4">
                 <span :class="[
                   'badge-emi',
                   oferta.tipo === 'pasantia' ? 'bg-info-100 text-info-800' : 'bg-success-100 text-success-800'
@@ -175,10 +175,10 @@
                   {{ oferta.tipo === 'pasantia' ? 'Pasantia' : 'Empleo' }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm text-slate-500">
+              <td class="hidden md:table-cell px-6 py-4 text-sm text-slate-500">
                 {{ oferta.institution_name || 'Sin asignar' }}
               </td>
-              <td class="px-6 py-4">
+              <td class="px-4 md:px-6 py-4">
                 <span :class="[
                   'badge-emi',
                   oferta.is_active ? 'bg-success-100 text-success-800' : 'bg-slate-100 text-slate-600'
@@ -186,7 +186,7 @@
                   {{ oferta.is_active ? 'Activa' : 'Inactiva' }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm text-slate-500">
+              <td class="hidden lg:table-cell px-6 py-4 text-sm text-slate-500">
                 <span v-if="oferta.fecha_cierre">
                   {{ formatDate(oferta.fecha_cierre) }}
                 </span>

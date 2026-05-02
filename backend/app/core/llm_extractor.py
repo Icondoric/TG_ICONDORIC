@@ -36,22 +36,24 @@ class GeminiKeyPool:
         self._load_keys()
 
     def _load_keys(self):
-        keys = set()
+        seen = set()
+        keys = []
 
-        # Single key (backward compat)
-        single = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")
-        if single.strip():
-            keys.add(single.strip())
-
-        # Multiple keys
+        # Multiple keys take priority (ordered)
         multi = os.getenv("GEMINI_API_KEYS", "")
         if multi.strip():
             for k in multi.split(","):
                 k = k.strip()
-                if k:
-                    keys.add(k)
+                if k and k not in seen:
+                    seen.add(k)
+                    keys.append(k)
 
-        self._keys = list(keys)
+        # Single key (backward compat) — append if not already in list
+        single = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")
+        if single.strip() and single.strip() not in seen:
+            keys.append(single.strip())
+
+        self._keys = keys
         if self._keys:
             logger.info(f"Gemini key pool: {len(self._keys)} key(s) loaded")
         else:

@@ -4,7 +4,7 @@
  * Vista para evaluar un CV contra un perfil institucional
  */
 
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useEvaluationStore } from '@/features/evaluation/store/evaluation.store'
 import { useAdminProfilesStore } from '@/features/admin/store/adminProfiles.store'
 import { useAuthStore } from '@/features/auth/store/auth.store'
@@ -17,6 +17,9 @@ const mlStore = useEvaluationStore()
 const profilesStore = useAdminProfilesStore()
 const authStore = useAuthStore()
 const isSecondarySidebarOpen = ref(true)
+const isLargeScreen = ref(window.innerWidth >= 1024)
+const onResize = () => { isLargeScreen.value = window.innerWidth >= 1024 }
+onUnmounted(() => window.removeEventListener('resize', onResize))
 
 // Estado local
 const fileInput = ref(null)
@@ -26,6 +29,7 @@ const step = ref(1) // 1: Seleccionar, 2: Resultado
 
 // Cargar perfiles activos al montar
 onMounted(async () => {
+    window.addEventListener('resize', onResize)
     try {
         await profilesStore.loadActiveProfiles() // Endpoint publico, solo activos
     } catch (error) {
@@ -99,7 +103,7 @@ const reset = () => {
             <!-- Main Content -->
             <div
                 class="flex-1 transition-[margin] duration-300 ease-in-out min-h-screen"
-                :style="{ marginLeft: isSecondarySidebarOpen ? '280px' : '60px' }"
+                :style="{ marginLeft: isLargeScreen ? (isSecondarySidebarOpen ? '280px' : '60px') : '0' }"
             >
                 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <!-- Header -->

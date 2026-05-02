@@ -21,72 +21,43 @@
         </svg>
         <div>
           <p class="text-red-700 text-sm">{{ error }}</p>
-          <button @click="loadAccountInfo" class="mt-1 text-red-600 hover:text-red-800 underline text-xs">
-            Reintentar
-          </button>
+          <button @click="loadAccountInfo" class="mt-1 text-red-600 hover:text-red-800 underline text-xs">Reintentar</button>
         </div>
       </div>
 
       <!-- Contenido -->
       <div v-else class="space-y-6">
 
-        <!-- ── Hero: avatar + identidad ── -->
-        <div class="card-emi !p-0 overflow-hidden">
-          <div class="h-20 w-full" :class="roleGradient"></div>
-          <div class="px-6 pb-6 -mt-10">
-            <div class="flex flex-col sm:flex-row sm:items-end gap-4">
-              <!-- Avatar inicial -->
-              <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center font-bold text-3xl shadow-lg border-4 border-white shrink-0"
-                :class="roleTextColor">
-                {{ (accountInfo.nombre_completo || accountInfo.email || '?').charAt(0).toUpperCase() }}
-              </div>
-              <div class="flex-1 pb-1">
-                <h2 class="text-xl font-bold text-emi-navy-800">{{ accountInfo.nombre_completo || 'Sin nombre' }}</h2>
-                <p class="text-slate-400 text-sm">{{ accountInfo.email }}</p>
-              </div>
-              <span :class="['badge-emi self-start sm:self-auto mb-1', roleBadgeColor]">
+        <!-- ── Identidad ── -->
+        <div class="card-emi p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="roleIconBg">
+              <svg class="w-5 h-5" :class="roleIconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-emi-navy-800">Identidad</h2>
+              <p class="text-xs text-slate-400 mt-0.5">Datos con los que apareces en el sistema</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <!-- Avatar inicial -->
+            <div
+              class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0"
+              :class="[roleIconBg, roleIconColor]"
+            >
+              {{ accountInfo.nombre_completo?.charAt(0).toUpperCase() || accountInfo.email?.charAt(0).toUpperCase() || '?' }}
+            </div>
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <p class="text-lg font-bold text-emi-navy-800 truncate">{{ accountInfo.nombre_completo || 'Sin nombre' }}</p>
+              <p class="text-sm text-slate-400 truncate">{{ accountInfo.email }}</p>
+              <span class="mt-1.5 inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize" :class="roleBadgeColor">
                 {{ accountInfo.rol }}
               </span>
             </div>
-          </div>
-        </div>
-
-        <!-- ── Stats: tipo, miembro desde, estado ── -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="card-emi p-5">
-            <div class="flex items-center gap-3 mb-2">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="roleIconBg">
-                <svg class="w-4 h-4" :class="roleIconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <span class="text-xs text-slate-400 uppercase tracking-wider font-medium">Tipo de cuenta</span>
-            </div>
-            <p class="text-base font-bold text-emi-navy-800 capitalize">{{ accountInfo.rol }}</p>
-          </div>
-
-          <div class="card-emi p-5">
-            <div class="flex items-center gap-3 mb-2">
-              <div class="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <span class="text-xs text-slate-400 uppercase tracking-wider font-medium">Miembro desde</span>
-            </div>
-            <p class="text-base font-bold text-emi-navy-800">{{ formatDate(accountInfo.created_at) }}</p>
-          </div>
-
-          <div class="card-emi p-5">
-            <div class="flex items-center gap-3 mb-2">
-              <div class="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <span class="text-xs text-slate-400 uppercase tracking-wider font-medium">Estado</span>
-            </div>
-            <p class="text-base font-bold text-success-600">Activa</p>
           </div>
         </div>
 
@@ -111,19 +82,22 @@
             </div>
             <div class="p-4 bg-slate-50 rounded-xl">
               <p class="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">Correo Electrónico</p>
-              <p class="text-sm font-semibold text-slate-800">{{ accountInfo.email }}</p>
+              <p class="text-sm font-semibold text-slate-800 break-all">{{ accountInfo.email }}</p>
             </div>
             <div class="p-4 bg-slate-50 rounded-xl">
-              <p class="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">Rol Asignado</p>
+              <p class="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">Tipo de Cuenta</p>
               <p class="text-sm font-semibold text-slate-800 capitalize">{{ accountInfo.rol }}</p>
             </div>
             <div class="p-4 bg-slate-50 rounded-xl">
-              <p class="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">Fecha de Registro</p>
+              <p class="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">Miembro Desde</p>
               <p class="text-sm font-semibold text-slate-800">{{ formatDate(accountInfo.created_at) }}</p>
             </div>
-            <div class="p-4 bg-slate-50 rounded-xl sm:col-span-2">
-              <p class="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">ID de Usuario</p>
-              <p class="text-sm font-mono text-slate-500">{{ accountInfo.id }}</p>
+            <div class="p-4 bg-slate-50 rounded-xl sm:col-span-2 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">Estado</p>
+                <p class="text-sm font-semibold text-success-600">Activa</p>
+              </div>
+              <div class="w-2.5 h-2.5 rounded-full bg-success-500"></div>
             </div>
           </div>
         </div>
@@ -145,20 +119,20 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
             <div class="p-4 bg-slate-50 rounded-xl">
               <p class="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">Carrera</p>
-              <p class="text-sm font-semibold text-slate-800">
+              <p class="text-sm font-semibold" :class="profileData.carrera ? 'text-slate-800' : 'text-warning-500 italic'">
                 {{ profileData.carrera || 'Sin especificar' }}
               </p>
               <p v-if="!profileData.carrera" class="text-xs text-warning-600 mt-1">
-                Sin carrera definida — algunas ofertas pueden excluirte del filtro de elegibilidad.
+                Algunas ofertas pueden excluirte del filtro de elegibilidad.
               </p>
             </div>
             <div v-if="accountInfo.rol === 'estudiante'" class="p-4 bg-slate-50 rounded-xl">
               <p class="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">Semestre Actual</p>
-              <p class="text-sm font-semibold text-slate-800">
+              <p class="text-sm font-semibold" :class="profileData.semestre_actual ? 'text-slate-800' : 'text-warning-500 italic'">
                 {{ profileData.semestre_actual ? `${profileData.semestre_actual}° semestre` : 'Sin especificar' }}
               </p>
               <p v-if="!profileData.semestre_actual" class="text-xs text-warning-600 mt-1">
-                Sin semestre definido — ofertas con rango de semestre podrían no considerarte.
+                Ofertas con rango de semestre podrían no considerarte.
               </p>
             </div>
           </div>
@@ -196,33 +170,6 @@ const profileData = ref({ carrera: '', semestre_actual: null })
 
 const rol = computed(() => authStore.user?.rol)
 
-const roleGradient = computed(() => {
-  switch (rol.value) {
-    case 'administrador': return 'bg-gradient-to-r from-emi-navy-700 to-emi-navy-900'
-    case 'operador':      return 'bg-gradient-to-r from-emi-navy-500 to-emi-navy-700'
-    case 'titulado':      return 'bg-gradient-to-r from-info-500 to-info-700'
-    default:              return 'bg-gradient-to-r from-emi-navy-400 to-emi-navy-600'
-  }
-})
-
-const roleTextColor = computed(() => {
-  switch (rol.value) {
-    case 'administrador': return 'text-emi-navy-700'
-    case 'operador':      return 'text-emi-navy-600'
-    case 'titulado':      return 'text-info-600'
-    default:              return 'text-emi-navy-500'
-  }
-})
-
-const roleBadgeColor = computed(() => {
-  switch (rol.value) {
-    case 'administrador': return 'bg-emi-navy-100 text-emi-navy-800'
-    case 'operador':      return 'bg-warning-100 text-warning-700'
-    case 'titulado':      return 'bg-info-100 text-info-700'
-    default:              return 'bg-emi-navy-100 text-emi-navy-700'
-  }
-})
-
 const roleIconBg = computed(() => {
   switch (rol.value) {
     case 'administrador': return 'bg-emi-navy-100'
@@ -238,6 +185,15 @@ const roleIconColor = computed(() => {
     case 'operador':      return 'text-warning-600'
     case 'titulado':      return 'text-info-600'
     default:              return 'text-emi-navy-500'
+  }
+})
+
+const roleBadgeColor = computed(() => {
+  switch (rol.value) {
+    case 'administrador': return 'bg-emi-navy-100 text-emi-navy-800'
+    case 'operador':      return 'bg-warning-100 text-warning-700'
+    case 'titulado':      return 'bg-info-100 text-info-700'
+    default:              return 'bg-emi-navy-100 text-emi-navy-700'
   }
 })
 

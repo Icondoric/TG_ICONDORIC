@@ -6,68 +6,69 @@
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
           <!-- Header -->
-          <div class="mb-6 flex items-center justify-between">
-            <div>
-              <h1 class="text-3xl font-bold text-emi-navy-500">Mi Perfil Digitalizado</h1>
-              <p class="mt-1 text-gray-500 text-sm">
-                Resumen de tus competencias y experiencia extraídas de tu CV
-              </p>
-            </div>
-            <div class="flex items-center gap-2 flex-wrap justify-end">
-              <!-- Actualizar CV -->
-              <router-link
-                to="/digitalizacion/subir-cv"
-                class="inline-flex items-center gap-2 btn-emi-secondary"
-              >
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                {{ profile.cv_filename ? 'Actualizar CV' : 'Subir CV' }}
-              </router-link>
+          <div class="mb-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-emi-navy-500">Mi Perfil Digitalizado</h1>
+            <p class="mt-1 text-gray-500 text-sm">
+              Resumen de tus competencias y experiencia extraídas de tu CV
+            </p>
+          </div>
 
-              <!-- Ver Recomendaciones -->
-              <router-link
-                to="/mis-recomendaciones"
-                class="inline-flex items-center gap-2 btn-emi-secondary"
-              >
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                Ver Recomendaciones
-              </router-link>
+          <!-- Acciones -->
+          <div class="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-end gap-2 mb-6">
+            <!-- Actualizar CV -->
+            <router-link
+              to="/digitalizacion/subir-cv"
+              class="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 rounded-lg font-medium text-xs sm:text-sm bg-emi-gold-500 text-emi-navy-800 hover:bg-emi-gold-400 transition-colors w-full sm:w-auto"
+            >
+              <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              {{ profile.cv_filename ? 'Actualizar CV' : 'Subir CV' }}
+            </router-link>
 
-              <!-- Editar Perfil -->
-              <router-link
-                to="/digitalizacion/editar"
-                class="inline-flex items-center gap-2 btn-emi-secondary"
-              >
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-                Editar Perfil
-              </router-link>
+            <!-- Ver Recomendaciones -->
+            <router-link
+              to="/mis-recomendaciones"
+              class="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 rounded-lg font-medium text-xs sm:text-sm bg-emi-gold-500 text-emi-navy-800 hover:bg-emi-gold-400 transition-colors w-full sm:w-auto"
+            >
+              <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span class="sm:hidden">Recomendaciones</span>
+              <span class="hidden sm:inline">Ver Recomendaciones</span>
+            </router-link>
 
-              <!-- Generar CV PDF -->
-              <button
-                @click="generateCVPdf"
-                :disabled="generatingPdf || loading"
-                class="inline-flex items-center gap-2 btn-emi-primary disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <svg v-if="!generatingPdf" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <svg v-else class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                  <path class="opacity-75" fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                {{ generatingPdf ? 'Generando...' : 'Generar CV PDF' }}
-              </button>
-            </div>
+            <!-- Editar Perfil -->
+            <router-link
+              to="/digitalizacion/editar"
+              class="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 rounded-lg font-medium text-xs sm:text-sm bg-emi-gold-500 text-emi-navy-800 hover:bg-emi-gold-400 transition-colors w-full sm:w-auto"
+            >
+              <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              Editar Perfil
+            </router-link>
+
+            <!-- Generar CV PDF -->
+            <button
+              @click="generateCVPdf"
+              :disabled="generatingPdf || loading"
+              class="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 rounded-lg font-medium text-xs sm:text-sm bg-emi-navy-500 text-white hover:bg-emi-navy-600 transition-colors w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <svg v-if="!generatingPdf" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <svg v-else class="animate-spin h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              <span class="sm:hidden">{{ generatingPdf ? 'Generando...' : 'Generar PDF' }}</span>
+              <span class="hidden sm:inline">{{ generatingPdf ? 'Generando...' : 'Generar CV PDF' }}</span>
+            </button>
           </div>
 
           <!-- Loading -->
@@ -83,8 +84,29 @@
             </button>
           </Card>
 
-          <!-- Content -->
-          <div v-else class="space-y-4">
+          <!-- Content + Mobile Stats -->
+          <div v-else>
+            <!-- Mobile Stats Bar (visible solo en < lg, reemplaza el sidebar oculto) -->
+            <div class="lg:hidden mb-4 grid grid-cols-4 gap-2 p-3 bg-white rounded-xl border border-gray-200 shadow-sm">
+              <div class="flex flex-col items-center">
+                <span class="text-lg font-bold text-emi-navy-600">{{ Math.round(profile.completeness_score * 100) }}%</span>
+                <span class="text-[11px] text-gray-500 text-center">Perfil</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <span class="text-lg font-bold text-emi-navy-600">{{ profile.hard_skills?.length ?? 0 }}</span>
+                <span class="text-[11px] text-gray-500 text-center">Técnicas</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <span class="text-lg font-bold text-emi-gold-600">{{ profile.soft_skills?.length ?? 0 }}</span>
+                <span class="text-[11px] text-gray-500 text-center">Blandas</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <span class="text-lg font-bold text-purple-600">{{ profile.experience_years ?? 0 }}</span>
+                <span class="text-[11px] text-gray-500 text-center">Años exp.</span>
+              </div>
+            </div>
+
+            <div class="space-y-4">
 
             <!-- Aviso sin CV -->
             <Card v-if="!profile.cv_filename" class="border-emi-gold-200 bg-emi-gold-50">
@@ -178,7 +200,8 @@
             </div>
             <!-- fin CV document -->
 
-          </div>
+            </div><!-- fin space-y-4 -->
+          </div><!-- fin v-else -->
         </div>
       </div>
 

@@ -1,11 +1,11 @@
 <template>
   <AppLayout>
-    <div class="max-w-5xl mx-auto px-6 py-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
 
       <!-- ═══ ENCABEZADO ESTÁNDAR (esquina derecha del main) ═══ -->
-      <div class="flex items-start justify-between gap-6 mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-emi-navy-500">Evaluación de Candidatos</h1>
+          <h1 class="text-2xl sm:text-3xl font-bold text-emi-navy-500">Evaluación de Candidatos</h1>
           <p class="mt-1 text-gray-600">
             Selecciona una convocatoria para ver los postulantes y su evaluación.
           </p>

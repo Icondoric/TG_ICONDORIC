@@ -1,9 +1,9 @@
 <template>
   <AppLayout>
-    <div class="max-w-4xl mx-auto px-6 py-8 space-y-6">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
 
       <!-- ═══ ENCABEZADO ESTÁNDAR ═══ -->
-      <div class="flex items-start justify-between gap-6">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <!-- Breadcrumb -->
           <router-link

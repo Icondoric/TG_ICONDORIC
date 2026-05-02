@@ -416,12 +416,12 @@ const getChildClasses = (child) => {
         @click="uiStore.closeMobileSidebar"
     >
         <aside
-            class="fixed inset-y-0 left-0 w-64 shadow-xl transform transition-transform duration-300"
+            class="fixed inset-y-0 left-0 w-64 shadow-xl transform transition-transform duration-300 flex flex-col"
             :class="isDark ? 'bg-emi-navy-900' : 'bg-white'"
             @click.stop
         >
             <!-- Mobile Header -->
-            <div class="flex items-center justify-between h-16 px-4" :class="isDark ? 'border-b border-emi-navy-700' : 'border-b border-gray-200'">
+            <div class="flex-shrink-0 flex items-center justify-between h-16 px-4" :class="isDark ? 'border-b border-emi-navy-700' : 'border-b border-gray-200'">
                 <img src="@/shared/assets/icons/logoEmi.png" alt="Logo EMI" class="h-11 w-auto" />
                 <button
                     @click="uiStore.closeMobileSidebar"
@@ -434,7 +434,7 @@ const getChildClasses = (child) => {
             </div>
 
             <!-- Mobile Menu -->
-            <div class="py-4 overflow-y-auto" style="max-height: calc(100vh - 128px)">
+            <div class="flex-1 overflow-y-auto py-4">
                 <!-- Bienvenida usuario mobile -->
                 <div
                     v-if="authStore.user"
@@ -526,7 +526,7 @@ const getChildClasses = (child) => {
             </div>
 
             <!-- Mobile Footer: Mi Cuenta + Logout -->
-            <div class="absolute bottom-0 left-0 right-0" :class="isDark ? 'border-t border-emi-navy-700' : 'border-t border-gray-200'">
+            <div class="flex-shrink-0" :class="isDark ? 'border-t border-emi-navy-700' : 'border-t border-gray-200'">
                 <!-- Mi Cuenta Section (mobile) -->
                 <div class="px-2 pt-3 pb-2">
                     <div>

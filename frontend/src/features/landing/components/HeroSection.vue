@@ -25,12 +25,12 @@
           <!-- Stats badges -->
           <div class="flex flex-wrap gap-4 pt-4">
             <div class="glass px-6 py-4 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
-              <div class="text-3xl font-bold text-emi-gold-400">92%</div>
-              <div class="text-sm text-white/70 mt-1">Precisión en evaluación</div>
+              <div class="text-3xl font-bold text-emi-gold-400">&lt; 30s</div>
+              <div class="text-sm text-white/70 mt-1">Procesamiento del CV</div>
             </div>
             <div class="glass px-6 py-4 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
-              <div class="text-3xl font-bold text-emi-gold-400">&lt; 30s</div>
-              <div class="text-sm text-white/70 mt-1">Procesamiento NLP</div>
+              <div class="text-3xl font-bold text-emi-gold-400">&lt; 20s</div>
+              <div class="text-sm text-white/70 mt-1">Generación de la evaluación</div>
             </div>
 
           </div>
@@ -51,7 +51,7 @@
               @drop.prevent="$emit('drop', $event)"
             >
               <div
-                class="border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300"
+                class="border-2 border-dashed rounded-2xl p-6 sm:p-12 text-center transition-all duration-300"
                 :class="isDragging ? 'border-emi-gold-500 bg-emi-gold-50' : 'border-gray-300 hover:border-emi-navy-400 hover:bg-gray-50'"
               >
                 <div v-if="!isProcessing" class="space-y-4">

@@ -1,6 +1,6 @@
 <template>
-  <div v-if="editModal.show" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <Card class="w-full max-w-2xl max-h-[90vh] overflow-y-auto" :hoverable="false">
+  <div v-if="editModal.show" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+    <Card class="w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-b-none sm:rounded-xl" :hoverable="false">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-semibold text-gray-900">{{ editModal.title }}</h3>
         <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600">

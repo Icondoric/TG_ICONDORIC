@@ -172,11 +172,11 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200">
-                                <th class="px-6 py-4 font-semibold text-slate-700 text-sm">Usuario</th>
-                                <th class="px-6 py-4 font-semibold text-slate-700 text-sm">Rol</th>
-                                <th class="px-6 py-4 font-semibold text-slate-700 text-sm">Estado Perfil</th>
-                                <th class="px-6 py-4 font-semibold text-slate-700 text-sm">Fecha Registro</th>
-                                <th class="px-6 py-4 font-semibold text-slate-700 text-sm text-right">Acciones</th>
+                                <th class="px-4 md:px-6 py-4 font-semibold text-slate-700 text-sm">Usuario</th>
+                                <th class="px-4 md:px-6 py-4 font-semibold text-slate-700 text-sm">Rol</th>
+                                <th class="hidden md:table-cell px-6 py-4 font-semibold text-slate-700 text-sm">Estado Perfil</th>
+                                <th class="hidden lg:table-cell px-6 py-4 font-semibold text-slate-700 text-sm">Fecha Registro</th>
+                                <th class="px-4 md:px-6 py-4 font-semibold text-slate-700 text-sm text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -186,18 +186,18 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
                                 </td>
                             </tr>
                             <tr v-for="user in usersStore.users" :key="user.id" class="hover:bg-slate-50 transition-colors">
-                                <td class="px-6 py-4">
+                                <td class="px-4 md:px-6 py-4">
                                     <div>
                                         <p class="font-medium text-slate-800">{{ user.nombre_completo || 'Sin nombre' }}</p>
                                         <p class="text-sm text-slate-500">{{ user.email }}</p>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-4 md:px-6 py-4">
                                     <span class="badge-rol badge-rol-default" :data-rol="user.rol">
                                         {{ user.rol }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="hidden md:table-cell px-6 py-4">
                                     <template v-if="user.rol !== 'administrador'">
                                         <div v-if="user.tiene_perfil" class="flex items-center gap-2">
                                             <div class="w-16 bg-slate-200 rounded-full h-2 overflow-hidden">
@@ -217,10 +217,10 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
                                     </template>
                                     <span v-else class="text-xs text-slate-400">-</span>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-slate-600">
+                                <td class="hidden lg:table-cell px-6 py-4 text-sm text-slate-600">
                                     {{ formatDate(user.created_at) }}
                                 </td>
-                                <td class="px-6 py-4 text-right">
+                                <td class="px-4 md:px-6 py-4 text-right">
                                     <button
                                         @click="viewUser(user.id)"
                                         class="px-3 py-1.5 bg-emi-navy-100 text-emi-navy-700 rounded-lg hover:bg-emi-navy-200 font-medium text-sm transition-colors"
@@ -234,9 +234,9 @@ const totalPages = computed(() => Math.ceil(usersStore.totalUsers / 20))
                 </div>
 
                 <!-- Pagination -->
-                <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-                    <div class="text-sm text-slate-500">
-                        Mostrando usuarios {{ (currentPage - 1) * 20 + 1 }} - {{ Math.min(currentPage * 20, usersStore.totalUsers) }} de {{ usersStore.totalUsers }}
+                <div class="px-4 md:px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="text-sm text-slate-500 text-center sm:text-left">
+                        Mostrando {{ (currentPage - 1) * 20 + 1 }}-{{ Math.min(currentPage * 20, usersStore.totalUsers) }} de {{ usersStore.totalUsers }}
                     </div>
                     <div class="flex gap-2">
                         <button

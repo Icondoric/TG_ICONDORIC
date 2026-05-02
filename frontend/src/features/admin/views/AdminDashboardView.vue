@@ -102,7 +102,7 @@ const visibleModules = computed(() =>
             </div>
 
             <!-- Main Content Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 <!-- Guía de navegación -->
                 <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-5">
