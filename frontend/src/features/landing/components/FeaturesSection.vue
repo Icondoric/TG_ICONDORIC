@@ -7,7 +7,7 @@
         </h2>
         <!-- 
         <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-        ...
+        i'm text xd
         </p>
         -->
       </div>
