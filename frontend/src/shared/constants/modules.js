@@ -1,8 +1,8 @@
 export const MODULES = [
     { id: 'gestion_usuarios',         label: 'Gestión de Usuarios' },
     { id: 'digitalizacion_perfiles',  label: 'Digitalización de Perfiles' },
-    { id: 'oferta_laboral',           label: 'Gestión de Convocatorias' },
     { id: 'perfiles_institucionales', label: 'Perfiles Institucionales' },
+    { id: 'oferta_laboral',           label: 'Gestión de Convocatorias' },
     { id: 'evaluacion_perfiles',      label: 'Evaluación de Perfiles' },
     { id: 'informes_reportes',        label: 'Informes y Reportes' },
 ]

@@ -64,10 +64,20 @@ const FIXED_ROLES = ['admin', 'administrador', 'operador', 'estudiante', 'titula
 export function getMenuItems(role, allowedModules = null) {
     // Rol personalizado: construir menú dinámico filtrando módulos Y sub-módulos permitidos
     if (allowedModules !== null && !FIXED_ROLES.includes(role)) {
-        return Object.entries(allowedModules)
-            .filter(([id]) => MODULE_MENU_ITEMS[id])
-            .map(([id, allowedSubs]) => {
+        const moduleOrder = [
+            'gestion_usuarios',
+            'digitalizacion_perfiles',
+            'perfiles_institucionales',
+            'oferta_laboral',
+            'evaluacion_perfiles',
+            'informes_reportes'
+        ];
+
+        return moduleOrder
+            .filter(id => allowedModules[id] && MODULE_MENU_ITEMS[id])
+            .map(id => {
                 const item = MODULE_MENU_ITEMS[id]
+                const allowedSubs = allowedModules[id]
                 const children = item.children.filter(c => allowedSubs.includes(c.submoduleId))
                 return { ...item, children }
             })
@@ -93,15 +103,15 @@ export function getMenuItems(role, allowedModules = null) {
                     ]
                 },
                 {
-                    label: 'Gestión de Convocatorias Laborales', icon: icons.ofertas, children: [
-                        { label: 'Lista de Convocatorias Laborales', path: '/admin/convocatorias' },
-                        { label: 'Nueva Convocatoria', path: '/admin/convocatorias/new' },
-                    ]
-                },
-                {
                     label: 'Perfiles Institucionales', icon: icons.instituciones, children: [
                         { label: 'Lista de Perfiles Institucionales', path: '/admin/profiles' },
                         { label: 'Nuevo Perfil', path: '/admin/profiles/new' },
+                    ]
+                },
+                {
+                    label: 'Gestión de Convocatorias Laborales', icon: icons.ofertas, children: [
+                        { label: 'Lista de Convocatorias Laborales', path: '/admin/convocatorias' },
+                        { label: 'Nueva Convocatoria', path: '/admin/convocatorias/new' },
                     ]
                 },
                 {
@@ -139,15 +149,15 @@ export function getMenuItems(role, allowedModules = null) {
                     ]
                 },
                 {
-                    label: 'Gestión de Convocatorias Laborales', icon: icons.ofertas, children: [
-                        { label: 'Lista de Convocatorias Laborales', path: '/admin/convocatorias' },
-                        { label: 'Nueva Convocatoria', path: '/admin/convocatorias/new' },
-                    ]
-                },
-                {
                     label: 'Perfiles Institucionales', icon: icons.instituciones, children: [
                         { label: 'Lista de Perfiles Institucionales', path: '/admin/profiles' },
                         { label: 'Nuevo Perfil', path: '/admin/profiles/new' },
+                    ]
+                },
+                {
+                    label: 'Gestión de Convocatorias Laborales', icon: icons.ofertas, children: [
+                        { label: 'Lista de Convocatorias Laborales', path: '/admin/convocatorias' },
+                        { label: 'Nueva Convocatoria', path: '/admin/convocatorias/new' },
                     ]
                 },
                 {
