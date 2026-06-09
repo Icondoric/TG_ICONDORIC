@@ -4,8 +4,6 @@ python-multipart
 # Run: python -m spacy download es_core_news_sm
 spacy
 pdfplumber
-fuzzywuzzy
-python-Levenshtein
 python-jose[cryptography]
 passlib[bcrypt]
 python-dotenv
@@ -15,7 +13,6 @@ email-validator
 bcrypt==3.2.2
 
 google-generativeai
-google-genai
 
 # ML / Feature Engineering (Fase 2)
 scikit-learn
