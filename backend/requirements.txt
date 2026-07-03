@@ -1,56 +1,194 @@
+﻿# =============================================
+# Python Version: 3.13.9
+# Generated from: pip freeze (venv exact versions)
+# =============================================
+
 # =============================================
 # Core API Framework
 # =============================================
-fastapi
-uvicorn[standard]
-python-multipart
+fastapi==0.136.1
+uvicorn[standard]==0.47.0
+python-multipart==0.0.29
+starlette==1.0.0
+httptools==0.8.0
+watchfiles==1.2.0
+websockets==15.0.1
 
 # =============================================
 # Authentication & Security
 # =============================================
-python-jose[cryptography]
-passlib[bcrypt]
+python-jose==3.5.0
+passlib==1.7.4
 bcrypt==4.0.1
+cryptography==48.0.0
+PyJWT==2.12.1
+ecdsa==0.19.2
+pyasn1==0.6.3
+pyasn1_modules==0.4.2
+rsa==4.9.1
 
 # =============================================
 # Configuration & Environment
 # =============================================
-python-dotenv
-pydantic-settings
+python-dotenv==1.2.2
+pydantic==2.13.4
+pydantic-settings==2.14.1
+pydantic_core==2.46.4
 
 # =============================================
-# Database
+# Database - Supabase
 # =============================================
-supabase
+supabase==2.30.0
+supabase-auth==2.30.0
+supabase-functions==2.30.0
+postgrest==2.30.0
+realtime==2.30.0
+storage3==2.30.0
 
 # =============================================
 # Data Validation
 # =============================================
-email-validator
+email-validator==2.3.0
+dnspython==2.8.0
+annotated-types==0.7.0
 
 # =============================================
 # PDF Processing
 # =============================================
-pdfplumber
-reportlab>=4.0.0
+pdfplumber==0.11.9
+reportlab==4.5.1
+pdfminer.six==20251230
+pypdfium2==5.8.0
+pillow==12.2.0
 
 # =============================================
-# NLP
+# NLP - spaCy
 # =============================================
-# Run after install: python -m spacy download es_core_news_sm
-spacy
+# Despues del install ejecutar:
+#   python -m spacy download es_core_news_sm
+# O para el modelo mediano:
+#   python -m spacy download es_core_news_md
+spacy==3.8.14
+spacy-legacy==3.0.12
+spacy-loggers==1.0.5
+thinc==8.3.13
+blis==1.3.3
+cymem==2.0.13
+murmurhash==1.0.15
+preshed==3.0.13
+srsly==2.5.3
+wasabi==1.1.3
+weasel==1.0.0
+catalogue==2.0.10
+cloudpathlib==0.24.0
+confection==1.3.3
+smart_open==7.6.1
+
+# Modelos spaCy (instalar por separado):
+# pip install https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl
+# pip install https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl
+
+# =============================================
+# Fuzzy Matching / Similitud de Texto
+# =============================================
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.27.3
+Levenshtein==0.27.3
+RapidFuzz==3.14.5
 
 # =============================================
 # LLM - OpenAI
 # =============================================
-openai
+openai==2.44.0
+jiter==0.16.0
+
+# =============================================
+# LLM - Google Gemini / GenAI
+# =============================================
+google-genai==2.4.0
+google-generativeai==0.8.6
+google-ai-generativelanguage==0.6.15
+google-api-core==2.30.3
+google-api-python-client==2.196.0
+google-auth==2.53.0
+google-auth-httplib2==0.4.0
+googleapis-common-protos==1.75.0
+grpcio==1.80.0
+grpcio-status==1.71.2
+proto-plus==1.28.0
+protobuf==5.29.6
+cachetools==6.2.6
 
 # =============================================
 # ML / Feature Engineering
 # =============================================
-scikit-learn
-numpy
-pandas
-matplotlib
-seaborn
-joblib
+scikit-learn==1.7.2
+numpy==2.4.6
+pandas==3.0.3
+matplotlib==3.10.9
+seaborn==0.13.2
+joblib==1.5.3
+scipy==1.17.1
+threadpoolctl==3.6.0
+
+# =============================================
+# HTTP / Networking
+# =============================================
+httpx==0.28.1
+httpcore==1.0.9
+httplib2==0.31.2
+requests==2.34.2
+urllib3==2.7.0
+certifi==2026.4.22
+charset-normalizer==3.4.7
+idna==3.15
+h11==0.16.0
+h2==4.3.0
+hpack==4.1.0
+hyperframe==6.1.0
+anyio==4.13.0
+sniffio==1.3.1
+
+# =============================================
+# Utilidades
+# =============================================
+python-dateutil==2.9.0.post0
+six==1.17.0
+click==8.4.0
+rich==14.3.4
+typer==0.25.1
+tqdm==4.67.3
+PyYAML==6.0.3
+packaging==26.2
+setuptools==82.0.1
+colorama==0.4.6
+Pygments==2.20.0
+distro==1.9.0
+tenacity==9.1.4
+deprecation==2.1.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+typing_extensions==4.15.0
+typing-inspection==0.4.2
+wrapt==2.1.2
+fsspec==2026.4.0
+shellingham==1.5.4
+mmh3==5.2.1
+multidict==6.7.1
+propcache==0.5.2
+yarl==1.24.2
+zstandard==0.25.0
+tzdata==2026.2
+fonttools==4.63.0
+kiwisolver==1.5.0
+cycler==0.12.1
+contourpy==1.3.3
+pyparsing==3.3.2
+markdown-it-py==4.2.0
+mdurl==0.1.2
+cffi==2.0.0
+pycparser==3.0
+annotated-doc==0.0.4
+uritemplate==4.2.0
+StrEnum==0.4.15
+strictyaml==1.7.3

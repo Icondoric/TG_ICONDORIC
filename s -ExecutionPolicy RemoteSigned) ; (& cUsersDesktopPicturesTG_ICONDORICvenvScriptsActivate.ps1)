@@ -1,0 +1,264 @@
+[33mcommit e49568757ea457ef7401b44ab58fdc3b6226cb95[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mwuas[m[33m, [m[1;31morigin/wuas[m[33m)[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Fri Jul 3 11:09:27 2026 -0400
+
+    change oai
+
+[33mcommit e38e77cdad090c694084186212e01e0ec701ee32[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Wed Jul 1 20:23:47 2026 -0400
+
+    mod sql
+
+[33mcommit 20e065ba8ebf2c33c39bbd54da622a19082bca6c[m[33m ([m[1;32mrefactor-db-setup-migration[m[33m)[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Mon Jun 8 20:44:45 2026 -0400
+
+    modificacion del readme
+
+[33mcommit 6d93e460a2c758f63fb7ba6f0ae78e19e172cf22[m
+Author: Icondoric <141535100+Icondoric@users.noreply.github.com>
+Date:   Sat May 16 18:47:45 2026 -0400
+
+    Delete .claude directory
+
+[33mcommit 85ce25d0fed3f17dfb3a4a482daeddd7936d13cd[m
+Merge: 788b7bc c900b2f
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sat May 16 18:45:07 2026 -0400
+
+    Merge branch 'main' of https://github.com/Icondoric/TG_ICONDORIC
+
+[33mcommit 788b7bc7c2bf2fd0a07229f5e5ff111717197612[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sat May 16 18:43:20 2026 -0400
+
+    MERGE cla1 v2 cambio en el orden los modulos
+
+[33mcommit c900b2f825fd89e0b66a4650be6856c597f2ab4b[m
+Author: Icondoric <141535100+Icondoric@users.noreply.github.com>
+Date:   Sat May 2 17:04:19 2026 -0400
+
+    Update README.md
+
+[33mcommit 2dcc7752ee73428af7dceec9b0a02f0781d1a6e0[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sat May 2 17:02:46 2026 -0400
+
+    MERGE cla1 v1
+
+[33mcommit 2a4d08d262f049c91bfa9e375ad4a68680a19baa[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sat May 2 17:01:34 2026 -0400
+
+    MERGE cla1
+
+[33mcommit 1450f3878f53d87ae27e9c16ba25af945bc6eb55[m[33m ([m[1;31morigin/cla1[m[33m)[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sat May 2 16:56:54 2026 -0400
+
+    mod finales v1
+
+[33mcommit b02ad01a453c2db9c15024def42822e205c28127[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sat Mar 28 12:54:14 2026 -0400
+
+    yo que se
+
+[33mcommit 8c4ba2eec9e1d4e537ae0ac8b6bae62ec77dcb0a[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Mon Mar 9 14:20:52 2026 -0400
+
+    f correspndecia
+
+[33mcommit ddedb9b478ef816ac48a99353e571559f976fcd8[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Mon Mar 9 12:40:44 2026 -0400
+
+    pov
+
+[33mcommit 60652496786f054d27e31e3c77289bc3ed2d1189[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sun Mar 8 14:32:30 2026 -0400
+
+    sospechoso
+
+[33mcommit a084bdf9d45cda8ed432724b050cc351b1f9c2d3[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Thu Mar 5 09:00:52 2026 -0400
+
+    ya no le toco 5
+
+[33mcommit d35cc4e15adca7136cc8a0b93726ee763d570aad[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Wed Mar 4 00:12:55 2026 -0400
+
+    ya no le toco 4
+
+[33mcommit 97bc3e9f7404927b82d938b864c765077ff8d20b[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Tue Mar 3 18:55:09 2026 -0400
+
+    ya no le toco 3
+
+[33mcommit eebf1a3f33a74641aae60b1fd1119eff001c6f18[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Mon Mar 2 22:09:58 2026 -0400
+
+    ya no le toco 2
+
+[33mcommit 9e9e9cf0e21d1daff21f59806e2c0032862a0623[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Mon Mar 2 21:02:04 2026 -0400
+
+    ya no le toco
+
+[33mcommit b5ec430dbf4861c28bd2db17747f8ee986b00a03[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Wed Feb 25 06:20:32 2026 -0400
+
+    tengo miedo2
+
+[33mcommit 88ca46e1d9215a7c46dd044a8c7480a2668085b9[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Tue Feb 24 18:42:09 2026 -0400
+
+    tengo miedo
+
+[33mcommit 59e660ca2a4f43439f6de6f5ae4d30f0282c9883[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sun Feb 22 23:54:47 2026 -0400
+
+    esta flama
+
+[33mcommit 8c0349ece4d40a7958face05f1118d3b5eaed3d8[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sat Feb 21 23:24:07 2026 -0400
+
+    por si se friega
+
+[33mcommit a8eeca797b5e408e40a2b7743e657c8f967ed33a[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Mon Feb 16 13:54:45 2026 -0400
+
+    correcciones que talves fallan ademas cambie el llm key
+
+[33mcommit eb5deb7c978a0fa46a6244ce9a917bfec2038ccd[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Mon Feb 9 23:06:08 2026 -0400
+
+    arquitectura Basada en Funcionalidades aplicada a front al con mas cosas que no se si las coumple
+
+[33mcommit 48d88aa9e7085508760c6cf80ca6c1359c513846[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sun Feb 8 23:02:58 2026 -0400
+
+    Arquitectura Basada en Funcionalidades aplicada a front al 100
+
+[33mcommit 441eecaa3084b908bb47e7ea7f0ecdab8f6f7a58[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sun Feb 8 19:32:15 2026 -0400
+
+    cambio tiene errores
+
+[33mcommit 4a48b476db0f14e1fb75eaa1fc08367fb247294f[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sun Feb 8 10:27:11 2026 -0400
+
+    modificado con operador
+
+[33mcommit 4c7f809f296512f5f9f7f1f2f060f52a88ef68e5[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Wed Feb 4 23:00:36 2026 -0400
+
+    ajustes
+
+[33mcommit 5ca0cd6b67a66f67fdeebd7f646320e2ce99706d[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Wed Feb 4 18:24:10 2026 -0400
+
+    añadi conf de cuenta estdiante
+
+[33mcommit 3d5dc639a78441aac4d228f77b52ea80e02bc218[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Tue Feb 3 22:17:19 2026 -0400
+
+    mejoras 2
+
+[33mcommit 91d3aed56abe60cc6cd3604dfbb7daf13ee28b8d[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Tue Feb 3 22:15:09 2026 -0400
+
+    mejoras
+
+[33mcommit d263feb6cc80309d5845972918c6af537c2f8f2b[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Tue Feb 3 16:39:46 2026 -0400
+
+    menu que no me convence
+
+[33mcommit c4258b8a33a02b1f580791dfc2fe82b180ec30f9[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Tue Feb 3 15:28:55 2026 -0400
+
+    modulo de reportes
+
+[33mcommit 37d3e2b223dc3a0a10e0fd772516f7ed5ab25aea[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Tue Feb 3 14:17:00 2026 -0400
+
+    modulo de gestion de usuarios
+
+[33mcommit 54312d7eb3641c47e7229509cb57879dc93d9ea5[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Tue Feb 3 13:16:40 2026 -0400
+
+    safe antes d egestion de usuarios e informes
+
+[33mcommit 6b8a0bdd410a0dacebc4af0711a2b3b0384f8ff3[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sun Feb 1 22:53:41 2026 -0400
+
+    ya funciona pero no como esperaba xd
+
+[33mcommit 6ebb4d4cf5fca1bc9228ac81ac3fde8c33ca065d[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sun Feb 1 13:48:08 2026 -0400
+
+    correccion de errores de implentacion de ml
+
+[33mcommit 36076c1d164de07afa2062372826af380f12b99a[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sat Jan 31 14:51:10 2026 -0400
+
+    fase 4 a 7
+
+[33mcommit 7554bcd32fcc5972999d1783564475105665fdf6[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Fri Jan 30 22:11:42 2026 -0400
+
+    fase 1 y 3
+
+[33mcommit 8d680e65653f747286009739262ace0a3e1ff36f[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Thu Jan 29 21:34:06 2026 -0400
+
+    fase 1-4 sin probar
+
+[33mcommit 1812d247d1334deb06eb4ac85484cfd4175420b4[m[33m ([m[1;31morigin/pln2[m[33m)[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Wed Jan 28 17:14:48 2026 -0400
+
+    eliminacion de pln vieja
+
+[33mcommit 1a99ea4e83d129da4750036506b3e714d6247df4[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Tue Jan 27 14:47:58 2026 -0400
+
+    implementacion de gemini exitosa
+
+[33mcommit 25b6c9e28ebe83dd1832751eead03346c14818e4[m
+Author: Icondoric <iconhu.icc@gmail.com>
+Date:   Sun Jan 25 21:53:15 2026 -0400
+
+    Reparación de repositorio y carga inicial
