@@ -1,30 +1,56 @@
+# =============================================
+# Core API Framework
+# =============================================
 fastapi
-uvicorn
+uvicorn[standard]
 python-multipart
-# Run: python -m spacy download es_core_news_sm
-spacy
-pdfplumber
+
+# =============================================
+# Authentication & Security
+# =============================================
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt==4.0.1
+
+# =============================================
+# Configuration & Environment
+# =============================================
 python-dotenv
-supabase
 pydantic-settings
+
+# =============================================
+# Database
+# =============================================
+supabase
+
+# =============================================
+# Data Validation
+# =============================================
 email-validator
-bcrypt==3.2.2
 
-google-generativeai
+# =============================================
+# PDF Processing
+# =============================================
+pdfplumber
+reportlab>=4.0.0
 
-# ML / Feature Engineering (Fase 2)
+# =============================================
+# NLP
+# =============================================
+# Run after install: python -m spacy download es_core_news_sm
+spacy
+
+# =============================================
+# LLM - OpenAI
+# =============================================
+openai
+
+# =============================================
+# ML / Feature Engineering
+# =============================================
 scikit-learn
 numpy
-
-# ML / Dataset Sintetico (Fase 3)
 pandas
 matplotlib
 seaborn
-
-# ML / Modelo Ridge (Fase 4)
 joblib
-
-# Generación de informes PDF
-reportlab>=4.0.0
